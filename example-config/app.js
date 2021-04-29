@@ -12,10 +12,9 @@ const externalAuthServers = {
 };
 
 /*
-  AuthServers can be of three types
+  Auth Servers can be these types:
   1. public-key. With a public key predefined.
   2. jwks. By specifying a JWKS standard config.
-  3. public-key-url. Specify the location of the public key.
 */
 const authServers = [
   /*
@@ -32,25 +31,14 @@ const authServers = [
   },
   /*
     This allows you to use an auth server without a well-known JWKS end point.
+    
     if externalAuthServers.allow is set to true (as above), and if the auth server uses a standard (.well-known) jwks.json path, pod-server can automatically fetch it - and the following config is not needed.
-
-    Recommendation is to disable this (if externalAuthServers.allow = true), and use auth servers with JWKS support.
   */
   {
     type: "jwks",
     issuer: "auth.example.app",
     jwksUri: "https://example.com/not/standard/path/jwks.json",
-  },
-  /*
-    This allows you to use an auth server which publishes the public key at a pre-configured location.
-
-    Recommendation is to disable this, and use auth servers with JWKS support.
-  */
-  {
-    type: "public-key-url",
-    issuer: "auth.example.com",
-    publicKeyUrl: "https://example.com/.well-known/pem",
-  },
+  }
 ];
 
 /*
@@ -71,21 +59,40 @@ const authServers = [
 */
 const selfHostingConfig = {
   mode: "local",
+
+  // Primary host name for this server.
+  host: "pods.example.com",
+
+  // External Auth Server config created earlier.
   externalAuthServers,
+
   // This is where data for each user is kept.
   // Each user gets an sqlite file.
   dataDir: "/path/to/data/dir",
-  users: [
+
+  // Optional. Whether live streaming updates are enabled.
+  // Only websocket is supported as of now.
+  // This enables streaming updates for all pods.
+  streams: ["websocket"],
+
+  // List of pods hosted by this pod-server
+  pods: [
+    // Config for alice.
     {
       claims: {
         iss: "https://example.com/auth",
         sub: "alice",
       },
+
       pod: "alice.pods.example.com",
-      // pods can optionally have multiple domain names.
+      // Optional. Pods can have multiple domain names.
       // Make sure you point webpodsofalice.com to the IP of this pod.
       alias: ["webpodsofalice.com"],
+
+      // Optional. Pods can have read-only replicas.
+      replicas: ["alice.replicas.example.com"],
     },
+    // Config for bob.
     {
       claims: {
         iss: "https://example.com/auth",
@@ -103,16 +110,30 @@ const selfHostingConfig = {
 */
 const serviceProviderConfig = {
   mode: "public",
+
+  // Primary host name for this server.
+  host: "pods.example.com",
+
+  // External Auth Server config created earlier.
   externalAuthServers,
+
   // Path to sqlite file.
   // This is where information about users is kept.
   dbPath: "/some/path/to/db",
+
   // This is where data for each user is kept.
   // Each user gets an sqlite file.
   dataDir: "/path/to/data/dir",
+
+  // Optional. Whether live streaming updates are enabled.
+  // Only websocket is supported as of now.
+  // This enables streaming updates for all pods.
+  streams: ["websocket"],
 };
 
 /* 
   This is where you export a config based on whether
+  this is a self-hosted pod server, or you're a service provider.  
+  Set this accordingly.  
 */
 module.exports = selfHostingConfig;
