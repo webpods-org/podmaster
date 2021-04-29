@@ -1,5 +1,5 @@
 import jwt = require("jsonwebtoken");
-import { IJwtConfig } from "../types";
+import { IJwtConfig } from "../types/config";
 
 let config: IJwtConfig;
 

@@ -16,6 +16,8 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "dependencies": {
+    "@types/better-sqlite3": "^5.4.1",
+    "better-sqlite3": "^7.1.5",
     "jsonwebtoken": "^8.5.1",
     "koa": "^2.13.1",
     "koa-bodyparser": "^4.3.0",

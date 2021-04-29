@@ -9,7 +9,7 @@ import { join } from "path";
 
 import * as db from "./db";
 import * as jwt from "./utils/jwt";
-import { IAppConfig, IJwtConfig } from "./types";
+import { IAppConfig, IJwtConfig } from "./types/config";
 import { login } from "./api/account";
 import { health } from "./api/sys/health";
 

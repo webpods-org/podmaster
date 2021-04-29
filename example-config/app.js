@@ -42,11 +42,6 @@ const authServers = [
 ];
 
 /*
-  Optional issuer allow list.
-  By defining this, you'll 
-*/
-
-/*
   We can define two types of configs. You must use only one of these.
   1. local: If you're self-hosting a pod-server for yourself, friends and family. Pod creation will be restricted to the users defined in this file.
   2. public: If you're running a commercial pod service, which allows people to sign up. Users who sign up will be able to create a pod.
@@ -66,10 +61,6 @@ const selfHostingConfig = {
   // External Auth Server config created earlier.
   externalAuthServers,
 
-  // This is where data for each user is kept.
-  // Each user gets an sqlite file.
-  dataDir: "/path/to/data/dir",
-
   // Optional. Whether live streaming updates are enabled.
   // Only websocket is supported as of now.
   // This enables streaming updates for all pods.
@@ -84,10 +75,15 @@ const selfHostingConfig = {
         sub: "alice",
       },
 
+      // primary hostname for the pod.
       hostname: "alice.pods.example.com",
+
       // Optional. Pods can have multiple domain names.
       // Make sure you point webpodsofalice.com to the IP of this pod.
       alias: ["webpodsofalice.com"],
+
+      // Where alice's data is kept
+      dataDir: "/path/to/data/dir/alice",
 
       // Permissions to apply to all logs on a pod.
       // This grants read access to carol for all logs.
@@ -98,7 +94,7 @@ const selfHostingConfig = {
             iss: "https://example.com/auth",
             sub: "carol",
           },
-          
+
           // All are optional.
           // Defaults to false when omitted.
           read: true, // read log
@@ -113,7 +109,10 @@ const selfHostingConfig = {
         iss: "https://example.com/auth",
         sub: "bob",
       },
-      pod: "bob.pods.example.com",
+      hostname: "alice.pods.example.com",
+
+      // Where bob's data is kept
+      dataDir: "/path/to/data/dir/bob",
     },
   ],
 };
@@ -136,9 +135,16 @@ const serviceProviderConfig = {
   // This is where information about users is kept.
   dbPath: "/some/path/to/db",
 
-  // This is where data for each user is kept.
-  // Each user gets an sqlite file.
-  dataDir: "/path/to/data/dir",
+  // This is the base directory which stores all data
+  // Each user will get a directory under this.
+  // Exact path will depend on the dirNesting option.
+  baseDataDir: "/path/to/data/dir",
+
+  // Number of directory levels to use for storage.
+  // [n1, n2] means first level has n1, second has n2
+  // [100, 100] means 100 dirs in dataDir, and 100 in each of them.
+  // Number goes n1, n2 etc.
+  dirNesting: [100, 100],
 
   // Optional. Whether live streaming updates are enabled.
   // Only websocket is supported as of now.

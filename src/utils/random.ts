@@ -1,10 +1,18 @@
-export function generate(length: number = 24) {
-  var result = "";
-  var characters =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  var charactersLength = characters.length;
-  for (var i = 0; i < length; i++) {
-    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+const characters = "abcdefghijklmnopqrstuvwxyz";
+const numbers = "0123456789";
+const charsAndNums = characters + numbers;
+const charactersLength = characters.length;
+const charsAndNumsLength = charsAndNums.length;
+
+export default function (length = 32): string {
+  let result = "";
+
+  for (let i = 0; i < length; i++) {
+    result +=
+      i === 0
+        ? characters.charAt(Math.floor(Math.random() * charactersLength))
+        : charsAndNums.charAt(Math.floor(Math.random() * charsAndNumsLength));
   }
+
   return result;
 }
