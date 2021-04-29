@@ -38,7 +38,7 @@ const authServers = [
     type: "jwks",
     issuer: "auth.example.app",
     jwksUri: "https://example.com/not/standard/path/jwks.json",
-  }
+  },
 ];
 
 /*
@@ -61,7 +61,7 @@ const selfHostingConfig = {
   mode: "local",
 
   // Primary host name for this server.
-  host: "pods.example.com",
+  hostname: "pods.example.com",
 
   // External Auth Server config created earlier.
   externalAuthServers,
@@ -84,13 +84,28 @@ const selfHostingConfig = {
         sub: "alice",
       },
 
-      pod: "alice.pods.example.com",
+      hostname: "alice.pods.example.com",
       // Optional. Pods can have multiple domain names.
       // Make sure you point webpodsofalice.com to the IP of this pod.
       alias: ["webpodsofalice.com"],
 
-      // Optional. Pods can have read-only replicas.
-      replicas: ["alice.replicas.example.com"],
+      // Permissions to apply to all logs on a pod.
+      // This grants read access to carol for all logs.
+      permissions: [
+        {
+          // identifier for JWT
+          claims: {
+            iss: "https://example.com/auth",
+            sub: "carol",
+          },
+          
+          // All are optional.
+          // Defaults to false when omitted.
+          read: true, // read log
+          write: false, // write to log
+          admin: false, // r+w & change permissions
+        },
+      ],
     },
     // Config for bob.
     {
@@ -106,13 +121,13 @@ const selfHostingConfig = {
 /*
   For service providers: If you're running a commercial pod service, which allows people to sign up. Users who sign up will be able to create a pod.
 
-  We do not define pod hostnames here. That'll come from the 
+  We do not define pod-specific configuration here. That'll be in the database.
 */
 const serviceProviderConfig = {
   mode: "public",
 
   // Primary host name for this server.
-  host: "pods.example.com",
+  hostname: "pods.example.com",
 
   // External Auth Server config created earlier.
   externalAuthServers,
