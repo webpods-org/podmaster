@@ -115,9 +115,14 @@ const selfHostingConfig = {
             All are optional.
             Defaults to false when omitted.
           */
-          read: true, // read log
-          write: false, // write to log
-          admin: false, // r+w & change permissions
+          // read log
+          read: true, 
+          // write to log
+          write: false,
+          // read metadata, eg: permissions
+          metadata: false, 
+          // everything
+          admin: false, 
         },
       ],
     },
