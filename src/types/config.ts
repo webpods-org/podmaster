@@ -36,6 +36,17 @@ export type PodConfig = {
   dataDir: string;
 };
 
+export type JWK = {
+  alg: string;
+  kty: string;
+  use: string;
+  n: string;
+  e: string;
+  kid: string;
+  x5t: string;
+  x5c: string[];
+};
+
 export type LocalConfig = {
   mode: "local";
   hostname: string;
@@ -43,6 +54,9 @@ export type LocalConfig = {
   dataDir: string;
   streams: StreamType[];
   pods: PodConfig[];
+  jwks: {
+    keys: JWK[];
+  };
 };
 
 export type ServiceProviderConfig = {
