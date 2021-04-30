@@ -3,16 +3,17 @@ export type ExternalAuthServers = {
   allowList?: string[];
 };
 
-export type JwksEndpoint =
-  | {
-      type: "jwks";
-      issuer: string;
-      url: string;
-    };
+export type JwksEndpoint = {
+  type: "jwks";
+  issuer: string;
+  url: string;
+};
 
 export type StreamType = "websocket";
 
 export type JwtClaims = {
+  iss: string;
+  sub: string;
   [key: string]: string;
 };
 
@@ -56,17 +57,26 @@ export type SelfHostedConfig = {
 };
 
 export type SqliteServiceProviderDbConfig = {
-  type: "sqlite",
+  type: "sqlite";
   dbPath: string;
   baseDataDir: string;
-  dirNesting: number[];  
-}
+  dirNesting: number[];
+};
 
 export type ServiceProviderDbConfig = SqliteServiceProviderDbConfig;
+
+export type Tier = {
+  type: "free" | "pro";
+  maxSpaceMB: number;
+  claims: {
+    [key: string]: string;
+  };
+};
 
 export type ServiceProviderConfig = {
   mode: "public";
   hostname: string;
+  tiers: Tier[];
   externalAuthServers: ExternalAuthServers;
   jwksEndpoints?: JwksEndpoint[];
   db: ServiceProviderDbConfig;

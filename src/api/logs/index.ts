@@ -1,7 +1,8 @@
-export { default as createLog } from "./createLog";
-export { default as removeLog } from "./removeLog";
-export { default as addEntries } from "./addEntries";
-export { default as updatePermissions } from "./updatePermissions";
-export { default as removePermissions } from "./removePermissions";
-export { default as getPermissions } from "./getPermissions";
+export { default as createLogAPI } from "./createLog";
+export { default as removeLogAPI } from "./removeLog";
+export { default as addEntriesAPI } from "./addEntries";
+export { default as getEntriesAPI } from "./getEntries";
+export { default as updatePermissionsAPI } from "./updatePermissions";
+export { default as removePermissionsAPI } from "./removePermissions";
+export { default as getPermissionsAPI } from "./getPermissions";
 

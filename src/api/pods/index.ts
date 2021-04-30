@@ -1,5 +1,5 @@
-export { default as createPod } from "./createPod";
-export { default as removePod } from "./removePod";
-export { default as updatePermissions } from "./updatePermissions";
-export { default as removePermissions } from "./removePermissions";
-export { default as getPermissions } from "./getPermissions";
+export { default as createPodAPI } from "./createPod";
+export { default as removePodAPI } from "./removePod";
+export { default as updatePermissionsAPI } from "./updatePermissions";
+export { default as removePermissionsAPI } from "./removePermissions";
+export { default as getPermissionsAPI } from "./getPermissions";

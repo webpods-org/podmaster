@@ -6,7 +6,6 @@ import Router = require("koa-router");
 import bodyParser = require("koa-bodyparser");
 import yargs = require("yargs");
 import { join } from "path";
-import { health } from "./api/sys/health";
 import * as podsApi from "./api/pods";
 import * as logsApi from "./api/logs";
 
@@ -30,18 +29,18 @@ export async function startApp(port: number, configDir: string) {
   // Set up routes
   const router = new Router();
 
-  router.post("/pods", podsApi.createPod);
-  router.delete("/pods", podsApi.removePod);
-  router.get("/pods/:name/permissions", podsApi.getPermissions);
-  router.post("/pods/:name/permissions/updates", podsApi.updatePermissions);
-  router.delete("/pods/:name/permissions", podsApi.removePermissions);
+  router.post("/pods", podsApi.createPodAPI);
+  router.delete("/pods", podsApi.removePodAPI);
+  router.get("/pods/:name/permissions", podsApi.getPermissionsAPI);
+  router.post("/pods/:name/permissions/updates", podsApi.updatePermissionsAPI);
+  router.delete("/pods/:name/permissions", podsApi.removePermissionsAPI);
 
-  router.post("/logs", logsApi.createLog);
-  router.delete("/logs", logsApi.removeLog);
-  router.post("/logs/:id/entries", logsApi.addEntries);
-  router.get("/logs/:id/permissions", podsApi.getPermissions);
-  router.post("/logs/:id/permissions/updates", podsApi.updatePermissions);
-  router.delete("/logs/:id/permissions", podsApi.removePermissions);
+  router.post("/logs", logsApi.createLogAPI);
+  router.delete("/logs", logsApi.removeLogAPI);
+  router.post("/logs/:id/entries", logsApi.addEntriesAPI);
+  router.get("/logs/:id/permissions", podsApi.getPermissionsAPI);
+  router.post("/logs/:id/permissions/updates", podsApi.updatePermissionsAPI);
+  router.delete("/logs/:id/permissions", podsApi.removePermissionsAPI);
   
   if (appConfig.streams && appConfig.streams.includes("websocket")) {
     // TODO: Setup web sockets...
