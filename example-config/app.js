@@ -59,7 +59,7 @@ const selfHostingConfig = {
   //   JWKS to be at {iss}/.well-known/jwks.json
   // - So it's important that when alice creates a JWT for herself,
   //   the iss claim should match the 'hostname' specified earlier.
-jwks: {
+  jwks: {
     keys: [
       {
         kty: "RSA",
