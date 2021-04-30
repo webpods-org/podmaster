@@ -12,23 +12,10 @@ const externalAuthServers = {
 };
 
 /*
-  Auth Servers can be these types:
-  1. public-key. With a public key predefined.
-  2. jwks. By specifying a JWKS standard config.
+  Optional. Only 'jwks' override is supported now.:
+    1. jwks. By specifying a JWKS standard config.
 */
 const authServers = [
-  /*
-    This allows you to use a JWT created with a locally generated key-pair.
-    Provide the name of the issuer (the iss field in the JWT you are generating) and the publicKey here.
-
-    To generate a JWT locally, use a took like jwtgen
-    - https://github.com/vandium-io/jwtgen
-  */
-  {
-    type: "public-key",
-    issuer: "makeupsomename",
-    publicKey: "ASSDF3skdjfh3sldkfhjsdf....",
-  },
   /*
     This allows you to use an auth server without a well-known JWKS end point.
     
@@ -36,8 +23,8 @@ const authServers = [
   */
   {
     type: "jwks",
-    issuer: "auth.example.app",
-    jwksUri: "https://example.com/not/standard/path/jwks.json",
+    issuer: "auth.google.app",
+    url: "https://www.googleapis.com/oauth2/v3/certs",
   },
 ];
 
@@ -66,12 +53,32 @@ const selfHostingConfig = {
   // This enables streaming updates for all pods.
   streams: ["websocket"],
 
+  // JWKS configuration for self-hosted pods:
+  // - This is exposed at https://{hostname}/.well-known/jwks.json
+  // - When alice connects to external pods, they will expect the
+  //   JWKS to be at {iss}/.well-known/jwks.json
+  // - So it's important that when alice creates a JWT for herself,
+  //   the iss claim should match the 'hostname' specified earlier.
+jwks: {
+    keys: [
+      {
+        kty: "RSA",
+        n: "xYm1YQ....dC9pyw",
+        kid: "de9556ad4680312c117afaef2920f5f99a4c79fd",
+        use: "sig",
+        alg: "RS256",
+        e: "AQAB",
+      },
+    ],
+  },
+
   // List of pods hosted by this pod-server
   pods: [
     // Config for alice.
     {
+      // Claims which identify alice.
       claims: {
-        iss: "https://example.com/auth",
+        iss: "https://pods.example.com",
         sub: "alice",
       },
 
@@ -106,7 +113,7 @@ const selfHostingConfig = {
     // Config for bob.
     {
       claims: {
-        iss: "https://example.com/auth",
+        iss: "https://pods.example.com",
         sub: "bob",
       },
       hostname: "alice.pods.example.com",
