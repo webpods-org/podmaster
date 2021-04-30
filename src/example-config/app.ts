@@ -1,3 +1,5 @@
+import { SelfHostedConfig, ServiceProviderConfig } from "../types/config";
+
 /*
   This is required if you want to allow external parties to READ your pods.
   Usually needed, since your friends or peers could be using extenral authServers. If all the users of this pod service (readers and writers) are local (and you need this restriction), then set this to false.
@@ -20,7 +22,7 @@ const externalAuthServers = {
 */
 const jwksEndpoints = [
   {
-    type: "jwks",
+    type: "jwks" as const,
     issuer: "https://abc.example.com",
     url: "https://example.com/oauth2/v3/certs",
   },
@@ -37,8 +39,8 @@ const jwksEndpoints = [
 /*
   For self hosting: If you're running this server for yourself, friends and family. Pod creation will be restricted to the users defined in this file.
 */
-const selfHostingConfig = {
-  mode: "local",
+const selfHostingConfig: SelfHostedConfig = {
+  mode: "self-hosted",
 
   // Primary host name for this server.
   hostname: "pods.example.com",
@@ -90,14 +92,14 @@ const selfHostingConfig = {
       // primary hostname for the pod.
       hostname: "alice.pods.example.com",
 
+      // Where alice's data is kept
+      dataDir: "/path/to/data/dir/alice",
+
       /*
         Optional. Pods can have multiple domain names.
         Make sure you point webpodsofalice.com to the IP of this pod.
       */
       alias: ["webpodsofalice.com"],
-
-      // Where alice's data is kept
-      dataDir: "/path/to/data/dir/alice",
 
       /*
         Permissions to apply to all logs on a pod.
@@ -116,13 +118,13 @@ const selfHostingConfig = {
             Defaults to false when omitted.
           */
           // read log
-          read: true, 
+          read: true,
           // write to log
           write: false,
-          // read metadata, eg: permissions
-          metadata: false, 
+          // read metadata, such as permissions
+          metadata: false,
           // everything
-          admin: false, 
+          admin: false,
         },
       ],
     },
@@ -145,7 +147,7 @@ const selfHostingConfig = {
 
   We do not define pod-specific configuration here. That'll be in the database.
 */
-const serviceProviderConfig = {
+const serviceProviderConfig: ServiceProviderConfig = {
   mode: "public",
 
   // Primary host name for this server.
@@ -157,26 +159,29 @@ const serviceProviderConfig = {
   // Optional. JWKS endpoint overrides
   jwksEndpoints,
 
-  /*
+  db: {
+    type: "sqlite",
+    /*
     Path to sqlite file.
     This is where information about users is kept.
   */
-  dbPath: "/some/path/to/db",
+    dbPath: "/some/path/to/db",
 
-  /*
-    This is the base directory which stores all data
-    Each user will get a directory under this.
-    Exact path will depend on the dirNesting option.
-  */
-  baseDataDir: "/path/to/data/dir",
+    /*
+      This is the base directory which stores all data
+      Each user will get a directory under this.
+      Exact path will depend on the dirNesting option.
+    */
+    baseDataDir: "/path/to/data/dir",
 
-  /*
-    Number of directory levels to use for storage.
-    [n1, n2] means first level has n1, second has n2
-    [100, 100] means 100 dirs in dataDir, and 100 in each of them.
-    Number goes n1, n2 etc.
-  */
-  dirNesting: [100, 100],
+    /*
+      Number of directory levels to use for storage.
+      [n1, n2] means first level has n1, second has n2
+      [100, 100] means 100 dirs in dataDir, and 100 in each of them.
+      Number goes n1, n2 etc.
+    */
+    dirNesting: [100, 100],
+  },
 
   /*
     Optional. Whether live streaming updates are enabled.

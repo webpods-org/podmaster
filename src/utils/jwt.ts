@@ -1,9 +1,9 @@
 import jwt = require("jsonwebtoken");
-import { IJwtConfig } from "../types/config";
+import { AppConfig, JwtClaims } from "../types/config";
 
 let config: IJwtConfig;
 
-export function init(c: IJwtConfig) {
+export function init(c: AppConfig) {
   if (!config) {
     config = c;
   } else {
@@ -25,23 +25,19 @@ export type IVerifiedInvalidJwt = {
 
 export type IVerifiedValidJwt = {
   valid: true;
-  value: IJwt;
+  claims: JwtClaims;
 };
 
 export type IVerifiedJwt = IVerifiedInvalidJwt | IVerifiedValidJwt;
 
 export function verify(token: string): IVerifiedJwt {
   try {
+    const result = jwt.verify(token, config.publicKey);
     return {
       valid: true,
-      value: jwt.verify(token, config.publicKey) as any,
+      claims: (result as any).claims,
     };
   } catch {
     return { valid: false };
   }
-}
-
-export function decode(token: string): IJwt | undefined {
-  const result = jwt.decode(token) as any;
-  return result || undefined;
 }

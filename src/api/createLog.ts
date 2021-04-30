@@ -1,7 +1,6 @@
 import { IRouterContext } from "koa-router";
 import * as configModule from "../config";
 import { authenticate } from "../domain/account";
-import { setCookie } from "../utils/cookie";
 
 export async function createLog(ctx: IRouterContext) {
   

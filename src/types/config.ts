@@ -3,36 +3,32 @@ export type ExternalAuthServers = {
   allowList?: string[];
 };
 
-export type AuthServer =
-  | {
-      type: "public-key";
-      issuer: string;
-      publicKey: string;
-    }
+export type JwksEndpoint =
   | {
       type: "jwks";
       issuer: string;
-      jwksUri: string;
+      url: string;
     };
 
 export type StreamType = "websocket";
 
-export type Claims = {
+export type JwtClaims = {
   [key: string]: string;
 };
 
 export type PermissionGrant = {
-  claims: Claims;
+  claims: JwtClaims;
   read?: boolean;
   write?: boolean;
+  metadata?: boolean;
   admin?: boolean;
 };
 
 export type PodConfig = {
-  claims: Claims;
+  claims: JwtClaims;
   hostname: string;
   alias?: string[];
-  permissions: PermissionGrant[];
+  permissions?: PermissionGrant[];
   dataDir: string;
 };
 
@@ -40,18 +36,18 @@ export type JWK = {
   alg: string;
   kty: string;
   use: string;
-  n: string;
-  e: string;
+  n?: string;
+  e?: string;
   kid: string;
-  x5t: string;
-  x5c: string[];
+  x5t?: string;
+  x5c?: string[];
 };
 
-export type LocalConfig = {
-  mode: "local";
+export type SelfHostedConfig = {
+  mode: "self-hosted";
   hostname: string;
   externalAuthServers: ExternalAuthServers;
-  dataDir: string;
+  jwksEndpoints?: JwksEndpoint[];
   streams: StreamType[];
   pods: PodConfig[];
   jwks: {
@@ -59,13 +55,22 @@ export type LocalConfig = {
   };
 };
 
+export type SqliteServiceProviderDbConfig = {
+  type: "sqlite",
+  dbPath: string;
+  baseDataDir: string;
+  dirNesting: number[];  
+}
+
+export type ServiceProviderDbConfig = SqliteServiceProviderDbConfig;
+
 export type ServiceProviderConfig = {
   mode: "public";
   hostname: string;
   externalAuthServers: ExternalAuthServers;
-  dbPath: string;
-  baseDataDir: string;
+  jwksEndpoints?: JwksEndpoint[];
+  db: ServiceProviderDbConfig;
   streams: StreamType[];
 };
 
-export type AppConfig = LocalConfig | ServiceProviderConfig;
+export type AppConfig = SelfHostedConfig | ServiceProviderConfig;

@@ -1,10 +1,11 @@
 import { IRouterContext } from "koa-router";
+import { JwtClaims } from "../../types/config";
 import { getFieldValue } from "../../utils/http";
 import { IVerifiedValidJwt, verify } from "../../utils/jwt";
 
-export async function ensureJwt(
+export async function validateJwt(
   ctx: IRouterContext,
-  then: (verifiedJwt: IVerifiedValidJwt, args: { jwt: string }) => Promise<any>
+  then: (claims: JwtClaims) => void | Promise<void>
 ) {
   const jwt = getFieldValue(ctx.headers["border-patrol-jwt"]);
 
@@ -18,9 +19,7 @@ export async function ensureJwt(
         return !result.valid
           ? /* Invalid JWT */
             ((ctx.status = 400), (ctx.body = "Invalid JWT token."))
-          : await then(result, {
-              jwt,
-            });
+          : await then(result);
       })();
 }
 
@@ -32,7 +31,7 @@ export async function ensureUserId(
     args: { jwt: string }
   ) => Promise<any>
 ) {
-  return ensureJwt(ctx, async (verfiedJwt, args) => {
+  return validateJwt(ctx, async (verfiedJwt, args) => {
     const userId = verfiedJwt.value.userId;
     return !userId
       ? ((ctx.status = 400),

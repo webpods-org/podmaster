@@ -6,16 +6,12 @@ import Router = require("koa-router");
 import bodyParser = require("koa-bodyparser");
 import yargs = require("yargs");
 import { join } from "path";
-
-import * as db from "./db";
-import * as jwt from "./utils/jwt";
-import { IAppConfig, IJwtConfig } from "./types/config";
-import { login } from "./api/account";
 import { health } from "./api/sys/health";
+import * as podsApi from "./api/pods";
+import * as logsApi from "./api/logs";
 
 import * as config from "./config";
-import * as jwtConfig from "./config/jwt";
-import * as pgConfig from "./config/pg";
+import { AppConfig } from "./types/config";
 
 const packageJson = require("../package.json");
 
@@ -26,30 +22,36 @@ const argv = yargs.options({
 }).argv;
 
 export async function startApp(port: number, configDir: string) {
-  const appSettings: IAppConfig = require(join(configDir, "app.js"));
-  const dbSettings = require(join(configDir, "pg.js"));
-  const jwtSettings: IJwtConfig = require(join(configDir, "jwt.js"));
+  const appConfig: AppConfig = require(join(configDir, "app.js"));
 
   // init configuration
-  config.init(appSettings);
-  jwtConfig.init(jwtSettings);
-  pgConfig.init(dbSettings);
-
-  // init the db library
-  db.init();
+  config.init(appConfig);
 
   // Set up routes
   const router = new Router();
 
-  router.post("/login", login);
-  router.get("/sys/health", health);
+  router.post("/pods", podsApi.createPod);
+  router.delete("/pods", podsApi.removePod);
+  router.get("/pods/:name/permissions", podsApi.getPermissions);
+  router.post("/pods/:name/permissions/updates", podsApi.updatePermissions);
+  router.delete("/pods/:name/permissions", podsApi.removePermissions);
+
+  router.post("/logs", logsApi.createLog);
+  router.delete("/logs", logsApi.removeLog);
+  router.post("/logs/:id/entries", logsApi.addEntries);
+  router.get("/logs/:id/permissions", podsApi.getPermissions);
+  router.post("/logs/:id/permissions/updates", podsApi.updatePermissions);
+  router.delete("/logs/:id/permissions", podsApi.removePermissions);
+  
+  if (appConfig.streams && appConfig.streams.includes("websocket")) {
+    // TODO: Setup web sockets...
+  }
 
   // Start app
   var app = new Koa();
   app.use(bodyParser());
   app.use(router.routes());
   app.use(router.allowedMethods());
-
   app.listen(port);
 
   return app;

@@ -7,7 +7,7 @@ export async function createLog(hostname: string, logName: string) {
   const dataDir = await getPodDirectory(hostname);
 
   // Check if db exists.
-  const dbPath = path.join(dataDir, "pod.sqlite");
+  const dbPath = path.join(dataDir, "pod.db");
   const db = new Database(dbPath);
 }
 
