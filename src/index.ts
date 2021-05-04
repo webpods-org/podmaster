@@ -6,8 +6,9 @@ import Router = require("koa-router");
 import bodyParser = require("koa-bodyparser");
 import yargs = require("yargs");
 import { join } from "path";
-import * as podsApi from "./api/pods";
-import * as logsApi from "./api/logs";
+// import * as podsApi from "./api/pods";
+// import * as logsApi from "./api/logs";
+import * as userApi from "./api/user";
 
 import * as config from "./config";
 import { AppConfig } from "./types/config";
@@ -29,19 +30,21 @@ export async function startApp(port: number, configDir: string) {
   // Set up routes
   const router = new Router();
 
-  router.post("/pods", podsApi.createPodAPI);
-  router.delete("/pods", podsApi.removePodAPI);
-  router.get("/pods/:name/permissions", podsApi.getPermissionsAPI);
-  router.post("/pods/:name/permissions/updates", podsApi.updatePermissionsAPI);
-  router.delete("/pods/:name/permissions", podsApi.removePermissionsAPI);
+  router.get("/profile", userApi.getProfile);
 
-  router.post("/logs", logsApi.createLogAPI);
-  router.delete("/logs", logsApi.removeLogAPI);
-  router.post("/logs/:id/entries", logsApi.addEntriesAPI);
-  router.get("/logs/:id/permissions", podsApi.getPermissionsAPI);
-  router.post("/logs/:id/permissions/updates", podsApi.updatePermissionsAPI);
-  router.delete("/logs/:id/permissions", podsApi.removePermissionsAPI);
-  
+  // router.post("/pods", podsApi.createPodAPI);
+  // router.delete("/pods", podsApi.removePodAPI);
+  // router.get("/pods/:name/permissions", podsApi.getPermissionsAPI);
+  // router.post("/pods/:name/permissions/updates", podsApi.updatePermissionsAPI);
+  // router.delete("/pods/:name/permissions", podsApi.removePermissionsAPI);
+
+  // router.post("/logs", logsApi.createLogAPI);
+  // router.delete("/logs", logsApi.removeLogAPI);
+  // router.post("/logs/:id/entries", logsApi.addEntriesAPI);
+  // router.get("/logs/:id/permissions", podsApi.getPermissionsAPI);
+  // router.post("/logs/:id/permissions/updates", podsApi.updatePermissionsAPI);
+  // router.delete("/logs/:id/permissions", podsApi.removePermissionsAPI);
+
   if (appConfig.streams && appConfig.streams.includes("websocket")) {
     // TODO: Setup web sockets...
   }

@@ -8,7 +8,7 @@ export default async function createPodAPI(ctx: IRouterContext) {
   const hostname = ctx.URL.hostname;  
   if (hostname === appConfig.hostname) {
     validateJwt(ctx, async (claims) => {
-      const result = await createPod(hostname, claims);
+      const result = await createPod(claims);
     });
   } else {
     ctx.status = 404;

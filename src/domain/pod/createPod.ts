@@ -2,8 +2,6 @@ import { JwtClaims } from "../../types/config";
 import * as config from "../../config";
 import { ACCESS_DENIED, INVALID_CLAIM } from "../errors/codes";
 import matchObject from "../../utils/matchObject";
-import * as fs from "fs";
-import * as path from "path";
 import random from "../../utils/random";
 import { getPodInfo } from "./getPodInfo";
 import * as db from "../../db";
@@ -13,7 +11,8 @@ export default async function createPod(userClaims: JwtClaims) {
   const appConfig = config.get();
 
   // Check if the user already has a pod.
-  const podInfo = await getPodInfo(userClaims);
+  const podInfo = await getPodInfo("");
+
   if (podInfo) {
     return podInfo;
   } else {
@@ -72,9 +71,10 @@ function generatePodName() {
 }
 
 export function getNesting(hostname: string) {
+  const appConfig = config.get();
   const baseDir =
     appConfig.storage.dirNesting.length === 0
-      ? appConfig.storage.baseDataDir
+      ? appConfig.storage.dataDir
       : (function loop() {
           const totalDirs = appConfig.storage.dirNesting.reduce(
             (acc, n) => acc * n,
