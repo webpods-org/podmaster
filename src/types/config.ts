@@ -14,7 +14,11 @@ export type StreamType = "websocket";
 export type JwtClaims = {
   iss: string;
   sub: string;
-  [key: string]: string;
+  webpods?: {
+    hostname: string;
+    pod: string;
+  };
+  [key: string]: unknown;
 };
 
 export type PermissionGrant = {
@@ -44,43 +48,30 @@ export type JWK = {
   x5c?: string[];
 };
 
-export type SelfHostedConfig = {
-  mode: "self-hosted";
-  hostname: string;
-  externalAuthServers: ExternalAuthServers;
-  jwksEndpoints?: JwksEndpoint[];
-  streams: StreamType[];
-  pods: PodConfig[];
-  jwks: {
-    keys: JWK[];
-  };
-};
-
-export type SqliteServiceProviderDbConfig = {
+export type SqliteStorageConfig = {
   type: "sqlite";
-  dbPath: string;
-  baseDataDir: string;
+  dataDir: string;
   dirNesting: number[];
 };
 
-export type ServiceProviderDbConfig = SqliteServiceProviderDbConfig;
+export type StorageConfig = SqliteStorageConfig;
 
 export type Tier = {
   type: "free" | "pro";
   maxSpaceMB: number;
   claims: {
-    [key: string]: string;
+    [key: string]: unknown;
   };
 };
 
-export type ServiceProviderConfig = {
-  mode: "public";
+export type AppConfig = {
   hostname: string;
-  tiers: Tier[];
   externalAuthServers: ExternalAuthServers;
   jwksEndpoints?: JwksEndpoint[];
-  db: ServiceProviderDbConfig;
   streams: StreamType[];
+  jwks: {
+    keys: JWK[];
+  };
+  tiers: Tier[];
+  storage: StorageConfig;
 };
-
-export type AppConfig = SelfHostedConfig | ServiceProviderConfig;

@@ -1,23 +1,14 @@
-import * as pg from "pg";
-import * as psychopiggy from "psychopiggy";
-import * as pgConfig from "../config/pg";
+import Sqlite3 = require("better-sqlite3");
+import * as config from "../config";
+import * as path from "path";
+
+let db: Sqlite3.Database;
 
 export async function init() {
-  let config: psychopiggy.IDbConfig = pgConfig.get();
-
-  if (config) {
-    psychopiggy.createPool(config);
-  } else {
-    throw "Cannot find database configuration.";
-  }
+  const appConfig = config.get();
+  db = new Sqlite3(path.join(appConfig.storage.dataDir, "webpodssysdb.sqlite"));
 }
 
-export function getPool() {
-  return psychopiggy.getPool(pgConfig.get());
-}
-
-export async function withTransaction<T>(
-  fn: (client: pg.PoolClient) => Promise<T>
-) {
-  return await psychopiggy.withTransaction(fn, pgConfig.get());
+export function get() : Sqlite3.Database {
+  return db;
 }

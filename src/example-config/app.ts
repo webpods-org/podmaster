@@ -1,4 +1,4 @@
-import { SelfHostedConfig, ServiceProviderConfig } from "../types/config";
+import { AppConfig } from "../types/config";
 
 /*
   This is required if you want to allow external parties to READ your pods.
@@ -28,20 +28,7 @@ const jwksEndpoints = [
   },
 ];
 
-/*
-  We can define two types of configs. You must use only one of these.
-  1. local: If you're self-hosting a pod-server for yourself, friends and family. Pod creation will be restricted to the users defined in this file.
-  2. public: If you're running a commercial pod service, which allows people to sign up. Users who sign up will be able to create a pod.
-
-  Export the relevant config as module.exports at the end of the file.
-*/
-
-/*
-  For self hosting: If you're running this server for yourself, friends and family. Pod creation will be restricted to the users defined in this file.
-*/
-const selfHostingConfig: SelfHostedConfig = {
-  mode: "self-hosted",
-
+const config: AppConfig = {
   // Primary host name for this server.
   hostname: "pods.example.com",
 
@@ -52,19 +39,11 @@ const selfHostingConfig: SelfHostedConfig = {
   jwksEndpoints,
 
   /*
-    Optional. Whether live streaming updates are enabled.
-    Only websocket is supported as of now.
-    This enables streaming updates for all pods.
-  */
-  streams: ["websocket"],
-
-  /*
-    JWKS configuration for self-hosted pods:
-    - This is exposed at https://{hostname}/.well-known/jwks.json
-    - When alice connects to external pods, they will expect the
+    Optional JWKS configuration:
+    - This data is exposed at https://{hostname}/.well-known/jwks.json
+    - It is useful if you're using self-generated keys.
+    - eg: When alice connects to external pods, they will expect the
       JWKS to be at {iss}/.well-known/jwks.json
-    - So it's important that when alice creates a JWT for herself,
-      the iss claim should match the 'hostname' specified earlier.
   */
   jwks: {
     keys: [
@@ -78,86 +57,6 @@ const selfHostingConfig: SelfHostedConfig = {
       },
     ],
   },
-
-  // List of pods hosted by this pod-server
-  pods: [
-    // Config for alice.
-    {
-      // Claims which identify alice.
-      claims: {
-        iss: "https://pods.example.com",
-        sub: "alice",
-      },
-
-      // primary hostname for the pod.
-      hostname: "alice.pods.example.com",
-
-      // Where alice's data is kept
-      dataDir: "/path/to/data/dir/alice",
-
-      /*
-        Optional. Pods can have multiple domain names.
-        Make sure you point webpodsofalice.com to the IP of this pod.
-      */
-      alias: ["webpodsofalice.com"],
-
-      /*
-        Permissions to apply to all logs on a pod.
-        This grants read access to carol for all logs.
-      */
-      permissions: [
-        {
-          // identifier for JWT
-          claims: {
-            iss: "https://example.com/auth",
-            sub: "carol",
-          },
-
-          /*
-            All are optional.
-            Defaults to false when omitted.
-          */
-          // read log
-          read: true,
-          // write to log
-          write: false,
-          // read metadata, such as permissions
-          metadata: false,
-          // everything
-          admin: false,
-        },
-      ],
-    },
-    // Config for bob.
-    {
-      claims: {
-        iss: "https://pods.example.com",
-        sub: "bob",
-      },
-      hostname: "alice.pods.example.com",
-
-      // Where bob's data is kept
-      dataDir: "/path/to/data/dir/bob",
-    },
-  ],
-};
-
-/*
-  For service providers: If you're running a commercial pod service, which allows people to sign up. Users who sign up will be able to create a pod.
-
-  We do not define pod-specific configuration here. That'll be in the database.
-*/
-const serviceProviderConfig: ServiceProviderConfig = {
-  mode: "public",
-
-  // Primary host name for this server.
-  hostname: "pods.example.com",
-
-  // External Auth Server config created earlier.
-  externalAuthServers,
-
-  // Optional. JWKS endpoint overrides
-  jwksEndpoints,
 
   /*
     Which JWTs can create a pod on this pod-server?
@@ -186,20 +85,14 @@ const serviceProviderConfig: ServiceProviderConfig = {
   ],
 
   // Only sqlite is supported now.
-  db: {
+  storage: {
     type: "sqlite",
-    /*
-      Path to sqlite file.
-      This is where information about users is kept.
-    */
-    dbPath: "/some/path/to/db",
-
     /*
       This is the base directory which stores all data
       Each user will get a directory under this.
       Exact path will depend on the dirNesting option.
     */
-    baseDataDir: "/path/to/data/dir",
+    dataDir: "/path/to/data/dir",
 
     /*
       Number of directory levels to use for storage.
@@ -223,4 +116,4 @@ const serviceProviderConfig: ServiceProviderConfig = {
   this is a self-hosted pod server, or you're a service provider.  
   Set this accordingly.  
 */
-module.exports = selfHostingConfig;
+module.exports = config;
