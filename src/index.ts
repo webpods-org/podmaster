@@ -6,6 +6,10 @@ import Router = require("koa-router");
 import bodyParser = require("koa-bodyparser");
 import yargs = require("yargs");
 import { join } from "path";
+import jwksMiddleware from "./lib/jwks/middleware";
+import { init as jwksMiddlewareInit } from "./lib/jwks/middleware";
+import * as db from "./db";
+
 // import * as podsApi from "./api/pods";
 // import * as logsApi from "./api/logs";
 import * as userApi from "./api/user";
@@ -24,8 +28,7 @@ const argv = yargs.options({
 export async function startApp(port: number, configDir: string) {
   const appConfig: AppConfig = require(join(configDir, "app.js"));
 
-  // init configuration
-  config.init(appConfig);
+  await init(appConfig);
 
   // Set up routes
   const router = new Router();
@@ -51,12 +54,21 @@ export async function startApp(port: number, configDir: string) {
 
   // Start app
   var app = new Koa();
+  app.use(jwksMiddlewareInit);
   app.use(bodyParser());
   app.use(router.routes());
   app.use(router.allowedMethods());
   app.listen(port);
 
   return app;
+}
+
+async function init(appConfig: AppConfig) {
+  // init configuration
+  // Init everything.
+  await config.init(appConfig);
+  await db.init();
+  await jwksMiddlewareInit();
 }
 
 if (require.main === module) {

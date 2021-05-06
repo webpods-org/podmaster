@@ -1,6 +1,7 @@
 export type ExternalAuthServers = {
   allow: boolean;
   allowList?: string[];
+  denyList?: string[];
 };
 
 export type JwksEndpoint = {
@@ -64,14 +65,23 @@ export type Tier = {
   };
 };
 
+export type LocallyDefinedJwtKeys = {
+  kid: string;
+  issuer: string;
+  alg: string;
+  publicKey: string
+}
+
 export type AppConfig = {
   hostname: string;
   externalAuthServers: ExternalAuthServers;
   jwksEndpoints?: JwksEndpoint[];
-  streams: StreamType[];
   jwks: {
     keys: JWK[];
   };
+  jwksCacheSize?: number;
+  jwtKeys?: LocallyDefinedJwtKeys[],
+  streams: StreamType[];
   tiers: Tier[];
   storage: StorageConfig;
 };

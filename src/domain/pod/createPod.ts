@@ -1,6 +1,6 @@
 import { JwtClaims } from "../../types/config";
 import * as config from "../../config";
-import { ACCESS_DENIED, INVALID_CLAIM } from "../errors/codes";
+import { ACCESS_DENIED, INVALID_CLAIM } from "../../errors/codes";
 import matchObject from "../../utils/matchObject";
 import random from "../../utils/random";
 import { getPodInfo } from "./getPodInfo";

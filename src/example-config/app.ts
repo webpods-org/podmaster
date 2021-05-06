@@ -13,7 +13,13 @@ const externalAuthServers = {
     Optional. But if defined limits issuer hostnames
     to those in this list.
   */
-  // allowList: ["azure.com", "example.com", "auth0.com"]
+  // allowList: ["azure.com", "example.com", "auth0.com"],
+  
+  /*
+    Optional. But if defined, disallows issuer urls
+    with these hostnames.
+  */
+  // denyList: ["azure.com", "example.com", "auth0.com"]
 };
 
 /*
