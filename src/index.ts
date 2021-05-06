@@ -54,7 +54,7 @@ export async function startApp(port: number, configDir: string) {
 
   // Start app
   var app = new Koa();
-  app.use(jwksMiddlewareInit);
+  app.use(jwksMiddleware({ exclude: [/^\/\.well-known\//] }));
   app.use(bodyParser());
   app.use(router.routes());
   app.use(router.allowedMethods());
