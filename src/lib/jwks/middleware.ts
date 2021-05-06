@@ -1,9 +1,13 @@
 import jwksClient from "jwks-rsa";
 import * as config from "../../config";
-import { ACCESS_DENIED, INVALID_JWT } from "../../errors/codes";
+import {
+  ACCESS_DENIED,
+  INVALID_JWT,
+  JWT_INVALID_ALGORITHM,
+} from "../../errors/codes";
 import LRU from "quick-lru";
 import * as jsonwebtoken from "jsonwebtoken";
-import { ExtendableContext, Next } from "koa";
+import { ParameterizedContext, Next } from "koa";
 
 let cache: LRU<string, { alg: string; publicKey: string }>;
 
@@ -24,10 +28,43 @@ export class AuthenticationError extends Error {
   }
 }
 
-export default async function jwksMiddleware(
-  ctx: ExtendableContext,
-  next: Next
-): Promise<void> {
+export default function jwksMiddleware(options: { exclude: RegExp[] }) {
+  return async (ctx: ParameterizedContext, next: Next): Promise<void> => {
+    if (options.exclude.some((regex) => regex.test(ctx.path))) {
+      next();
+    } else {
+      try {
+        const { token, alg, publicKey } = await getSigningKey(ctx);
+        if (!(ctx as any).state) {
+          ctx.state = {};
+        }
+
+        ctx.state.jwt = jsonwebtoken.verify(token, publicKey, {
+          algorithms: [alg as any],
+        });
+      } catch (ex) {
+        if (ex instanceof AuthenticationError) {
+          ctx.status = 401;
+          ctx.body = { error: ex.message, code: ex.code };
+        } else {
+          ctx.body = { error: "Authentication error." };
+        }
+      }
+
+      next();
+    }
+  };
+}
+
+async function getSigningKey(
+  ctx: ParameterizedContext
+): Promise<{
+  token: string;
+  alg: string;
+  publicKey: string;
+  payload: any;
+  signature: string;
+}> {
   const token = resolveAuthorizationHeader(ctx);
 
   if (token === null) {
@@ -52,7 +89,13 @@ export default async function jwksMiddleware(
     header: { alg, kid },
     payload,
     signature,
-  } = decodeResult;
+  } = decodeResult as {
+    header: { alg: string; kid: string };
+    payload: {
+      [key: string]: any;
+    };
+    signature: string;
+  };
 
   const appConfig = config.get();
 
@@ -93,8 +136,15 @@ export default async function jwksMiddleware(
         const signingKey = appConfig.jwtKeys.find(
           (x) => x.issuer === issuer && x.kid === kid && x.alg === alg
         );
+
         if (signingKey) {
-          return validateWithKey(alg, signingKey.publicKey);
+          return {
+            token,
+            alg,
+            publicKey: signingKey.publicKey,
+            payload,
+            signature,
+          };
         }
       }
 
@@ -103,7 +153,13 @@ export default async function jwksMiddleware(
 
       if (cacheEntry) {
         if (alg === cacheEntry.alg) {
-          return validateWithKey(alg, cacheEntry.publicKey);
+          return {
+            token,
+            alg,
+            publicKey: cacheEntry.publicKey,
+            payload,
+            signature,
+          };
         } else {
           throw new AuthenticationError(
             "Authentication error. Invalid JWT.",
@@ -128,8 +184,8 @@ export default async function jwksMiddleware(
         const key = await client.getSigningKey(kid);
         const publicKey = key.getPublicKey();
         cache.set(cacheKey, { alg: key.alg, publicKey });
-        
-        validateWithKey(alg, publicKey);
+
+        return { token, alg, publicKey, payload, signature };
       }
     } else {
       throw new AuthenticationError(
@@ -145,9 +201,7 @@ export default async function jwksMiddleware(
   }
 }
 
-function validateWithKey(alg: string, publicKey: string) {}
-
-function resolveAuthorizationHeader(ctx: ExtendableContext): string | null {
+function resolveAuthorizationHeader(ctx: ParameterizedContext): string | null {
   if (!ctx.header || !ctx.header.authorization) {
     return null;
   }
