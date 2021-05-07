@@ -1,5 +1,3 @@
 export default function jwtVerification() {
-  it("should approve valid JWT", async () => {
-    
-  })
+  it("should approve valid JWT", async () => {});
 }

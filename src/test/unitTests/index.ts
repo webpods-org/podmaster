@@ -17,7 +17,7 @@ export default function run(dbConfig: { database: string }, configDir: string) {
     // });
   }
 
-  describe("domain", async () => {
+  describe("unit tests", async () => {
     async function writeSampleData() {
       // const pool = new pg.Pool(dbConfig);
       // const sampleDataSQL = readFileSync(

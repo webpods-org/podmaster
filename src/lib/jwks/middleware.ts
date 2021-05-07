@@ -1,21 +1,30 @@
 import jwksClient from "jwks-rsa";
 import * as config from "../../config";
-import {
-  ACCESS_DENIED,
-  INVALID_JWT,
-  JWT_INVALID_ALGORITHM,
-} from "../../errors/codes";
-import LRU from "quick-lru";
+import { ACCESS_DENIED, INVALID_JWT } from "../../errors/codes";
+import HLRU from "hashlru";
 import * as jsonwebtoken from "jsonwebtoken";
 import { ParameterizedContext, Next } from "koa";
 
-let cache: LRU<string, { alg: string; publicKey: string }>;
+const createHash: typeof HLRU = require("hashlru");
+
+type CacheItem = { alg: string; publicKey: string };
+type HLRUCache = {
+  has: (key: string | number) => boolean;
+  remove: (key: string | number) => void;
+  get: (key: string | number) => any;
+  set: (key: string | number, value: any) => void;
+  clear: () => void;
+};
+
+let cache: HLRUCache;
 
 export async function init() {
   const appConfig = config.get();
-  cache = new LRU<string, { alg: string; publicKey: string }>({
-    maxSize: appConfig.jwksCacheSize || 1000,
-  });
+  cache = createHash(appConfig.jwksCacheSize || 1000);
+}
+
+function getItemFromCache(key: string): CacheItem {
+  return cache.get(key);
 }
 
 export class AuthenticationError extends Error {
@@ -149,7 +158,7 @@ async function getSigningKey(
       }
 
       const cacheKey = `${issuer}::${kid}`;
-      const cacheEntry = cache.get(cacheKey);
+      const cacheEntry = getItemFromCache(cacheKey);
 
       if (cacheEntry) {
         if (alg === cacheEntry.alg) {

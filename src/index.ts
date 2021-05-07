@@ -10,9 +10,9 @@ import jwksMiddleware from "./lib/jwks/middleware";
 import { init as jwksMiddlewareInit } from "./lib/jwks/middleware";
 import * as db from "./db";
 
-// import * as podsApi from "./api/pods";
-// import * as logsApi from "./api/logs";
+import * as podsApi from "./api/pods";
 import * as userApi from "./api/user";
+// import * as logsApi from "./api/logs";
 
 import * as config from "./config";
 import { AppConfig } from "./types/config";
@@ -25,17 +25,16 @@ const argv = yargs.options({
   v: { type: "boolean", alias: "version" },
 }).argv;
 
-export async function startApp(port: number, configDir: string) {
-  const appConfig: AppConfig = require(join(configDir, "app.js"));
+export async function startApp(port: number, configFile: string) {
+  const appConfig: AppConfig = require(configFile);
 
   await init(appConfig);
 
   // Set up routes
   const router = new Router();
 
-  router.get("/profile", userApi.getProfile);
-
-  // router.post("/pods", podsApi.createPodAPI);
+  router.post("/pods", podsApi.createPodAPI);
+  // router.get("/profile", userApi.getProfile);
   // router.delete("/pods", podsApi.removePodAPI);
   // router.get("/pods/:name/permissions", podsApi.getPermissionsAPI);
   // router.post("/pods/:name/permissions/updates", podsApi.updatePermissionsAPI);
@@ -83,15 +82,15 @@ if (require.main === module) {
 
     if (!argv.c) {
       console.log(
-        "The configuration directory should be specified with the -c option."
+        "The configuration file should be specified with the -c option."
       );
       process.exit(1);
     }
 
-    const configDir = argv.c;
+    const configFile = argv.c;
     const port = argv.p;
 
-    startApp(port, configDir);
+    startApp(port, configFile);
     console.log(`listening on port ${port}`);
   }
 }
