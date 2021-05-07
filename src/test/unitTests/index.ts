@@ -1,7 +1,6 @@
 import { join } from "path";
 import { readFileSync } from "fs";
-// import { IDbConfig } from "psychopiggy";
-// import * as localAccountModule from "../domain/account";
+import jwtVerification from "./jwtVerification";
 
 export default function run(dbConfig: { database: string }, configDir: string) {
   async function selectAndMatchRows(
@@ -27,23 +26,25 @@ export default function run(dbConfig: { database: string }, configDir: string) {
       // await pool.query(sampleDataSQL);
     }
 
-    it("localAccount.createLocalUser() creates a local user", async () => {
-      // const result = await localAccountModule.createLocalUser(
-      //   "jeswin",
-      //   "secret"
-      // );
-      // (result as any).jwt = "something";
-      // result.should.deepEqual({
-      //   created: true,
-      //   jwt: "something",
-      //   tokens: {
-      //     userId: "jeswin",
-      //     providerUserId: "jeswin",
-      //     provider: "local",
-      //   },
-      // });
-      // await selectAndMatchRows("user", 1, 0, { id: "jeswin" });
-      // await selectAndMatchRows("local_user_auth", 1, 0, { user_id: "jeswin" });
-    });
+    jwtVerification();
+
+    // it("localAccount.createLocalUser() creates a local user", async () => {
+    //   const result = await localAccountModule.createLocalUser(
+    //     "jeswin",
+    //     "secret"
+    //   );
+    //   (result as any).jwt = "something";
+    //   result.should.deepEqual({
+    //     created: true,
+    //     jwt: "something",
+    //     tokens: {
+    //       userId: "jeswin",
+    //       providerUserId: "jeswin",
+    //       provider: "local",
+    //     },
+    //   });
+    //   await selectAndMatchRows("user", 1, 0, { id: "jeswin" });
+    //   await selectAndMatchRows("local_user_auth", 1, 0, { user_id: "jeswin" });
+    // });
   });
 }

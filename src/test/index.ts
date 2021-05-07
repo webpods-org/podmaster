@@ -1,7 +1,7 @@
 import "mocha";
 import "should";
-import serviceTest from "./serviceTest";
-import domainTest from "./domainTest";
+import integrationTests from "./integrationTests";
+import unitTests from "./unitTests";
 import { join } from "path";
 import { readFileSync } from "fs";
 
@@ -62,8 +62,8 @@ function run() {
       // await pool.query(createTablesSQL);
     });
 
-    serviceTest(dbConfig, port, configDir);
-    domainTest(dbConfig, configDir);
+    integrationTests(dbConfig, port, configDir);
+    unitTests(dbConfig, configDir);
   });
 }
 

@@ -8,7 +8,7 @@
   ],
   "scripts": {
     "build": "./build.sh",
-    "test": "./build.sh && mocha --exit dist/test/test.js"
+    "test": "./build.sh && mocha --exit dist/test/index.js"
   },
   "bin": {
     "pod-server": "dist/index.js"

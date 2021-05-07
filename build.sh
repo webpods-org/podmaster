@@ -1,3 +1,3 @@
 rm -rf dist
 tsc
-cp src/test/sample-data.sql dist/test/sample-data.sql
+cp src/test/unitTests/sample-data.sql dist/test/unitTests/sample-data.sql

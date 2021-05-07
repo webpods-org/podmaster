@@ -1,4 +1,4 @@
-import { startApp } from "..";
+import { startApp } from "../..";
 import request = require("supertest");
 
 let app: any;
