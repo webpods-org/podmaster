@@ -4,3 +4,5 @@ export const INVALID_CLAIM = "INVALID_CLAIM";
 export const INVALID_JWT = "INVALID_JWT";
 export const MISSING_JWT = "MISSING_JWT";
 export const JWT_INVALID_ALGORITHM = "JWT_INVALID_ALGORITHM";
+export const NOT_FOUND = "NOT_FOUND";
+export const UNKNOWN_ERROR = "UNKNOWN_ERROR";

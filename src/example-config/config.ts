@@ -14,7 +14,7 @@ const externalAuthServers = {
     to those in this list.
   */
   // allowList: ["azure.com", "example.com", "auth0.com"],
-  
+
   /*
     Optional. But if defined, disallows issuer urls
     with these hostnames.
@@ -63,6 +63,21 @@ const config: AppConfig = {
       },
     ],
   },
+
+  /*
+    Locally defined JWT keys.
+    These do not require a JWKS lookup.
+    Supports symmetric and asymmetric algos.
+    Asymmetric is strongly recommended.
+  */
+  jwtKeys: [
+    {
+      alg: "HS256",
+      issuer: "https://example.com",
+      kid: "007",
+      secret: "mysecretkey",
+    },
+  ],
 
   /*
     Which JWTs can create a pod on this pod-server?

@@ -65,6 +65,21 @@ const config: AppConfig = {
   },
 
   /*
+    Locally defined JWT keys.
+    These do not require a JWKS lookup.
+    Supports symmetric (HS256) and asymmetric (RS256) algos.
+    Asymmetric is strongly recommended.
+  */
+  jwtKeys: [
+    {
+      alg: "HS256",
+      issuer: "https://example.com",
+      kid: "007",
+      secret: "mysecretkey",
+    },
+  ],
+
+  /*
     Which JWTs can create a pod on this pod-server?
     Any JWT which matches one of these is allowed to.
     So include the 'iss' field at a minimum.

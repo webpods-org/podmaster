@@ -21,6 +21,7 @@ export default function run(
         "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImp0aSI6IjFlMThmYWE0LWMyNTItNGQ3Yy1hNzU0LTJiYWVjNzM4NDgxZSIsImlhdCI6MTYyMDM3ODQyOSwiZXhwIjoxNjIwMzgyMDI5fQ.whjZQpOsQtvax9JmWh3XrRtvEMTHjFlLJNEROW6h3iE";
       const response = await request(app)
         .post("/pods")
+        .set("Host", process.env.WEBPODS_TEST_HOSTNAME as string)
         .set("Authorization", `Bearer ${token}`);
       response.status.should.equal(200);
       console.log(response.text);

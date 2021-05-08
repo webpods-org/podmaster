@@ -1,3 +1,5 @@
+import { AsymmetricAlgorithm, SymmetricAlgorithm } from "./crypto";
+
 export type ExternalAuthServers = {
   allow: boolean;
   allowList?: string[];
@@ -58,19 +60,29 @@ export type SqliteStorageConfig = {
 export type StorageConfig = SqliteStorageConfig;
 
 export type Tier = {
-  type: "free" | "pro";
+  type: string;
   maxSpaceMB: number;
   claims: {
     [key: string]: unknown;
   };
 };
 
-export type LocallyDefinedJwtKeys = {
+export type LocallyDefinedSymmetricJwtKey = {
   kid: string;
   issuer: string;
-  alg: string;
-  publicKey: string
-}
+  alg: SymmetricAlgorithm;
+  secret: string;
+};
+export type LocallyDefinedAsymmetricJwtKey = {
+  kid: string;
+  issuer: string;
+  alg: AsymmetricAlgorithm;
+  publicKey: string;
+};
+
+export type LocallyDefinedJwtKeys =
+  | LocallyDefinedSymmetricJwtKey
+  | LocallyDefinedAsymmetricJwtKey;
 
 export type AppConfig = {
   hostname: string;
@@ -80,7 +92,7 @@ export type AppConfig = {
     keys: JWK[];
   };
   jwksCacheSize?: number;
-  jwtKeys?: LocallyDefinedJwtKeys[],
+  jwtKeys?: LocallyDefinedJwtKeys[];
   streams: StreamType[];
   tiers: Tier[];
   storage: StorageConfig;

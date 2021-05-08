@@ -6,15 +6,21 @@ import random from "../../utils/random";
 import { getPodInfo } from "./getPodInfo";
 import * as db from "../../db";
 import getUserIdFromClaims from "../user/getUserIdFromClaims";
+import { APIResult } from "../../types/api";
 
-export default async function createPod(userClaims: JwtClaims) {
+export default async function createPod(
+  userClaims: JwtClaims
+): Promise<APIResult<{ hostname: string }>> {
   const appConfig = config.get();
 
   // Check if the user already has a pod.
   const podInfo = await getPodInfo("");
 
   if (podInfo) {
-    return podInfo;
+    return {
+      success: true,
+      hostname: podInfo.hostname,
+    };
   } else {
     const sqlite = db.get();
     const userId = await getUserIdFromClaims(userClaims);
@@ -45,14 +51,14 @@ export default async function createPod(userClaims: JwtClaims) {
         const pod = generatePodName();
 
         return {
+          success: true,
           hostname: `${pod}.${appConfig.hostname}`,
-          pod,
         };
       } else {
         return {
           success: false,
           error: "Access denied.",
-          errorCode: ACCESS_DENIED,
+          code: ACCESS_DENIED,
         };
       }
     } else {
@@ -60,7 +66,7 @@ export default async function createPod(userClaims: JwtClaims) {
         success: false,
         error:
           "Cannot create user id from claims. Check the authentication token.",
-        errorCode: INVALID_CLAIM,
+        code: INVALID_CLAIM,
       };
     }
   }

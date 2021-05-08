@@ -1,13 +1,23 @@
-import jwksClient from "jwks-rsa";
+import jwksClient, { SigningKey } from "jwks-rsa";
 import * as config from "../../config";
-import { ACCESS_DENIED, INVALID_JWT } from "../../errors/codes";
+import {
+  ACCESS_DENIED,
+  INVALID_JWT,
+  JWT_INVALID_ALGORITHM,
+} from "../../errors/codes";
 import HLRU from "hashlru";
 import * as jsonwebtoken from "jsonwebtoken";
 import { ParameterizedContext, Next } from "koa";
+import { AsymmetricAlgorithm, SymmetricAlgorithm } from "../../types/crypto";
+import { isAsymmetricAlgorithm, isSymmetricAlgorithm } from "./crypto";
+import { LocallyDefinedSymmetricJwtKey } from "../../types/config";
 
 const createHash: typeof HLRU = require("hashlru");
 
-type CacheItem = { alg: string; publicKey: string };
+type CacheItem =
+  | { alg: AsymmetricAlgorithm; publicKey: string }
+  | { alg: SymmetricAlgorithm; secret: string };
+
 type HLRUCache = {
   has: (key: string | number) => boolean;
   remove: (key: string | number) => void;
@@ -37,26 +47,61 @@ export class AuthenticationError extends Error {
   }
 }
 
+function areParamsForSymmetricAlgorithm(
+  params: JwtParameters
+): params is JwtParamsForSymmetricAlgorithm {
+  return isSymmetricAlgorithm(params.alg);
+}
+
+function areParamsForAsymmetricAlgorithm(
+  params: JwtParameters
+): params is JwtParamsForAsymmetricAlgorithm {
+  return isAsymmetricAlgorithm(params.alg);
+}
+
 export default function jwksMiddleware(options: { exclude: RegExp[] }) {
   return async (ctx: ParameterizedContext, next: Next): Promise<void> => {
     if (options.exclude.some((regex) => regex.test(ctx.path))) {
       next();
     } else {
       try {
-        const { token, alg, publicKey } = await getSigningKey(ctx);
+        const jwtParams = await getJwtParameters(ctx);
+
         if (!(ctx as any).state) {
           ctx.state = {};
         }
 
-        ctx.state.jwt = jsonwebtoken.verify(token, publicKey, {
-          algorithms: [alg as any],
-        });
+        if (areParamsForSymmetricAlgorithm(jwtParams)) {
+          ctx.state.jwt = jsonwebtoken.verify(
+            jwtParams.token,
+            jwtParams.secret,
+            {
+              algorithms: [jwtParams.alg],
+            }
+          );
+        } else if (areParamsForAsymmetricAlgorithm(jwtParams)) {
+          ctx.state.jwt = jsonwebtoken.verify(
+            jwtParams.token,
+            jwtParams.publicKey,
+            {
+              algorithms: [jwtParams.alg],
+            }
+          );
+        }
       } catch (ex) {
         if (ex instanceof AuthenticationError) {
           ctx.status = 401;
-          ctx.body = { error: ex.message, code: ex.code };
+          ctx.body = {
+            success: false,
+            error: "Access denied.",
+            code: ACCESS_DENIED,
+          };
         } else {
-          ctx.body = { error: "Authentication error." };
+          ctx.body = {
+            success: false,
+            error: "Authentication error.",
+            code: ACCESS_DENIED,
+          };
         }
       }
 
@@ -65,15 +110,29 @@ export default function jwksMiddleware(options: { exclude: RegExp[] }) {
   };
 }
 
-async function getSigningKey(
-  ctx: ParameterizedContext
-): Promise<{
+type JwtParamsForSymmetricAlgorithm = {
+  alg: SymmetricAlgorithm;
+  secret: string;
   token: string;
-  alg: string;
-  publicKey: string;
   payload: any;
   signature: string;
-}> {
+};
+
+type JwtParamsForAsymmetricAlgorithm = {
+  alg: AsymmetricAlgorithm;
+  publicKey: string;
+  token: string;
+  payload: any;
+  signature: string;
+};
+
+type JwtParameters =
+  | JwtParamsForSymmetricAlgorithm
+  | JwtParamsForAsymmetricAlgorithm;
+
+async function getJwtParameters(
+  ctx: ParameterizedContext
+): Promise<JwtParameters> {
   const token = resolveAuthorizationHeader(ctx);
 
   if (token === null) {
@@ -148,9 +207,8 @@ async function getSigningKey(
 
         if (signingKey) {
           return {
+            ...signingKey,
             token,
-            alg,
-            publicKey: signingKey.publicKey,
             payload,
             signature,
           };
@@ -163,9 +221,8 @@ async function getSigningKey(
       if (cacheEntry) {
         if (alg === cacheEntry.alg) {
           return {
+            ...cacheEntry,
             token,
-            alg,
-            publicKey: cacheEntry.publicKey,
             payload,
             signature,
           };
@@ -191,10 +248,16 @@ async function getSigningKey(
         });
 
         const key = await client.getSigningKey(kid);
-        const publicKey = key.getPublicKey();
-        cache.set(cacheKey, { alg: key.alg, publicKey });
-
-        return { token, alg, publicKey, payload, signature };
+        if (key.alg === "RS256") {
+          const publicKey = key.getPublicKey();
+          cache.set(cacheKey, { alg: key.alg, publicKey });
+          return { token, alg: "RS256", publicKey, payload, signature };
+        } else {
+          throw new AuthenticationError(
+            "Authentication error. Unsupported signing algorithm.",
+            JWT_INVALID_ALGORITHM
+          );
+        }
       }
     } else {
       throw new AuthenticationError(
