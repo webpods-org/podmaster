@@ -41,7 +41,8 @@ basho \
 # JWT
 # 1. let's create keys
 ssh-keygen -t rsa -b 4096 -m PEM -f "$CONFIG_DIR/jwtRS256.key" -q -N ""
+# 2. convert it to a PEM file format.
 ssh-keygen -f "$CONFIG_DIR/jwtRS256.key.pub" -e -m pem > "$CONFIG_DIR/jwtRS256.key.pub.pem"
-
+# 3. create the jwt
 "$SCRIPT_PATH/create-jwt.sh" $CONFIG_DIR
 
