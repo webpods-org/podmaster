@@ -1,3 +1,8 @@
+# If arg is not provided, take current directory.
+KEYS_DIR=${1:-$PWD}
+
+echo $KEYS_DIR
+
 basho \
 --import fs fs \
 --import crypto crypto \
@@ -7,7 +12,7 @@ basho \
 -d toBase64Url 'x => x.replace(/=/g, "").replace(/\+/g, "-").replace(/\//g, "_")' \
 -d base64Header 'k.toBase64Url(k.toBase64(k.header))' \
 -d base64Payload 'k.toBase64Url(k.toBase64(k.payload))' \
--d privateKey 'fs.readFileSync(process.cwd() + "/privatekey.pem", "utf8")' \
+-d privateKey 'fs.readFileSync("'"$KEYS_DIR"'/jwtRS256.key", "utf8")' \
 -d signFunc 'crypto.createSign("RSA-SHA256")' \
 -d sig \
 'k.signFunc.update(`${k.base64Header}.${k.base64Payload}`),k.signFunc.end(),k.toBase64Url(k.signFunc.sign(k.privateKey, "base64"))' \
