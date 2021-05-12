@@ -12,25 +12,19 @@ function run() {
     throw new Error("Tests can only be run with NODE_ENV=development.");
   }
 
-  if (!process.env.WEBPODS_TEST_PORT) {
-    throw new Error(
-      "The port should be specified in process.env.WEBPODS_TEST_PORT."
-    );
+  for (const envVar of [
+    "WEBPODS_TEST_PORT",
+    "WEBPODS_TEST_CONFIG_DIR",
+    "WEBPODS_TEST_HOSTNAME",
+    "WEBPODS_TEST_JWT_ISSUER_HOSTNAME",
+    "WEBPODS_TEST_JWT_PUBLIC_KEY",
+  ]) {
+    if (!process.env[envVar]) {
+      throw new Error(`The process.env.${envVar} should be defined.`);
+    }
   }
 
-  if (!process.env.WEBPODS_TEST_CONFIG_DIR) {
-    throw new Error(
-      "The configuration directory should be specified in process.env.WEBPODS_TEST_CONFIG_DIR."
-    );
-  }
-
-  if (!process.env.WEBPODS_TEST_HOSTNAME) {
-    throw new Error(
-      "The hostname should be specified in process.env.WEBPODS_TEST_HOSTNAME."
-    );
-  }
-
-  const port = parseInt(process.env.WEBPODS_TEST_PORT);
+  const port = parseInt(process.env.WEBPODS_TEST_PORT as string);
   const configDir = process.env.WEBPODS_TEST_CONFIG_DIR as string;
   const configFilePath = join(configDir, "config");
   const appConfig: AppConfig = require(configFilePath);

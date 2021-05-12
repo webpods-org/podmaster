@@ -1,5 +1,6 @@
-# If arg is not provided, take current directory.
-CONFIG_DIR=${1:-$PWD}
+CONFIG_DIR=$1
+HOSTNAME=$2
+JWT_ISSUER_HOSTNAME=$3
 
 # Get script directory
 SCRIPT_PATH=$(dirname "$0")
@@ -12,13 +13,13 @@ REPLACE_LIST=$(cat <<"EOF"
 [
   [`"pods.example.com"`, `process.env.WEBPODS_TEST_HOSTNAME`], 
   
-  [`"https://auth.example.com/"`, `"https://" + process.env.WEBPODS_TEST_HOSTNAME + "/"`],
+  [`"https://auth.example.com/"`, `"https://" + process.env.WEBPODS_TEST_JWT_ISSUER_HOSTNAME + "/"`],
   
   [`"/path/to/data/dir"`, `path.join(process.env.WEBPODS_TEST_CONFIG_DIR, "data")`],
   
-  [`issuer: "https://issuer.example.com"`, `issuer: process.env.WEBPODS_TEST_JWT_ISSUER`], 
+  [`issuer: "https://issuer.example.com"`, `issuer: process.env.WEBPODS_TEST_JWT_ISSUER_HOSTNAME`], 
   
-  [`secret: "mysecretkey"`, `publicKey: process.env.WEBPODS_TEST_JWT_PUBLIC_KEY`]
+  [`publicKey: "mysecretkey"`, `publicKey: process.env.WEBPODS_TEST_JWT_PUBLIC_KEY`]
 ]
 EOF
 )

@@ -1,4 +1,4 @@
-import jwksClient, { SigningKey } from "jwks-rsa";
+import jwksClient = require("jwks-rsa");
 import * as config from "../../config";
 import {
   ACCESS_DENIED,
@@ -154,12 +154,14 @@ async function getJwtParameters(
   }
 
   const {
-    header: { alg, kid },
+    header: { alg },
     payload,
     signature,
   } = decodeResult as {
-    header: { alg: string; kid: string };
+    header: { alg: string; type: "JWT" };
     payload: {
+      kid: string;
+      iss: string;
       [key: string]: any;
     };
     signature: string;
@@ -167,8 +169,8 @@ async function getJwtParameters(
 
   const appConfig = config.get();
 
-  if (payload && payload.iss && kid) {
-    const issuer: string = payload.iss;
+  const { iss: issuer, kid } = payload;
+  if (payload && issuer && kid) {
     const issuerIsUrl = issuer.startsWith("http://" || "https://");
     const issuerHostname = issuerIsUrl ? new URL(issuer).hostname : issuer;
 
@@ -285,4 +287,8 @@ function resolveAuthorizationHeader(ctx: ParameterizedContext): string | null {
       ? parts[1]
       : null
     : null;
+}
+
+function removeTrailingSlash(str: string) {
+  return str.replace(/\/$/, "");
 }

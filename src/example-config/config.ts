@@ -1,4 +1,7 @@
+import * as pathModule from "path";
 import { AppConfig } from "../types/config";
+
+const path: typeof pathModule = require("path");
 
 /*
   This is required if you want to allow external parties to READ your pods.
@@ -72,10 +75,10 @@ const config: AppConfig = {
   */
   jwtKeys: [
     {
-      alg: "HS256",
+      alg: "RS256",
       issuer: "https://issuer.example.com",
       kid: "007",
-      secret: "mysecretkey",
+      publicKey: "mysecretkey",
     },
   ],
 

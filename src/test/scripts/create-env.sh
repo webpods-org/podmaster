@@ -1,6 +1,6 @@
 CONFIG_DIR=$1
 HOSTNAME=$2
-JWT_ISSUER=$3
+JWT_ISSUER_HOSTNAME=$3
 
 # Get script directory
 SCRIPT_PATH=$(dirname "$0")
@@ -17,7 +17,7 @@ REPLACE_LIST=$(cat <<"EOF"
   
   [`WEBPODS_TEST_HOSTNAME="some.example.com"`, `WEBPODS_TEST_HOSTNAME="${k.hostname}"`],
   
-  [`WEBPODS_TEST_JWT_ISSUER="issuer.example.com"`, `WEBPODS_TEST_JWT_ISSUER="${k.jwtIssuer}"`],
+  [`WEBPODS_TEST_JWT_ISSUER_HOSTNAME="issuer.example.com"`, `WEBPODS_TEST_JWT_ISSUER_HOSTNAME="${k.jwtIssuer}"`],
   
   [`WEBPODS_TEST_JWT_PUBLIC_KEY="abcdef"`, `WEBPODS_TEST_JWT_PUBLIC_KEY="${k.publicKey}"`], 
 ]
@@ -34,7 +34,7 @@ basho \
 --import path path \
 -d configDir "\"$CONFIG_DIR\"" \
 -d hostname "\"$HOSTNAME\"" \
--d jwtIssuer "\"$JWT_ISSUER\"" \
+-d jwtIssuer "\"$JWT_ISSUER_HOSTNAME\"" \
 -d publicKey "\"$PUBLIC_KEY\"" \
 -d filename "\"$CONFIG_DIR/env-source.sh\"" \
 -d replacements "$REPLACE_LIST" \
