@@ -73,7 +73,7 @@ const config: AppConfig = {
   jwtKeys: [
     {
       alg: "HS256",
-      issuer: "https://example.com",
+      issuer: "https://issuer.example.com",
       kid: "007",
       secret: "mysecretkey",
     },

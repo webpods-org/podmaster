@@ -1,0 +1,5 @@
+export WEBPODS_TEST_PORT="11666"
+export WEBPODS_TEST_CONFIG_DIR="/some/path"
+export WEBPODS_TEST_HOSTNAME="some.example.com"
+export WEBPODS_TEST_JWT_ISSUER="issuer.example.com"
+export WEBPODS_TEST_JWT_PUBLIC_KEY="abcdef"

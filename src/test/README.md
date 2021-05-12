@@ -5,10 +5,14 @@
 2. Set up the following env variables first:
 
 ```sh
-export WEBPODS_TEST_PORT=11666
-export WEBPODS_TEST_CONFIG_FILE_PATH=/some/path/config.js
-export WEBPODS_TEST_HOSTNAME=some.example.com
-export WEBPODS_TEST_DATA_DIR=/some/path/data
+export WEBPODS_TEST_PORT="11666"
+export WEBPODS_TEST_CONFIG_DIR="/some/path"
+export WEBPODS_TEST_HOSTNAME="some.example.com"
+export WEBPODS_TEST_JWT_ISSUER="issuer.example.com"
+export WEBPODS_TEST_JWT_PUBLIC_KEY="abcdef"
 ```
 
+3. Point WEBPODS_TEST_HOSTNAME and WEBPODS_TEST_JWT_ISSUER to localhost in /etc/hosts.
+
 Then run `npm run build && npm test`.
+

@@ -4,6 +4,7 @@ import integrationTests from "./integrationTests";
 import unitTests from "./unitTests";
 import * as path from "path";
 import { AppConfig } from "../types/config";
+import { join } from "path";
 
 function run() {
   /* Sanity check to make sure we don't accidentally run on the server. */
@@ -17,9 +18,9 @@ function run() {
     );
   }
 
-  if (!process.env.WEBPODS_TEST_CONFIG_FILE_PATH) {
+  if (!process.env.WEBPODS_TEST_CONFIG_DIR) {
     throw new Error(
-      "The configuration directory should be specified in process.env.WEBPODS_TEST_CONFIG_FILE_PATH."
+      "The configuration directory should be specified in process.env.WEBPODS_TEST_CONFIG_DIR."
     );
   }
 
@@ -29,21 +30,16 @@ function run() {
     );
   }
 
-  if (!process.env.WEBPODS_TEST_DATA_DIR) {
-    throw new Error(
-      "The data directory should be specified in process.env.WEBPODS_TEST_DATA_DIR."
-    );
-  }
-
   const port = parseInt(process.env.WEBPODS_TEST_PORT);
-  const configFilePath = process.env.WEBPODS_TEST_CONFIG_FILE_PATH as string;
+  const configDir = process.env.WEBPODS_TEST_CONFIG_DIR as string;
+  const configFilePath = join(configDir, "config");
   const appConfig: AppConfig = require(configFilePath);
   const dbConfig = {
     path: path.join(appConfig.storage.dataDir, "webpodssysdb.sqlite"),
   };
 
   describe("webpods", () => {
-    integrationTests(port, configFilePath, dbConfig);
+    integrationTests(port, configDir, configFilePath, dbConfig);
     // unitTests(configDir, dbConfig);
   });
 }

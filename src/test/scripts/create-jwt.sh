@@ -1,8 +1,6 @@
 # If arg is not provided, take current directory.
 KEYS_DIR=${1:-$PWD}
 
-echo $KEYS_DIR
-
 basho \
 --import fs fs \
 --import crypto crypto \
