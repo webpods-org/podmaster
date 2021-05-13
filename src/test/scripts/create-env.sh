@@ -8,7 +8,10 @@ SCRIPT_PATH=$(dirname "$0")
 # copy environment setup
 cp "$SCRIPT_PATH/env.sh" "$CONFIG_DIR/env-source.sh"
 
-PUBLIC_KEY=`cat $CONFIG_DIR/jwtRS256.key.pub.pem`
+#PUBLIC_KEY=`cat $CONFIG_DIR/jwtRS256.key.pub.pem`
+PUBLIC_KEY=$(basho -i fs fs 'fs.readFileSync("'"$CONFIG_DIR"'/jwtRS256.key.pub.pem").toString().replace(/\r?\n|\r/g, "\\r\\n")')
+
+echo $PUBLIC_KEY
 
 # make a list of strings to replace
 REPLACE_LIST=$(cat <<"EOF"
@@ -25,13 +28,12 @@ EOF
 )
 
 # replace new lines.
-PUBLIC_KEY=${PUBLIC_KEY//$'\n'/}
 REPLACE_LIST=${REPLACE_LIST//$'\n'/}
 
 # write out the new confile file.
 basho \
---import fs fs \
---import path path \
+-i fs fs \
+-i path path \
 -d configDir "\"$CONFIG_DIR\"" \
 -d hostname "\"$HOSTNAME\"" \
 -d jwtIssuer "\"$JWT_ISSUER_HOSTNAME\"" \

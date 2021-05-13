@@ -67,22 +67,12 @@ export type Tier = {
   };
 };
 
-export type LocallyDefinedSymmetricJwtKey = {
-  kid: string;
-  issuer: string;
-  alg: SymmetricAlgorithm;
-  secret: string;
-};
 export type LocallyDefinedAsymmetricJwtKey = {
   kid: string;
   issuer: string;
   alg: AsymmetricAlgorithm;
   publicKey: string;
 };
-
-export type LocallyDefinedJwtKeys =
-  | LocallyDefinedSymmetricJwtKey
-  | LocallyDefinedAsymmetricJwtKey;
 
 export type AppConfig = {
   hostname: string;
@@ -92,7 +82,7 @@ export type AppConfig = {
     keys: JWK[];
   };
   jwksCacheSize?: number;
-  jwtKeys?: LocallyDefinedJwtKeys[];
+  jwtKeys?: LocallyDefinedAsymmetricJwtKey[];
   streams: StreamType[];
   tiers: Tier[];
   storage: StorageConfig;

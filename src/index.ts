@@ -6,8 +6,8 @@ import Router = require("koa-router");
 import bodyParser = require("koa-bodyparser");
 import yargs = require("yargs");
 import { join } from "path";
-import jwksMiddleware from "./lib/jwks/middleware";
-import { init as jwksMiddlewareInit } from "./lib/jwks/middleware";
+import jwtMiddleware from "./lib/jwt/middleware";
+import { init as jwksMiddlewareInit } from "./lib/jwt/middleware";
 import * as db from "./db";
 
 import * as podsApi from "./api/pods";
@@ -53,7 +53,7 @@ export async function startApp(port: number, configFile: string) {
 
   // Start app
   var app = new Koa();
-  app.use(jwksMiddleware({ exclude: [/^\/\.well-known\//] }));
+  app.use(jwtMiddleware({ exclude: [/^\/\.well-known\//] }));
   app.use(bodyParser());
   app.use(router.routes());
   app.use(router.allowedMethods());

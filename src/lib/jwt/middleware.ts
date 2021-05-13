@@ -8,15 +8,14 @@ import {
 import HLRU from "hashlru";
 import * as jsonwebtoken from "jsonwebtoken";
 import { ParameterizedContext, Next } from "koa";
-import { AsymmetricAlgorithm, SymmetricAlgorithm } from "../../types/crypto";
-import { isAsymmetricAlgorithm, isSymmetricAlgorithm } from "./crypto";
-import { LocallyDefinedSymmetricJwtKey } from "../../types/config";
+import { AsymmetricAlgorithm } from "../../types/crypto";
 
 const createHash: typeof HLRU = require("hashlru");
 
-type CacheItem =
-  | { alg: AsymmetricAlgorithm; publicKey: string }
-  | { alg: SymmetricAlgorithm; secret: string };
+// Only this for now.
+const supportedAlgorithms: string[] = ["RS256"];
+
+type CacheItem = { alg: AsymmetricAlgorithm; publicKey: string };
 
 type HLRUCache = {
   has: (key: string | number) => boolean;
@@ -47,19 +46,7 @@ export class AuthenticationError extends Error {
   }
 }
 
-function areParamsForSymmetricAlgorithm(
-  params: JwtParameters
-): params is JwtParamsForSymmetricAlgorithm {
-  return isSymmetricAlgorithm(params.alg);
-}
-
-function areParamsForAsymmetricAlgorithm(
-  params: JwtParameters
-): params is JwtParamsForAsymmetricAlgorithm {
-  return isAsymmetricAlgorithm(params.alg);
-}
-
-export default function jwksMiddleware(options: { exclude: RegExp[] }) {
+export default function jwtMiddleware(options: { exclude: RegExp[] }) {
   return async (ctx: ParameterizedContext, next: Next): Promise<void> => {
     if (options.exclude.some((regex) => regex.test(ctx.path))) {
       next();
@@ -71,23 +58,17 @@ export default function jwksMiddleware(options: { exclude: RegExp[] }) {
           ctx.state = {};
         }
 
-        if (areParamsForSymmetricAlgorithm(jwtParams)) {
-          ctx.state.jwt = jsonwebtoken.verify(
-            jwtParams.token,
-            jwtParams.secret,
-            {
-              algorithms: [jwtParams.alg],
-            }
-          );
-        } else if (areParamsForAsymmetricAlgorithm(jwtParams)) {
-          ctx.state.jwt = jsonwebtoken.verify(
-            jwtParams.token,
-            jwtParams.publicKey,
-            {
-              algorithms: [jwtParams.alg],
-            }
-          );
-        }
+        const claims = jsonwebtoken.verify(
+          jwtParams.token,
+          jwtParams.publicKey,
+          {
+            algorithms: [jwtParams.alg],
+          }
+        );
+        
+        ctx.state.jwt = {
+          claims,
+        };
       } catch (ex) {
         if (ex instanceof AuthenticationError) {
           ctx.status = 401;
@@ -110,14 +91,6 @@ export default function jwksMiddleware(options: { exclude: RegExp[] }) {
   };
 }
 
-type JwtParamsForSymmetricAlgorithm = {
-  alg: SymmetricAlgorithm;
-  secret: string;
-  token: string;
-  payload: any;
-  signature: string;
-};
-
 type JwtParamsForAsymmetricAlgorithm = {
   alg: AsymmetricAlgorithm;
   publicKey: string;
@@ -126,13 +99,9 @@ type JwtParamsForAsymmetricAlgorithm = {
   signature: string;
 };
 
-type JwtParameters =
-  | JwtParamsForSymmetricAlgorithm
-  | JwtParamsForAsymmetricAlgorithm;
-
 async function getJwtParameters(
   ctx: ParameterizedContext
-): Promise<JwtParameters> {
+): Promise<JwtParamsForAsymmetricAlgorithm> {
   const token = resolveAuthorizationHeader(ctx);
 
   if (token === null) {
@@ -166,6 +135,14 @@ async function getJwtParameters(
     };
     signature: string;
   };
+
+  //
+  if (!supportedAlgorithms.includes(alg.toUpperCase())) {
+    throw new AuthenticationError(
+      `Authentication error. Unsupported algorithm ${alg}.`,
+      JWT_INVALID_ALGORITHM
+    );
+  }
 
   const appConfig = config.get();
 
@@ -250,13 +227,19 @@ async function getJwtParameters(
         });
 
         const key = await client.getSigningKey(kid);
-        if (key.alg === "RS256") {
+        if (supportedAlgorithms.includes(key.alg.toUpperCase())) {
           const publicKey = key.getPublicKey();
           cache.set(cacheKey, { alg: key.alg, publicKey });
-          return { token, alg: "RS256", publicKey, payload, signature };
+          return {
+            token,
+            alg: key.alg as AsymmetricAlgorithm,
+            publicKey,
+            payload,
+            signature,
+          };
         } else {
           throw new AuthenticationError(
-            "Authentication error. Unsupported signing algorithm.",
+            `Authentication error. Unsupported algorithm ${key.alg}.`,
             JWT_INVALID_ALGORITHM
           );
         }
