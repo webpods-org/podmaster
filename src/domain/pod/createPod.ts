@@ -14,7 +14,7 @@ export default async function createPod(
   const appConfig = config.get();
 
   // Check if the user already has a pod.
-  const podInfo = await getPodInfo("");
+  const podInfo = await getPodInfo(userClaims.iss, userClaims.sub);
 
   if (podInfo) {
     return {
@@ -23,11 +23,10 @@ export default async function createPod(
     };
   } else {
     const sqlite = db.get();
-    const userId = await getUserIdFromClaims(userClaims);
 
-    if (userId) {
-      const matchingTier = appConfig.tiers.find((tierClaims) =>
-        matchObject(tierClaims, userClaims)
+    if (userClaims.iss && userClaims.sub) {
+      const matchingTier = appConfig.tiers.find((tier) =>
+        matchObject(tier.claims, userClaims)
       );
       if (matchingTier) {
         /*
@@ -39,16 +38,19 @@ export default async function createPod(
             Create a randomly named pod.
         */
         const insertPodStmt = sqlite.prepare(
-          "INSERT INTO pods VALUES (@hostname, @name, @user_id)"
+          "INSERT INTO pods VALUES (@issuer, @user_id, @hostname, @created_at, @tier, @dir)"
         );
+        
+        const pod = generatePodName();
 
         insertPodStmt.run({
-          hostname: "",
-          name: "",
-          user_id: userId,
+          issuer: userClaims.iss,
+          user_id: userClaims.sub,
+          hostname: appConfig.hostname,
+          created_at: Date.now(),
+          tier: "free",
+          dir: "abcd"
         });
-
-        const pod = generatePodName();
 
         return {
           success: true,

@@ -1,29 +1,29 @@
-export default function matchObject(obj: any, source: any) : boolean {
-  if (typeof source !== typeof obj) {
+export default function matchObject(subset: any, superset: any) : boolean {
+  if (typeof subset !== typeof superset) {
     return false;
   }
-  if (Array.isArray(source)) {
-    if (!Array.isArray(obj)) {
+  if (Array.isArray(subset)) {
+    if (!Array.isArray(superset)) {
       return false;
     } else {
-      for (const item of source) {
-        if (!obj.some((bItem) => matchObject(item, bItem))) {
+      for (const item of subset) {
+        if (!superset.some((bItem) => matchObject(item, bItem))) {
           return false;
         }
       }
     }
-  } else if (Object(source) === source) {
-    if (Object(obj) !== obj) {
+  } else if (Object(subset) === subset) {
+    if (Object(superset) !== superset) {
       return false;
     } else {
-      for (const valueKey of Object.keys(source)) {
-        if (!matchObject(source[valueKey], obj[valueKey])) {
+      for (const valueKey of Object.keys(subset)) {
+        if (!matchObject(subset[valueKey], superset[valueKey])) {
           return false;
         }
       }
     }
   } else {
-    if (source !== obj) {
+    if (subset !== superset) {
       return false;
     }
   }

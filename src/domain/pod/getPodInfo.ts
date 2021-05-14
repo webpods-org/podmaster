@@ -7,15 +7,25 @@ export type PodInfo = {
   userDir: string;
 };
 
-export async function getPodInfo(userId: string): Promise<PodInfo | undefined> {
+export async function getPodInfo(
+  issuer: string,
+  userId: string
+): Promise<PodInfo | null> {
   const appConfig = config.get();
   const sqlite = db.get();
   const podInfoStmt = sqlite.prepare(
-    "SELECT * FROM pods WHERE user_id=@user_id"
-  );  
-  const { hostname, dir } = podInfoStmt.get({ user_id: userId });  
-  return {
-    hostname,
-    userDir: `${path.join(appConfig.storage.dataDir, dir)}`,
-  };
+    "SELECT * FROM pods WHERE issuer=@issuer AND user_id=@user_id"
+  );
+
+  const results = podInfoStmt.get({ issuer, user_id: userId });
+
+  if (results) {
+    const { hostname, dir } = results;
+    return {
+      hostname,
+      userDir: `${path.join(appConfig.storage.dataDir, dir)}`,
+    };
+  } else {
+    return null;
+  }
 }

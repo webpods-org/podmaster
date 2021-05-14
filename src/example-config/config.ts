@@ -87,23 +87,24 @@ const config: AppConfig = {
     Any JWT which matches one of these is allowed to.
     So include the 'iss' field at a minimum.
 
-    In the following example, the usage tier is identified by the 'plan' claim.
+    The first match (based on claims) is selected.
+    So if you want multiple tiers, include a claim like 'plan'.
+    See commented example below.
   */
   tiers: [
+    // {
+    //   type: "pro",
+    //   maxSpaceMB: 1024,
+    //   claims: {
+    //     iss: "https://auth.example.com/",
+    //     plan: "pro",
+    //   },
+    // },
     {
       type: "free",
       maxSpaceMB: 64,
       claims: {
-        iss: "https://auth.example.com/",
-        plan: "free",
-      },
-    },
-    {
-      type: "pro",
-      maxSpaceMB: 1024,
-      claims: {
-        iss: "https://auth.example.com/",
-        plan: "pro",
+        iss: "https://auth.example.com/"
       },
     },
   ],

@@ -65,28 +65,27 @@ export default function jwtMiddleware(options: { exclude: RegExp[] }) {
             algorithms: [jwtParams.alg],
           }
         );
-        
+
         ctx.state.jwt = {
           claims,
         };
+
+        next();
       } catch (ex) {
         if (ex instanceof AuthenticationError) {
-          ctx.status = 401;
-          ctx.body = {
+          ctx.throw(401, {
             success: false,
             error: "Access denied.",
             code: ACCESS_DENIED,
-          };
+          });
         } else {
-          ctx.body = {
+          ctx.throw(401, {
             success: false,
             error: "Authentication error.",
             code: ACCESS_DENIED,
-          };
+          });
         }
       }
-
-      next();
     }
   };
 }
