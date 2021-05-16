@@ -9,7 +9,7 @@ SCRIPT_PATH=$(dirname "$0")
 cp "$SCRIPT_PATH/env.sh" "$CONFIG_DIR/env-source.sh"
 
 # Replace all the newlines with \r\n
-PUBLIC_KEY=$(basho -i fs fs 'fs.readFileSync("'"$CONFIG_DIR"'/jwtRS256.key.pub.pem").toString().replace(/\r?\n|\r/g, "\\\\r\\\\n")')
+PUBLIC_KEY=$(basho -i fs fs 'fs.readFileSync("'"$CONFIG_DIR"'/jwtRS256.key.pub.pem").toString().replace(/\r?\n|\r/g, "\\r\\n")')
 
 # make a list of strings to replace
 REPLACE_LIST=$(cat <<"EOF"

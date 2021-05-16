@@ -40,7 +40,7 @@ export default async function createPod(
         const insertPodStmt = sqlite.prepare(
           "INSERT INTO pods VALUES (@issuer, @user_id, @hostname, @created_at, @tier, @dir)"
         );
-        
+
         const pod = generatePodName();
 
         insertPodStmt.run({
@@ -49,7 +49,7 @@ export default async function createPod(
           hostname: appConfig.hostname,
           created_at: Date.now(),
           tier: "free",
-          dir: "abcd"
+          dir: "abcd",
         });
 
         return {

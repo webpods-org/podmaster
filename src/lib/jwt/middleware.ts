@@ -70,8 +70,9 @@ export default function jwtMiddleware(options: { exclude: RegExp[] }) {
           claims,
         };
 
-        next();
+        return next();
       } catch (ex) {
+        console.log(ex);
         if (ex instanceof AuthenticationError) {
           ctx.throw(401, {
             success: false,
