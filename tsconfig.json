@@ -7,7 +7,6 @@
     "moduleResolution": "node",
     "declaration": true,
     "lib": ["es2017", "esnext", "dom"],
-    "allowSyntheticDefaultImports": true,
     "sourceMap": true,
     "strict": true,
     "types": ["node"]
