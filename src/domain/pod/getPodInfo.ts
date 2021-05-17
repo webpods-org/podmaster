@@ -9,15 +9,15 @@ export type PodInfo = {
 
 export async function getPodInfo(
   issuer: string,
-  userId: string
+  username: string
 ): Promise<PodInfo | null> {
   const appConfig = config.get();
   const sqlite = db.get();
   const podInfoStmt = sqlite.prepare(
-    "SELECT * FROM pods WHERE issuer=@issuer AND user_id=@user_id"
+    "SELECT * FROM pods WHERE identity_issuer=@issuer AND identity_username=@username"
   );
 
-  const results = podInfoStmt.get({ issuer, user_id: userId });
+  const results = podInfoStmt.get({ issuer, username });
 
   if (results) {
     const { hostname, dir } = results;

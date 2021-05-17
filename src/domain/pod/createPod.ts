@@ -5,8 +5,9 @@ import matchObject from "../../utils/matchObject";
 import random from "../../utils/random";
 import { getPodInfo } from "./getPodInfo";
 import * as db from "../../db";
-import getUserIdFromClaims from "../user/getUserIdFromClaims";
 import { APIResult } from "../../types/api";
+import { join } from "path";
+import mkdirp = require("mkdirp");
 
 export default async function createPod(
   userClaims: JwtClaims
@@ -38,23 +39,29 @@ export default async function createPod(
             Create a randomly named pod.
         */
         const insertPodStmt = sqlite.prepare(
-          "INSERT INTO pods VALUES (@issuer, @user_id, @hostname, @created_at, @tier, @dir)"
+          "INSERT INTO pods VALUES (@identity_issuer, @identity_username, @pod, @created_at, @dir, @tier)"
         );
 
         const pod = generatePodName();
 
+        // Gotta make a directory.
+        const hostname = `${pod}.${appConfig.hostname}`;
+
         insertPodStmt.run({
-          issuer: userClaims.iss,
-          user_id: userClaims.sub,
-          hostname: appConfig.hostname,
+          identity_issuer: userClaims.iss,
+          identity_username: userClaims.sub,
+          pod,
           created_at: Date.now(),
           tier: "free",
           dir: "abcd",
         });
 
+        const dirname = join(appConfig.storage.dataDir, pod);
+        await mkdirp(dirname);
+
         return {
           success: true,
-          hostname: `${pod}.${appConfig.hostname}`,
+          hostname,
         };
       } else {
         return {

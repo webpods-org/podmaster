@@ -1,9 +1,9 @@
 CREATE TABLE IF NOT EXISTS pods (
-  issuer TEXT NOT NULL,
-	user_id TEXT NOT NULL,
-  hostname TEXT NOT NULL,
+	identity_issuer TEXT NOT NULL,
+  identity_username TEXT NOT NULL,
+  pod TEXT NOT NULL UNIQUE,
 	created_at INTEGER NOT NULL,
-  tier TEXT NOT NULL,
   dir TEXT NOT NULL,
-	PRIMARY KEY (issuer, user_id)
+  tier TEXT NOT NULL,
+	PRIMARY KEY (identity_issuer, identity_username)
 );
