@@ -20,7 +20,8 @@ export async function getPodInfo(
   const results = podInfoStmt.get({ issuer, username });
 
   if (results) {
-    const { hostname, dir } = results;
+    const { pod, dir } = results;
+    const hostname = `${pod}.${appConfig.hostname}`;
     return {
       hostname,
       userDir: `${path.join(appConfig.storage.dataDir, dir)}`,
