@@ -33,9 +33,18 @@ export async function startApp(port: number, configFile: string) {
   // Set up routes
   const router = new Router();
 
+  // Create a pod
   router.post("/pods", podsApi.createPodAPI);
+  router.get("/pods", podsApi.getPodsAPI);
+  
+  // Set up a custom hostname
+  router.put("/settings/hostname", podsApi.createPodAPI);
+
+
+
   // router.get("/profile", userApi.getProfile);
   // router.delete("/pods", podsApi.removePodAPI);
+
   // router.get("/pods/:name/permissions", podsApi.getPermissionsAPI);
   // router.post("/pods/:name/permissions/updates", podsApi.updatePermissionsAPI);
   // router.delete("/pods/:name/permissions", podsApi.removePermissionsAPI);

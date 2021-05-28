@@ -3,7 +3,6 @@ import * as config from "../../config";
 import { ACCESS_DENIED, INVALID_CLAIM } from "../../errors/codes";
 import matchObject from "../../utils/matchObject";
 import random from "../../utils/random";
-import { getPodInfo } from "./getPodInfo";
 import * as db from "../../db";
 import { APIResult } from "../../types/api";
 import { join } from "path";
@@ -15,69 +14,63 @@ export default async function createPod(
   const appConfig = config.get();
 
   // Check if the user already has a pod.
-  const podInfo = await getPodInfo(userClaims.iss, userClaims.sub);
 
-  if (podInfo) {
-    return {
-      success: true,
-      hostname: podInfo.hostname,
-    };
-  } else {
-    const sqlite = db.get();
+  const sqlite = db.get();
 
-    if (userClaims.iss && userClaims.sub) {
-      const matchingTier = appConfig.tiers.find((tier) =>
-        matchObject(tier.claims, userClaims)
+  if (userClaims.iss && userClaims.sub) {
+    const matchingTier = appConfig.tiers.find((tier) =>
+      matchObject(tier.claims, userClaims)
+    );
+    if (matchingTier) {
+      /*
+        Claims verified, create the Pod.
+        The rules are:
+          If webpods.hostname and webpods.pod exists in the jwt,
+          create ${webpods.pod}.${webpods.hostname}.
+        If not:
+          Create a randomly named pod.
+      */
+      const insertPodStmt = sqlite.prepare(
+        "INSERT INTO pods VALUES (@identity_issuer, @identity_username, @pod_id, @hostname, @hostname_alias, @created_at, @dir, @tier)"
       );
-      if (matchingTier) {
-        /*
-          Claims verified, create the Pod.
-          The rules are:
-            If webpods.hostname and webpods.pod exists in the jwt,
-            create ${webpods.pod}.${webpods.hostname}.
-          If not:
-            Create a randomly named pod.
-        */
-        const insertPodStmt = sqlite.prepare(
-          "INSERT INTO pods VALUES (@identity_issuer, @identity_username, @pod, @created_at, @dir, @tier)"
-        );
 
-        const pod = generatePodName();
+      const podId = generatePodName();
 
-        // Gotta make a directory.
-        const hostname = `${pod}.${appConfig.hostname}`;
+      // Gotta make a directory.
+      const hostname = `${podId}.${appConfig.hostname}`;
 
-        insertPodStmt.run({
-          identity_issuer: userClaims.iss,
-          identity_username: userClaims.sub,
-          pod,
-          created_at: Date.now(),
-          tier: "free",
-          dir: "abcd",
-        });
+      insertPodStmt.run({
+        identity_issuer: userClaims.iss,
+        identity_username: userClaims.sub,
+        pod_id: podId,
+        hostname,
+        hostname_alias: null,
+        created_at: Date.now(),
+        tier: "free",
+        dir: "abcd",
+      });
 
-        const dirname = join(appConfig.storage.dataDir, pod);
-        await mkdirp(dirname);
+      const dirname = join(appConfig.storage.dataDir, podId);
+      await mkdirp(dirname);
 
-        return {
-          success: true,
-          hostname,
-        };
-      } else {
-        return {
-          success: false,
-          error: "Access denied.",
-          code: ACCESS_DENIED,
-        };
-      }
+      return {
+        success: true,
+        hostname,
+      };
     } else {
       return {
         success: false,
-        error:
-          "Cannot create user id from claims. Check the authentication token.",
-        code: INVALID_CLAIM,
+        error: "Access denied.",
+        code: ACCESS_DENIED,
       };
     }
+  } else {
+    return {
+      success: false,
+      error:
+        "Cannot create user id from claims. Check the authentication token.",
+      code: INVALID_CLAIM,
+    };
   }
 }
 

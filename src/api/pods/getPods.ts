@@ -1,20 +1,29 @@
 import { IRouterContext } from "koa-router";
-import createPod from "../../domain/pod/createPod";
 import * as config from "../../config";
 import { NOT_FOUND, UNKNOWN_ERROR } from "../../errors/codes";
+import { getPods } from "../../domain/pod/getPods";
 
-export type CreatePodAPIResult = {
-  hostname: string;
+export type GetPodsAPIResult = {
+  pods: {
+    hostname: string;
+    hostnameAlias: string | null;
+  }[];
 };
 
-export default async function createPodAPI(ctx: IRouterContext) {
+export default async function getPodsAPI(ctx: IRouterContext) {
   const appConfig = config.get();
   const hostname = ctx.URL.hostname;
   if (hostname === appConfig.hostname) {
-    const result = await createPod(ctx.state.jwt.claims);
+    const result = await getPods(
+      ctx.state.jwt.claims.iss,
+      ctx.state.jwt.claims.sub
+    );
     if (result.success) {
-      const apiResult: CreatePodAPIResult = {
-        hostname: `${result.hostname}`,
+      const apiResult: GetPodsAPIResult = {
+        pods: result.pods.map((x) => ({
+          hostname: x.hostname,
+          hostnameAlias: x.hostnameAlias,
+        })),
       };
       ctx.body = apiResult;
     } else {

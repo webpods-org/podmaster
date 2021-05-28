@@ -3,20 +3,16 @@ import createPod from "../../domain/pod/createPod";
 import * as config from "../../config";
 import { NOT_FOUND, UNKNOWN_ERROR } from "../../errors/codes";
 
-export type CreatePodAPIResult = {
-  hostname: string;
-};
-
 export default async function createPodAPI(ctx: IRouterContext) {
   const appConfig = config.get();
   const hostname = ctx.URL.hostname;
+  
   if (hostname === appConfig.hostname) {
     const result = await createPod(ctx.state.jwt.claims);
     if (result.success) {
-      const apiResult: CreatePodAPIResult = {
+      ctx.body = {
         hostname: `${result.hostname}`,
       };
-      ctx.body = apiResult;
     } else {
       // TODO - fill this by checking error code.
       ctx.status = 500;

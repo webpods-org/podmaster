@@ -2,6 +2,10 @@ import { startApp } from "../..";
 import request = require("supertest");
 import { join } from "path";
 import { readFileSync } from "fs";
+import should = require("should");
+import { PodInfo } from "../../domain/pod/getPods";
+import { GetPodsAPIResult } from "../../api/pods/getPods";
+import { CreatePodAPIResult } from "../../api/pods/createPod";
 
 let app: any;
 
@@ -30,9 +34,20 @@ export default function run(
         .set("Authorization", `Bearer ${jwt}`);
 
       response.status.should.equal(200);
-      JSON.parse(response.text).should.deepEqual({
-        exists: true,
-      });
+      const apiResult: CreatePodAPIResult = JSON.parse(response.text);
+      should.exist(apiResult.hostname);
+    });
+
+    it("gets all pods", async () => {
+      const response = await request(app)
+        .get("/pods")
+        .set("Host", process.env.WEBPODS_TEST_HOSTNAME as string)
+        .set("Authorization", `Bearer ${jwt}`);
+
+      response.status.should.equal(200);
+      const apiResult: GetPodsAPIResult = JSON.parse(response.text);
+      should.exist(apiResult.pods);
+      apiResult.pods.length.should.be.greaterThan(0);
     });
 
     // it("says missing userid is missing", async () => {
