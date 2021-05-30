@@ -3,10 +3,11 @@ import * as path from "path";
 import * as config from "../../config";
 import { APIResult } from "../../types/api";
 import { PodsRow } from "../../types/db";
+import { hostname } from "os";
 
 export type PodInfo = {
   hostname: string;
-  userDir: string;
+  dataDir: string;
   hostnameAlias: string | null;
 };
 
@@ -22,15 +23,24 @@ export async function getPods(
 
   const dbResults: PodsRow[] = podInfoStmt.all({ issuer, username });
 
-  const pods = dbResults.map((result) => {
+  const predefinedPods = appConfig.pods
+    ? appConfig.pods.map((x) => ({
+        hostname: x.hostname,
+        hostnameAlias: x.hostnameAlias,
+        dataDir: x.dataDir,
+      }))
+    : [];
+
+  const podsInDb = dbResults.map((result) => {
     return {
       hostname: result.hostname,
       hostnameAlias: result.hostname_alias,
-      userDir: `${path.join(appConfig.storage.dataDir, result.dir)}`,
+      dataDir: `${path.join(appConfig.storage.dataDir, result.data_dir)}`,
     };
   });
+
   return {
     success: true,
-    pods,
+    pods: predefinedPods.concat(podsInDb),
   };
 }

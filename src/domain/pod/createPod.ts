@@ -31,13 +31,15 @@ export default async function createPod(
           Create a randomly named pod.
       */
       const insertPodStmt = sqlite.prepare(
-        "INSERT INTO pods VALUES (@identity_issuer, @identity_username, @pod_id, @hostname, @hostname_alias, @created_at, @dir, @tier)"
+        "INSERT INTO pods VALUES (@identity_issuer, @identity_username, @pod_id, @hostname, @hostname_alias, @created_at, @data_dir, @tier)"
       );
 
       const podId = generatePodName();
 
       // Gotta make a directory.
       const hostname = `${podId}.${appConfig.hostname}`;
+
+      const dirname = join(appConfig.storage.dataDir, podId);
 
       insertPodStmt.run({
         identity_issuer: userClaims.iss,
@@ -47,10 +49,9 @@ export default async function createPod(
         hostname_alias: null,
         created_at: Date.now(),
         tier: "free",
-        dir: "abcd",
+        data_dir: dirname,
       });
 
-      const dirname = join(appConfig.storage.dataDir, podId);
       await mkdirp(dirname);
 
       return {

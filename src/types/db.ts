@@ -5,6 +5,6 @@ export type PodsRow = {
   hostname: string;
   hostname_alias: string | null;
   created_at: string;
-  dir: string;
+  data_dir: string;
   tier: string;
 };

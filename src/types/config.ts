@@ -32,14 +32,6 @@ export type PermissionGrant = {
   admin?: boolean;
 };
 
-export type PodConfig = {
-  claims: JwtClaims;
-  hostname: string;
-  alias?: string[];
-  permissions?: PermissionGrant[];
-  dataDir: string;
-};
-
 export type JWK = {
   alg: string;
   kty: string;
@@ -74,6 +66,18 @@ export type LocallyDefinedAsymmetricJwtKey = {
   publicKey: string;
 };
 
+export type PodConfig = {
+  identityIssuer: string;
+  identityUsername: string;
+  podId: string;
+  hostname: string;
+  hostnameAlias: string | null;
+  createdAt: string;
+  dataDir: string;
+  tier: string;
+  permissions?: PermissionGrant[];
+};
+
 export type AppConfig = {
   hostname: string;
   externalAuthServers: ExternalAuthServers;
@@ -86,4 +90,5 @@ export type AppConfig = {
   streams: StreamType[];
   tiers: Tier[];
   storage: StorageConfig;
+  pods?: PodConfig[];
 };

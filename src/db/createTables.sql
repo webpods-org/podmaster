@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS pods (
   hostname TEXT NOT NULL UNIQUE,
   hostname_alias TEXT UNIQUE,
 	created_at INTEGER NOT NULL,
-  dir TEXT NOT NULL,
+  data_dir TEXT NOT NULL,
   tier TEXT NOT NULL,
 	PRIMARY KEY (identity_issuer, identity_username, pod_id)
 );
