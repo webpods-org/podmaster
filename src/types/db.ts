@@ -1,7 +1,7 @@
 export type PodsRow = {
-  identity_issuer: string;
-  identity_username: string;
-  pod_id: string;
+  issuer: string;
+  username: string;
+  pod: string;
   hostname: string;
   hostname_alias: string | null;
   created_at: string;

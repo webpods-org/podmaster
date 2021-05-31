@@ -1,9 +1,8 @@
 import * as db from "../../db";
 import * as path from "path";
 import * as config from "../../config";
-import { APIResult } from "../../types/api";
-import { PodsRow } from "../../types/db";
-import { hostname } from "os";
+import { DomainResult } from "../../types/api";
+import mapper from "../../mappers/pod";
 
 export type PodInfo = {
   hostname: string;
@@ -14,33 +13,43 @@ export type PodInfo = {
 export async function getPods(
   issuer: string,
   username: string
-): Promise<APIResult<{ pods: PodInfo[] }>> {
+): Promise<DomainResult<{ pods: PodInfo[] }>> {
   const appConfig = config.get();
   const sqlite = db.get();
   const podInfoStmt = sqlite.prepare(
-    "SELECT * FROM pods WHERE identity_issuer=@issuer AND identity_username=@username"
+    "SELECT * FROM pods WHERE issuer=@issuer AND username=@username"
   );
 
-  const dbResults: PodsRow[] = podInfoStmt.all({ issuer, username });
+  // See if it's already in predefined.
+  function getPodsFromConfig() {
+    return appConfig.pods
+      ? appConfig.pods.filter(
+          (x) => x.issuer === issuer && x.username === username
+        )
+      : [];
+  }
 
-  const predefinedPods = appConfig.pods
-    ? appConfig.pods.map((x) => ({
-        hostname: x.hostname,
-        hostnameAlias: x.hostnameAlias,
-        dataDir: x.dataDir,
-      }))
-    : [];
+  function getPodsFromDb() {
+    const podInfoStmt = sqlite.prepare(
+      "SELECT * FROM pods WHERE issuer=@issuer AND username=@username"
+    );
 
-  const podsInDb = dbResults.map((result) => {
-    return {
-      hostname: result.hostname,
-      hostnameAlias: result.hostname_alias,
-      dataDir: `${path.join(appConfig.storage.dataDir, result.data_dir)}`,
-    };
-  });
+    return podInfoStmt
+      .all({ issuer, username })
+      .map(mapper);
+  }
+
+  
+  const pods = getPodsFromConfig()
+    .concat(getPodsFromDb())
+    .map((x) => ({
+      hostname: x.hostname,
+      hostnameAlias: x.hostnameAlias,
+      dataDir: `${path.join(appConfig.storage.dataDir, x.dataDir)}`,
+    }));
 
   return {
     success: true,
-    pods: predefinedPods.concat(podsInDb),
+    pods,
   };
 }

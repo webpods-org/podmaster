@@ -6,3 +6,4 @@ export const MISSING_JWT = "MISSING_JWT";
 export const JWT_INVALID_ALGORITHM = "JWT_INVALID_ALGORITHM";
 export const NOT_FOUND = "NOT_FOUND";
 export const UNKNOWN_ERROR = "UNKNOWN_ERROR";
+export const MISSING_POD = "MISSING_POD";

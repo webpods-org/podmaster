@@ -3,9 +3,10 @@ import request = require("supertest");
 import { join } from "path";
 import { readFileSync } from "fs";
 import should = require("should");
-import { PodInfo } from "../../domain/pod/getPods";
 import { GetPodsAPIResult } from "../../api/pods/getPods";
 import { CreatePodAPIResult } from "../../api/pods/createPod";
+import { CreateLogResult } from "../../domain/log/createLog";
+import { CreateLogAPIResult } from "../../api/logs/createLog";
 
 let app: any;
 
@@ -21,11 +22,17 @@ export default function run(
 
   describe("integration tests", async () => {
     let app: any;
+    let port: number;
 
     before(async () => {
       const service = await startApp(port, configFilePath);
       app = service.listen();
+      port = app.address().port;
     });
+
+    beforeEach(() => {});
+
+    let hostname: string;
 
     it("creates a pod", async () => {
       const response = await request(app)
@@ -36,6 +43,7 @@ export default function run(
       response.status.should.equal(200);
       const apiResult: CreatePodAPIResult = JSON.parse(response.text);
       should.exist(apiResult.hostname);
+      hostname = apiResult.hostname;
     });
 
     it("gets all pods", async () => {
@@ -48,6 +56,17 @@ export default function run(
       const apiResult: GetPodsAPIResult = JSON.parse(response.text);
       should.exist(apiResult.pods);
       apiResult.pods.length.should.be.greaterThan(0);
+    });
+
+    it("creates a log", async () => {
+      const response = await request(app)
+        .post("/logs")
+        .set("Host", hostname)
+        .set("Authorization", `Bearer ${jwt}`);
+
+      response.status.should.equal(200);
+      const apiResult: CreateLogAPIResult = JSON.parse(response.text);
+      should.exist(apiResult.log);
     });
 
     // it("says missing userid is missing", async () => {

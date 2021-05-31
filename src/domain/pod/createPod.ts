@@ -4,13 +4,13 @@ import { ACCESS_DENIED, INVALID_CLAIM } from "../../errors/codes";
 import matchObject from "../../utils/matchObject";
 import random from "../../utils/random";
 import * as db from "../../db";
-import { APIResult } from "../../types/api";
+import { DomainResult } from "../../types/api";
 import { join } from "path";
 import mkdirp = require("mkdirp");
 
 export default async function createPod(
   userClaims: JwtClaims
-): Promise<APIResult<{ hostname: string }>> {
+): Promise<DomainResult<{ hostname: string }>> {
   const appConfig = config.get();
 
   // Check if the user already has a pod.
@@ -31,28 +31,28 @@ export default async function createPod(
           Create a randomly named pod.
       */
       const insertPodStmt = sqlite.prepare(
-        "INSERT INTO pods VALUES (@identity_issuer, @identity_username, @pod_id, @hostname, @hostname_alias, @created_at, @data_dir, @tier)"
+        "INSERT INTO pods VALUES (@issuer, @username, @pod, @hostname, @hostname_alias, @created_at, @data_dir, @tier)"
       );
 
-      const podId = generatePodName();
+      const pod = generatePodId();
 
       // Gotta make a directory.
-      const hostname = `${podId}.${appConfig.hostname}`;
+      const hostname = `${pod}.${appConfig.hostname}`;
 
-      const dirname = join(appConfig.storage.dataDir, podId);
+      const podDir = join(appConfig.storage.dataDir, pod);
 
       insertPodStmt.run({
-        identity_issuer: userClaims.iss,
-        identity_username: userClaims.sub,
-        pod_id: podId,
+        issuer: userClaims.iss,
+        username: userClaims.sub,
+        pod: pod,
         hostname,
         hostname_alias: null,
         created_at: Date.now(),
         tier: "free",
-        data_dir: dirname,
+        data_dir: podDir,
       });
 
-      await mkdirp(dirname);
+      await mkdirp(podDir);
 
       return {
         success: true,
@@ -75,7 +75,7 @@ export default async function createPod(
   }
 }
 
-function generatePodName() {
+function generatePodId() {
   return random(8);
 }
 

@@ -11,6 +11,7 @@ import { init as jwksMiddlewareInit } from "./lib/jwt/middleware";
 import * as db from "./db";
 
 import * as podsApi from "./api/pods";
+import * as logsApi from "./api/logs";
 import * as userApi from "./api/user";
 // import * as logsApi from "./api/logs";
 
@@ -33,14 +34,15 @@ export async function startApp(port: number, configFile: string) {
   // Set up routes
   const router = new Router();
 
-  // Create a pod
+  // pods
   router.post("/pods", podsApi.createPodAPI);
   router.get("/pods", podsApi.getPodsAPI);
-  
+
+  // logs
+  router.post("/logs", logsApi.createLogAPI);
+
   // Set up a custom hostname
-  router.put("/settings/hostname", podsApi.createPodAPI);
-
-
+  // router.put("/settings/hostname", podsApi.createPodAPI);
 
   // router.get("/profile", userApi.getProfile);
   // router.delete("/pods", podsApi.removePodAPI);
