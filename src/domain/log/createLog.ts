@@ -6,6 +6,7 @@ import { MISSING_POD } from "../../errors/codes";
 import { join } from "path";
 import random from "../../utils/random";
 import mkdirp = require("mkdirp");
+import { getPodByHostname } from "../pod/getPodByHostname";
 
 export type CreateLogResult = {
   log: string
@@ -20,34 +21,8 @@ export default async function createLog(
   const appConfig = config.get();
   const sqlite = db.get();
 
-  // See if it's already in predefined.
-  function getPodFromConfig() {
-    return appConfig.pods
-      ? appConfig.pods.find(
-          (x) =>
-            x.issuer === issuer &&
-            x.username === username &&
-            (x.hostname === hostname || x.hostnameAlias === hostname)
-        )
-      : undefined;
-  }
-
-  function getPodFromDb() {
-    const podInfoStmt = sqlite.prepare(
-      "SELECT * FROM pods WHERE issuer=@issuer AND username=@username AND (hostname=@hostname OR hostname_alias=@hostname)"
-    );
-
-    const dbRow = podInfoStmt.get({
-      issuer: issuer,
-      username: username,
-      hostname,
-    });
-
-    return dbRow ? mapper(dbRow) : undefined;
-  }
-
-  const pod = getPodFromConfig() || getPodFromDb();
-
+  const pod = await getPodByHostname(issuer, username, hostname)
+  
   if (pod) {
     // Let's see if the log already exists.
     const podDir = join(appConfig.storage.dataDir, pod.dataDir);

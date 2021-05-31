@@ -4,7 +4,14 @@ export type PodsRow = {
   pod: string;
   hostname: string;
   hostname_alias: string | null;
-  created_at: string;
+  created_at: number;
   data_dir: string;
   tier: string;
+};
+
+export type LogsRow = {
+  pod: string;
+  log: string;
+  created_at: number;
+  tags: string | null;
 };

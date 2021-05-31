@@ -1,4 +1,4 @@
-import { AppConfig } from "../types/config";
+import { AppConfig } from "../types/types";
 
 let config: AppConfig;
 

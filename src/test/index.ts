@@ -3,7 +3,7 @@ import "should";
 import integrationTests from "./integrationTests";
 import unitTests from "./unitTests";
 import * as path from "path";
-import { AppConfig } from "../types/config";
+import { AppConfig } from "../types/types";
 import { join } from "path";
 
 function run() {

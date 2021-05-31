@@ -66,16 +66,23 @@ export type LocallyDefinedAsymmetricJwtKey = {
   publicKey: string;
 };
 
-export type PodConfig = {
+export type PodInfo = {
   issuer: string;
   username: string;
   pod: string;
   hostname: string;
   hostnameAlias: string | null;
-  createdAt: string;
+  createdAt: number;
   dataDir: string;
   tier: string;
   permissions?: PermissionGrant[];
+};
+
+export type LogInfo = {
+  pod: string;
+  log: string;
+  createdAt: number;
+  tags: string | null;
 };
 
 export type AppConfig = {
@@ -90,5 +97,5 @@ export type AppConfig = {
   streams: StreamType[];
   tiers: Tier[];
   storage: StorageConfig;
-  pods?: PodConfig[];
+  pods?: PodInfo[];
 };

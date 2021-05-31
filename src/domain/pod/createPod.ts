@@ -1,4 +1,4 @@
-import { JwtClaims } from "../../types/config";
+import { JwtClaims } from "../../types/types";
 import * as config from "../../config";
 import { ACCESS_DENIED, INVALID_CLAIM } from "../../errors/codes";
 import matchObject from "../../utils/matchObject";

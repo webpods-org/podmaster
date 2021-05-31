@@ -4,16 +4,18 @@ import * as config from "../../config";
 import { DomainResult } from "../../types/api";
 import mapper from "../../mappers/pod";
 
-export type PodInfo = {
-  hostname: string;
-  dataDir: string;
-  hostnameAlias: string | null;
+export type GetPodsResult = {
+  pods: {
+    hostname: string;
+    dataDir: string;
+    hostnameAlias: string | null;
+  }[];
 };
 
 export async function getPods(
   issuer: string,
   username: string
-): Promise<DomainResult<{ pods: PodInfo[] }>> {
+): Promise<DomainResult<GetPodsResult>> {
   const appConfig = config.get();
   const sqlite = db.get();
   const podInfoStmt = sqlite.prepare(
@@ -34,12 +36,9 @@ export async function getPods(
       "SELECT * FROM pods WHERE issuer=@issuer AND username=@username"
     );
 
-    return podInfoStmt
-      .all({ issuer, username })
-      .map(mapper);
+    return podInfoStmt.all({ issuer, username }).map(mapper);
   }
 
-  
   const pods = getPodsFromConfig()
     .concat(getPodsFromDb())
     .map((x) => ({

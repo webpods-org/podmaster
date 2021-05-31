@@ -1,7 +1,7 @@
-import { PodConfig } from "../types/config";
+import { PodInfo } from "../types/types";
 import { PodsRow } from "../types/db";
 
-export default function map(row: PodsRow): PodConfig {
+export default function map(row: PodsRow): PodInfo {
   return {
     issuer: row.issuer,
     username: row.username,

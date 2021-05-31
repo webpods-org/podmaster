@@ -16,7 +16,7 @@ import * as userApi from "./api/user";
 // import * as logsApi from "./api/logs";
 
 import * as config from "./config";
-import { AppConfig } from "./types/config";
+import { AppConfig } from "./types/types";
 
 const packageJson = require("../package.json");
 
@@ -39,6 +39,7 @@ export async function startApp(port: number, configFile: string) {
   router.get("/pods", podsApi.getPodsAPI);
 
   // logs
+  router.get("/logs", logsApi.getLogsAPI);
   router.post("/logs", logsApi.createLogAPI);
 
   // Set up a custom hostname
