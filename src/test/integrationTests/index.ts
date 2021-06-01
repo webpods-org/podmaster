@@ -8,6 +8,7 @@ import { CreatePodAPIResult } from "../../api/pods/createPod";
 import { CreateLogResult } from "../../domain/log/createLog";
 import { CreateLogAPIResult } from "../../api/logs/createLog";
 import { GetLogsAPIResult } from "../../api/logs/getLogs";
+import { AddEntriesAPIResult } from "../../api/logs/addEntries";
 
 let app: any;
 
@@ -103,8 +104,9 @@ export default function run(
         .set("Authorization", `Bearer ${jwt}`);
 
       response.status.should.equal(200);
-      const apiResult: GetLogsAPIResult = JSON.parse(response.text);
-      should.exist(apiResult.logs);
+      const apiResult: AddEntriesAPIResult = JSON.parse(response.text);
+      should.exist(apiResult.entries);
+      apiResult.entries.length.should.be.greaterThan(0);
     });
 
     // it("says missing userid is missing", async () => {

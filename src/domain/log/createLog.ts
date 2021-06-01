@@ -25,17 +25,17 @@ export default async function createLog(
   if (pod) {
     // Let's see if the log already exists.
     const podDataDir = join(appConfig.storage.dataDir, pod.dataDir);
+
     const log = generateLogId();
     const logDir = join(podDataDir, log);
 
-    const sqlite = db.getPodDb(podDataDir);
+    const podDb = db.getPodDb(podDataDir);
 
-    const insertLogStmt = sqlite.prepare(
-      "INSERT INTO logs VALUES (@pod, @log, @created_at, @tags)"
+    const insertLogStmt = podDb.prepare(
+      "INSERT INTO logs VALUES (@log, @created_at, @tags)"
     );
 
     insertLogStmt.run({
-      pod: pod.pod,
       log: log,
       created_at: Date.now(),
       tags: tags || "",

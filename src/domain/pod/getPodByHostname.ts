@@ -9,7 +9,7 @@ export async function getPodByHostname(
   hostname: string
 ): Promise<PodInfo | undefined> {
   const appConfig = config.get();
-  const sqlite = db.getSystemDb();
+  const systemDb = db.getSystemDb();
 
   function getPodFromConfig() {
     return appConfig.pods
@@ -23,7 +23,7 @@ export async function getPodByHostname(
   }
 
   function getPodFromDb() {
-    const podInfoStmt = sqlite.prepare(
+    const podInfoStmt = systemDb.prepare(
       "SELECT * FROM pods WHERE issuer=@issuer AND username=@username AND (hostname=@hostname OR hostname_alias=@hostname)"
     );
 

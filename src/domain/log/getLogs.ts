@@ -23,16 +23,17 @@ export default async function getLogs(
   tags: string | undefined
 ): Promise<DomainResult<GetLogsResult>> {
   const appConfig = config.get();
-  const sqlite = db.getSystemDb();
+  const systemDb = db.getSystemDb();
   const pod = await getPodByHostname(issuer, username, hostname);
 
   if (pod) {
-    const getLogsStmt = sqlite.prepare("SELECT * FROM logs WHERE pod=@pod");
-
     const tagsList = tags ? tags.split(",") : [];
+    
+    const podDataDir = join(appConfig.storage.dataDir, pod.dataDir);
+    const podDb = db.getPodDb(podDataDir);    
+    const getLogsStmt = podDb.prepare("SELECT * FROM logs");
 
-    const logs = getLogsStmt
-      .all({ pod: pod.pod })
+    const logs = getLogsStmt.all()
       .map((x: LogsRow) => ({
         log: x.log,
         tags: x.tags,

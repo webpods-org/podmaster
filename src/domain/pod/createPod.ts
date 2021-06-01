@@ -52,7 +52,7 @@ export default async function createPod(
         hostname_alias: null,
         created_at: Date.now(),
         tier: "free",
-        data_dir: podDataDir,
+        data_dir: pod,
       });
 
       await mkdirp(podDataDir);
