@@ -109,6 +109,37 @@ export default function run(
       apiResult.entries.length.should.be.greaterThan(0);
     });
 
+    // it("adds permissions to a log", async () => {
+    //   const response = await request(app)
+    //     .post(`/logs/${log}/permissions`)
+    //     .send({
+    //       permissions: [
+    //         {
+    //           type: "jwt",
+    //           claims: {
+    //             iss: "https://example.com",
+    //             sub: "alice",
+    //           },
+    //           access: {
+    //             read: true,
+    //             write: false,
+    //             admin: false,
+    //             metadata: false,
+    //           }
+    //         },
+    //       ],
+    //     })
+    //     .set("Host", hostname)
+    //     .set("Authorization", `Bearer ${jwt}`);
+
+    //   response.status.should.equal(200);
+    //   const apiResult: AddEntriesAPIResult = JSON.parse(response.text);
+    //   should.exist(apiResult.entries);
+    //   apiResult.entries.length.should.be.greaterThan(0);
+    // });
+
+
+
     // it("says missing userid is missing", async () => {
     //   const response = await request(app).get("/user-ids/alice");
     //   response.status.should.equal(200);

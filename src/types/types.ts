@@ -68,7 +68,7 @@ export type LocallyDefinedAsymmetricJwtKey = {
 
 export type PodInfo = {
   issuer: string;
-  username: string;
+  subject: string;
   pod: string;
   hostname: string;
   hostnameAlias: string | null;

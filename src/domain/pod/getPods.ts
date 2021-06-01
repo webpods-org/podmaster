@@ -14,29 +14,29 @@ export type GetPodsResult = {
 
 export async function getPods(
   issuer: string,
-  username: string
+  subject: string
 ): Promise<DomainResult<GetPodsResult>> {
   const appConfig = config.get();
   const systemDb = db.getSystemDb();
   const podInfoStmt = systemDb.prepare(
-    "SELECT * FROM pods WHERE issuer=@issuer AND username=@username"
+    "SELECT * FROM pods WHERE issuer=@issuer AND subject=@subject"
   );
 
   // See if it's already in predefined.
   function getPodsFromConfig() {
     return appConfig.pods
       ? appConfig.pods.filter(
-          (x) => x.issuer === issuer && x.username === username
+          (x) => x.issuer === issuer && x.subject === subject
         )
       : [];
   }
 
   function getPodsFromDb() {
     const podInfoStmt = systemDb.prepare(
-      "SELECT * FROM pods WHERE issuer=@issuer AND username=@username"
+      "SELECT * FROM pods WHERE issuer=@issuer AND subject=@subject"
     );
 
-    return podInfoStmt.all({ issuer, username }).map(mapper);
+    return podInfoStmt.all({ issuer, subject: subject }).map(mapper);
   }
 
   const pods = getPodsFromConfig()

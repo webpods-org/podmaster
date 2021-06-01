@@ -5,7 +5,7 @@ import { PodInfo } from "../../types/types";
 
 export async function getPodByHostname(
   issuer: string,
-  username: string,
+  subject: string,
   hostname: string
 ): Promise<PodInfo | undefined> {
   const appConfig = config.get();
@@ -16,7 +16,7 @@ export async function getPodByHostname(
       ? appConfig.pods.find(
           (x) =>
             x.issuer === issuer &&
-            x.username === username &&
+            x.subject === subject &&
             (x.hostname === hostname || x.hostnameAlias === hostname)
         )
       : undefined;
@@ -24,12 +24,12 @@ export async function getPodByHostname(
 
   function getPodFromDb() {
     const podInfoStmt = systemDb.prepare(
-      "SELECT * FROM pods WHERE issuer=@issuer AND username=@username AND (hostname=@hostname OR hostname_alias=@hostname)"
+      "SELECT * FROM pods WHERE issuer=@issuer AND subject=@subject AND (hostname=@hostname OR hostname_alias=@hostname)"
     );
 
     const dbRow = podInfoStmt.get({
       issuer: issuer,
-      username: username,
+      subject: subject,
       hostname,
     });
 

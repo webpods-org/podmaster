@@ -14,13 +14,13 @@ export type CreateLogResult = {
 
 export default async function createLog(
   issuer: string,
-  username: string,
+  subject: string,
   hostname: string,
   tags: string
 ): Promise<DomainResult<CreateLogResult>> {
   const appConfig = config.get();
 
-  const pod = await getPodByHostname(issuer, username, hostname);
+  const pod = await getPodByHostname(issuer, subject, hostname);
 
   if (pod) {
     // Let's see if the log already exists.

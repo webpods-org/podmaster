@@ -18,13 +18,13 @@ export type GetLogsResult = {
 
 export default async function getLogs(
   issuer: string,
-  username: string,
+  subject: string,
   hostname: string,
   tags: string | undefined
 ): Promise<DomainResult<GetLogsResult>> {
   const appConfig = config.get();
   const systemDb = db.getSystemDb();
-  const pod = await getPodByHostname(issuer, username, hostname);
+  const pod = await getPodByHostname(issuer, subject, hostname);
 
   if (pod) {
     const tagsList = tags ? tags.split(",") : [];

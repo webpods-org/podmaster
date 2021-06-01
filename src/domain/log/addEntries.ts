@@ -25,7 +25,7 @@ export type LogEntry = {
 
 export default async function addEntries(
   issuer: string,
-  username: string,
+  subject: string,
   hostname: string,
   log: string,
   entries: LogEntry[] | undefined,
@@ -33,7 +33,7 @@ export default async function addEntries(
 ): Promise<DomainResult<AddEntriesResult>> {
   const appConfig = config.get();
 
-  const pod = await getPodByHostname(issuer, username, hostname);
+  const pod = await getPodByHostname(issuer, subject, hostname);
 
   const savedEntryIds: {
     id: number;
