@@ -98,4 +98,5 @@ export type AppConfig = {
   tiers: Tier[];
   storage: StorageConfig;
   pods?: PodInfo[];
+  podDbCacheSize?: number;
 };

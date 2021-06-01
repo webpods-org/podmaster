@@ -8,14 +8,16 @@ import { DomainResult } from "../../types/api";
 import { join } from "path";
 import mkdirp = require("mkdirp");
 
+export type CreatePodResult = { hostname: string; pod: string };
+
 export default async function createPod(
   userClaims: JwtClaims
-): Promise<DomainResult<{ hostname: string }>> {
+): Promise<DomainResult<CreatePodResult>> {
   const appConfig = config.get();
 
   // Check if the user already has a pod.
 
-  const sqlite = db.get();
+  const sqlite = db.getSystemDb();
 
   if (userClaims.iss && userClaims.sub) {
     const matchingTier = appConfig.tiers.find((tier) =>
@@ -56,6 +58,7 @@ export default async function createPod(
 
       return {
         success: true,
+        pod,
         hostname,
       };
     } else {

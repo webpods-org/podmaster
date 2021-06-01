@@ -23,7 +23,7 @@ export default async function getLogs(
   tags: string | undefined
 ): Promise<DomainResult<GetLogsResult>> {
   const appConfig = config.get();
-  const sqlite = db.get();
+  const sqlite = db.getSystemDb();
   const pod = await getPodByHostname(issuer, username, hostname);
 
   if (pod) {

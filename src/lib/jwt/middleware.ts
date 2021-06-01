@@ -5,35 +5,25 @@ import {
   INVALID_JWT,
   JWT_INVALID_ALGORITHM,
 } from "../../errors/codes";
-import HLRU from "hashlru";
 import * as jsonwebtoken from "jsonwebtoken";
 import { ParameterizedContext, Next } from "koa";
 import { AsymmetricAlgorithm } from "../../types/crypto";
-
-const createHash: typeof HLRU = require("hashlru");
+import { LRUMap } from "../lruCache/lru";
 
 // Only this for now.
 const supportedAlgorithms: string[] = ["RS256"];
 
 type CacheItem = { alg: AsymmetricAlgorithm; publicKey: string };
 
-type HLRUCache = {
-  has: (key: string | number) => boolean;
-  remove: (key: string | number) => void;
-  get: (key: string | number) => any;
-  set: (key: string | number, value: any) => void;
-  clear: () => void;
-};
-
-let cache: HLRUCache;
+let cache: LRUMap<string, CacheItem>;
 
 export async function init() {
   const appConfig = config.get();
-  cache = createHash(appConfig.jwksCacheSize || 1000);
+  cache = new LRUMap(appConfig.jwksCacheSize || 1000);
 }
 
-function getItemFromCache(key: string): CacheItem {
-  return cache.get(key);
+function getItemFromCache(key: string): CacheItem | undefined {
+  return cache.find(key);
 }
 
 export class AuthenticationError extends Error {
@@ -229,7 +219,10 @@ async function getJwtParameters(
         const key = await client.getSigningKey(kid);
         if (supportedAlgorithms.includes(key.alg.toUpperCase())) {
           const publicKey = key.getPublicKey();
-          cache.set(cacheKey, { alg: key.alg, publicKey });
+          cache.set(cacheKey, {
+            alg: key.alg as AsymmetricAlgorithm,
+            publicKey,
+          });
           return {
             token,
             alg: key.alg as AsymmetricAlgorithm,

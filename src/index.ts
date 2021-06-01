@@ -3,7 +3,7 @@
 import Koa = require("koa");
 import mount = require("koa-mount");
 import Router = require("koa-router");
-import bodyParser = require("koa-bodyparser");
+import bodyParser = require("koa-body");
 import yargs = require("yargs");
 import { join } from "path";
 import jwtMiddleware from "./lib/jwt/middleware";
@@ -41,6 +41,7 @@ export async function startApp(port: number, configFile: string) {
   // logs
   router.get("/logs", logsApi.getLogsAPI);
   router.post("/logs", logsApi.createLogAPI);
+  router.post("/logs/:log/entries", logsApi.addEntriesAPI);
 
   // Set up a custom hostname
   // router.put("/settings/hostname", podsApi.createPodAPI);

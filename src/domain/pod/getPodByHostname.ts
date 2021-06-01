@@ -9,7 +9,7 @@ export async function getPodByHostname(
   hostname: string
 ): Promise<PodInfo | undefined> {
   const appConfig = config.get();
-  const sqlite = db.get();
+  const sqlite = db.getSystemDb();
 
   function getPodFromConfig() {
     return appConfig.pods

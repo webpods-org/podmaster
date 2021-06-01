@@ -5,6 +5,7 @@ import { NOT_FOUND, UNKNOWN_ERROR } from "../../errors/codes";
 
 export type CreatePodAPIResult = {
   hostname: string;
+  pod: string
 };
 
 export default async function createPodAPI(ctx: IRouterContext) {
@@ -14,7 +15,8 @@ export default async function createPodAPI(ctx: IRouterContext) {
     const result = await createPod(ctx.state.jwt.claims);
     if (result.success) {
       const apiResult: CreatePodAPIResult = {
-        hostname: `${result.hostname}`,
+        pod: result.pod,
+        hostname: result.hostname,
       };
       ctx.body = apiResult;
     } else {

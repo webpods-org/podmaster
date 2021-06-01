@@ -1,15 +1,31 @@
 import Sqlite3 = require("better-sqlite3");
 import * as config from "../config";
 import * as path from "path";
-import { readFile, readFileSync } from "fs";
+import { readFileSync } from "fs";
 import { join } from "path";
+import { LRUMap } from "../lib/lruCache/lru";
 
-let db: Sqlite3.Database;
+let podDbCache: LRUMap<string, Sqlite3.Database>;
+
+let systemDb: Sqlite3.Database;
 
 export async function init() {
   const appConfig = config.get();
-  db = new Sqlite3(path.join(appConfig.storage.dataDir, "webpodssysdb.sqlite"));
+  systemDb = new Sqlite3(
+    path.join(appConfig.storage.dataDir, "webpodssysdb.sqlite")
+  );
   await ensureTablesExist();
+  podDbCache = new LRUMap(appConfig.podDbCacheSize || 100);
+
+  podDbCache.shift = function onCacheEvict() {
+    const entry: [string, Sqlite3.Database] | undefined =
+      LRUMap.prototype.shift.call(this);
+    if (entry) {
+      const [key, value] = entry;
+      value.close();
+      return entry;
+    }
+  };
 }
 
 async function ensureTablesExist() {
@@ -18,9 +34,20 @@ async function ensureTablesExist() {
     "utf8"
   ).toString();
 
-  db.exec(createTablesSql);
+  systemDb.exec(createTablesSql);
 }
 
-export function get(): Sqlite3.Database {
-  return db;
+export function getSystemDb(): Sqlite3.Database {
+  return systemDb;
+}
+
+export function getPodDb(podDataDir: string): Sqlite3.Database {
+  const db = podDbCache.find(podDataDir);
+  if (db) {
+    return db;
+  } else {
+    const podDb = new Sqlite3(path.join(podDataDir, "pod.sqlite"));
+    podDbCache.set(podDataDir, podDb);
+    return podDb;
+  }
 }

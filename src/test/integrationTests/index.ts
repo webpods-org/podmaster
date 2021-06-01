@@ -34,6 +34,8 @@ export default function run(
     beforeEach(() => {});
 
     let hostname: string;
+    let pod: string;
+    let log: string;
 
     it("creates a pod", async () => {
       const response = await request(app)
@@ -43,8 +45,10 @@ export default function run(
 
       response.status.should.equal(200);
       const apiResult: CreatePodAPIResult = JSON.parse(response.text);
+      should.exist(apiResult.pod);
       should.exist(apiResult.hostname);
       hostname = apiResult.hostname;
+      pod = apiResult.pod;
     });
 
     it("gets all pods", async () => {
@@ -68,11 +72,33 @@ export default function run(
       response.status.should.equal(200);
       const apiResult: CreateLogAPIResult = JSON.parse(response.text);
       should.exist(apiResult.log);
+      log = apiResult.log;
     });
 
     it("gets all logs", async () => {
       const response = await request(app)
         .get("/logs")
+        .set("Host", hostname)
+        .set("Authorization", `Bearer ${jwt}`);
+
+      response.status.should.equal(200);
+      const apiResult: GetLogsAPIResult = JSON.parse(response.text);
+      should.exist(apiResult.logs);
+    });
+
+    it("writes a log entry", async () => {
+      const response = await request(app)
+        .post(`/logs/${log}/entries`)
+        .send({
+          entries: [
+            {
+              data: "hello",
+            },
+            {
+              data: "world",
+            },
+          ],
+        })
         .set("Host", hostname)
         .set("Authorization", `Bearer ${jwt}`);
 

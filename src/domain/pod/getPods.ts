@@ -17,7 +17,7 @@ export async function getPods(
   username: string
 ): Promise<DomainResult<GetPodsResult>> {
   const appConfig = config.get();
-  const sqlite = db.get();
+  const sqlite = db.getSystemDb();
   const podInfoStmt = sqlite.prepare(
     "SELECT * FROM pods WHERE issuer=@issuer AND username=@username"
   );
