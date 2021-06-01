@@ -9,7 +9,7 @@ import mkdirp = require("mkdirp");
 import { getPodByHostname } from "../pod/getPodByHostname";
 
 export type CreateLogResult = {
-  log: string
+  log: string;
 };
 
 export default async function createLog(
@@ -19,15 +19,16 @@ export default async function createLog(
   tags: string
 ): Promise<DomainResult<CreateLogResult>> {
   const appConfig = config.get();
-  const sqlite = db.getSystemDb();
 
-  const pod = await getPodByHostname(issuer, username, hostname)
-  
+  const pod = await getPodByHostname(issuer, username, hostname);
+
   if (pod) {
     // Let's see if the log already exists.
-    const podDir = join(appConfig.storage.dataDir, pod.dataDir);
+    const podDataDir = join(appConfig.storage.dataDir, pod.dataDir);
     const log = generateLogId();
-    const logDir = join(podDir, log);
+    const logDir = join(podDataDir, log);
+
+    const sqlite = db.getPodDb(podDataDir);
 
     const insertLogStmt = sqlite.prepare(
       "INSERT INTO logs VALUES (@pod, @log, @created_at, @tags)"

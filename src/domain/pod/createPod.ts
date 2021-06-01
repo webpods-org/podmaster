@@ -7,6 +7,7 @@ import * as db from "../../db";
 import { DomainResult } from "../../types/api";
 import { join } from "path";
 import mkdirp = require("mkdirp");
+import { readFileSync } from "fs";
 
 export type CreatePodResult = { hostname: string; pod: string };
 
@@ -17,7 +18,7 @@ export default async function createPod(
 
   // Check if the user already has a pod.
 
-  const sqlite = db.getSystemDb();
+  const systemDb = db.getSystemDb();
 
   if (userClaims.iss && userClaims.sub) {
     const matchingTier = appConfig.tiers.find((tier) =>
@@ -32,7 +33,7 @@ export default async function createPod(
         If not:
           Create a randomly named pod.
       */
-      const insertPodStmt = sqlite.prepare(
+      const insertPodStmt = systemDb.prepare(
         "INSERT INTO pods VALUES (@issuer, @username, @pod, @hostname, @hostname_alias, @created_at, @data_dir, @tier)"
       );
 
@@ -41,7 +42,7 @@ export default async function createPod(
       // Gotta make a directory.
       const hostname = `${pod}.${appConfig.hostname}`;
 
-      const podDir = join(appConfig.storage.dataDir, pod);
+      const podDataDir = join(appConfig.storage.dataDir, pod);
 
       insertPodStmt.run({
         issuer: userClaims.iss,
@@ -51,10 +52,14 @@ export default async function createPod(
         hostname_alias: null,
         created_at: Date.now(),
         tier: "free",
-        data_dir: podDir,
+        data_dir: podDataDir,
       });
 
-      await mkdirp(podDir);
+      await mkdirp(podDataDir);
+
+      // Create the Pod DB
+      const podDb = db.getPodDb(podDataDir);
+      await db.initPodDb(podDb);
 
       return {
         success: true,

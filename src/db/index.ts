@@ -30,11 +30,20 @@ export async function init() {
 
 async function ensureTablesExist() {
   const createTablesSql = readFileSync(
-    join(__dirname, "createTables.sql"),
+    join(__dirname, "createSystemDbTables.sql"),
     "utf8"
   ).toString();
 
   systemDb.exec(createTablesSql);
+}
+
+export async function initPodDb(db: Sqlite3.Database) {
+  const createTablesSql = readFileSync(
+    join(__dirname, "createPodDbTables.sql"),
+    "utf8"
+  ).toString();
+
+  db.exec(createTablesSql);
 }
 
 export function getSystemDb(): Sqlite3.Database {
