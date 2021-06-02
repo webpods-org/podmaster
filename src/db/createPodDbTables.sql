@@ -18,6 +18,10 @@ CREATE TABLE IF NOT EXISTS permissions (
 	log TEXT NOT NULL,
   iss INTEGER,
   sub TEXT NOT NULL UNIQUE,
+  read INTEGER NOT NULL,
+  write INTEGER NOT NULL,
+  admin INTEGER NOT NULL,
+  metadata INTEGER NOT NULL,
   created_at INTEGER NOT NULL,
   PRIMARY KEY (iss, sub, log)
 );

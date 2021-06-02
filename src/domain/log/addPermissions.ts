@@ -41,11 +41,16 @@ export default async function addPermissions(
               "SELECT * FROM permissions WHERE log=@log AND iss=@iss AND sub=@sub"
             );
 
-            const existingItem = existingPermStmt.get();
+            const existingItem = existingPermStmt.get({
+              log,
+              iss: permission.claims.iss,
+              sub: permission.claims.sub,
+            });
 
+            // Don't insert if it already exists.
             if (!existingItem) {
               const insertPermStmt = podDb.prepare(
-                "INSERT INTO permissions (log, iss, sub, read, write, admin, metadata) VALUES (log, iss, sub, @read, @write, @admin, @metadata)"
+                "INSERT INTO permissions (log, iss, sub, read, write, admin, metadata, created_at) VALUES (@log, @iss, @sub, @read, @write, @admin, @metadata, @created_at)"
               );
 
               insertPermStmt.run({
@@ -56,6 +61,7 @@ export default async function addPermissions(
                 write: permission.access.write ? 1 : 0,
                 admin: permission.access.admin ? 1 : 0,
                 metadata: permission.access.metadata ? 1 : 0,
+                created_at: Date.now(),
               });
             }
           }

@@ -1,27 +1,20 @@
-import createLog from "../../domain/log/createLog";
 import * as config from "../../config";
-import { MISSING_POD, NOT_FOUND, UNKNOWN_ERROR } from "../../errors/codes";
+import { MISSING_POD, UNKNOWN_ERROR } from "../../errors/codes";
 import { IRouterContext } from "koa-router";
-import addEntries from "../../domain/log/addEntries";
+import addPermissions from "../../domain/log/addPermissions";
 
-export type AddEntriesAPIResult = {
-  entries: {
-    id: number;
-    commitId: string;
-  }[];
-};
+export type AddPermissionsAPIResult = {};
 
-export default async function addEntriesAPI(ctx: IRouterContext) {
+export default async function addPermissionsAPI(ctx: IRouterContext) {
   const appConfig = config.get();
   const hostname = ctx.URL.hostname;
 
-  const result = await addEntries(
+  const result = await addPermissions(
     ctx.state.jwt.claims.iss,
     ctx.state.jwt.claims.sub,
     hostname,
     ctx.params.log,
-    ctx.request.body.entries,
-    ctx.request.files
+    ctx.request.body.permissions
   );
   if (result.success) {
     ctx.body = result;
