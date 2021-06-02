@@ -100,3 +100,16 @@ export type AppConfig = {
   pods?: PodInfo[];
   podDbCacheSize?: number;
 };
+
+export type Permission = {
+  claims: {
+    iss: string;
+    sub: string;
+  };
+  access: {
+    read: boolean;
+    write: boolean;
+    admin: boolean;
+    metadata: boolean;
+  };
+};

@@ -5,7 +5,6 @@ import { readFileSync } from "fs";
 import should = require("should");
 import { GetPodsAPIResult } from "../../api/pods/getPods";
 import { CreatePodAPIResult } from "../../api/pods/createPod";
-import { CreateLogResult } from "../../domain/log/createLog";
 import { CreateLogAPIResult } from "../../api/logs/createLog";
 import { GetLogsAPIResult } from "../../api/logs/getLogs";
 import { AddEntriesAPIResult } from "../../api/logs/addEntries";
@@ -109,36 +108,33 @@ export default function run(
       apiResult.entries.length.should.be.greaterThan(0);
     });
 
-    // it("adds permissions to a log", async () => {
-    //   const response = await request(app)
-    //     .post(`/logs/${log}/permissions`)
-    //     .send({
-    //       permissions: [
-    //         {
-    //           type: "jwt",
-    //           claims: {
-    //             iss: "https://example.com",
-    //             sub: "alice",
-    //           },
-    //           access: {
-    //             read: true,
-    //             write: false,
-    //             admin: false,
-    //             metadata: false,
-    //           }
-    //         },
-    //       ],
-    //     })
-    //     .set("Host", hostname)
-    //     .set("Authorization", `Bearer ${jwt}`);
+    it("adds permissions to a log", async () => {
+      const response = await request(app)
+        .post(`/logs/${log}/permissions`)
+        .send({
+          permissions: [
+            {
+              claims: {
+                iss: "https://example.com",
+                sub: "alice",
+              },
+              access: {
+                read: true,
+                write: false,
+                admin: false,
+                metadata: false,
+              },
+            },
+          ],
+        })
+        .set("Host", hostname)
+        .set("Authorization", `Bearer ${jwt}`);
 
-    //   response.status.should.equal(200);
-    //   const apiResult: AddEntriesAPIResult = JSON.parse(response.text);
-    //   should.exist(apiResult.entries);
-    //   apiResult.entries.length.should.be.greaterThan(0);
-    // });
-
-
+      response.status.should.equal(200);
+      const apiResult: AddEntriesAPIResult = JSON.parse(response.text);
+      should.exist(apiResult.entries);
+      apiResult.entries.length.should.be.greaterThan(0);
+    });
 
     // it("says missing userid is missing", async () => {
     //   const response = await request(app).get("/user-ids/alice");

@@ -13,3 +13,11 @@ CREATE TABLE IF NOT EXISTS entries (
   created_at INTEGER NOT NULL,
   PRIMARY KEY (id)
 );
+
+CREATE TABLE IF NOT EXISTS permissions (
+	log TEXT NOT NULL,
+  iss INTEGER,
+  sub TEXT NOT NULL UNIQUE,
+  created_at INTEGER NOT NULL,
+  PRIMARY KEY (iss, sub, log)
+);
