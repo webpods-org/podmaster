@@ -12,7 +12,7 @@ import ensurePod from "./ensurePod";
 export type AddEntriesResult = {
   entries: {
     id: number;
-    commitId: string;
+    commit: string;
   }[];
 };
 
@@ -35,7 +35,7 @@ export default async function addEntries(
   return ensurePod(issuer, subject, hostname, async (pod) => {
     const savedEntryIds: {
       id: number;
-      commitId: string;
+      commit: string;
     }[] = [];
 
     if (entries) {
@@ -46,27 +46,27 @@ export default async function addEntries(
       const insertEntriesTx = podDb.transaction((entries: LogEntry[]) => {
         // Get the last item
         const lastItemStmt = podDb.prepare(
-          "SELECT id, commit_id FROM entries ORDER BY id DESC LIMIT 1"
+          "SELECT id, commit FROM entries ORDER BY id DESC LIMIT 1"
         );
 
-        let { id: lastId, commit_id: lastCommitId } = lastItemStmt.get() || {
+        let { id: lastId, commit: lastCommitId } = lastItemStmt.get() || {
           id: 0,
           lastCommitId: "",
         };
 
         for (const entry of entries) {
-          const commitIdAndData = `${lastCommitId};${entry.data}`;
+          const commitAndData = `${lastCommitId};${entry.data}`;
 
           const newCommitId = createHash("sha256")
-            .update(commitIdAndData)
+            .update(commitAndData)
             .digest("base64");
 
           const insertLogStmt = podDb.prepare(
-            "INSERT INTO entries (commit_id, log, data, created_at) VALUES (@commit_id, @log, @data, @created_at)"
+            "INSERT INTO entries (commit, log, data, created_at) VALUES (@commit, @log, @data, @created_at)"
           );
 
           insertLogStmt.run({
-            commit_id: newCommitId,
+            commit: newCommitId,
             log,
             data: entry.data,
             created_at: Date.now(),
@@ -74,7 +74,7 @@ export default async function addEntries(
 
           savedEntryIds.push({
             id: lastId + 1,
-            commitId: newCommitId,
+            commit: newCommitId,
           });
 
           lastId++;

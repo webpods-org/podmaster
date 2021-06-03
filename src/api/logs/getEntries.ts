@@ -5,7 +5,8 @@ import handleResult from "../handleResult";
 export type AddEntriesAPIResult = {
   entries: {
     id: number;
-    commit: string;
+    commit
+    : string;
   }[];
 };
 

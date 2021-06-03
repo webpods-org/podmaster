@@ -18,7 +18,7 @@ export type LogsRow = {
 
 export type EntriesRow = {
   id: number;
-  commit_id: string;
+  commit: string;
   log: string;
   data: string;
   created_at: number;

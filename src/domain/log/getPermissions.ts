@@ -38,7 +38,3 @@ export default async function getPermissions(
     };
   });
 }
-
-function generateLogId() {
-  return random(8);
-}

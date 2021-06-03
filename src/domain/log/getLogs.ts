@@ -47,7 +47,3 @@ export default async function getLogs(
     return { ok: true, logs };
   });
 }
-
-function generateLogId() {
-  return random(8);
-}
