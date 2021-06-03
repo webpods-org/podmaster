@@ -1,31 +1,35 @@
 import { IRouterContext } from "koa-router";
-import addEntries from "../../domain/log/addEntries";
+import getEntries from "../../domain/log/getEntries";
+import transformQuery from "../utils/transformQuery";
 import handleResult from "../handleResult";
+import getQuery from "../utils/getParam";
 
-export type AddEntriesAPIResult = {
+export type GetEntriesAPIResult = {
   entries: {
     id: number;
-    commit
-    : string;
+    commit: string;
+    data: string;
   }[];
 };
 
-export default async function addEntriesAPI(ctx: IRouterContext) {
+export default async function getEntriesAPI(ctx: IRouterContext) {
   const hostname = ctx.URL.hostname;
 
   await handleResult(
     ctx,
     () =>
-      addEntries(
+      getEntries(
         ctx.state.jwt.claims.iss,
         ctx.state.jwt.claims.sub,
         hostname,
         ctx.params.log,
-        ctx.request.body.entries,
-        ctx.request.files
+        transformQuery(ctx.request.query.fromId, parseInt),
+        getQuery(ctx.request.query.fromCommit),
+        getQuery(ctx.request.query.commits),
+        transformQuery(ctx.request.query.count, parseInt)
       ),
     (result) => {
-      const body: AddEntriesAPIResult = {
+      const body: GetEntriesAPIResult = {
         entries: result.entries,
       };
       ctx.body = body;

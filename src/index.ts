@@ -41,6 +41,7 @@ export async function startApp(port: number, configFile: string) {
   // logs
   router.get("/logs", logsApi.getLogsAPI);
   router.post("/logs", logsApi.createLogAPI);
+  router.get("/logs/:log/entries", logsApi.getEntriesAPI);
   router.post("/logs/:log/entries", logsApi.addEntriesAPI);
   router.get("/logs/:log/permissions", logsApi.getPermissionsAPI);
   router.post("/logs/:log/permissions", logsApi.addPermissionsAPI);

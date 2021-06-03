@@ -46,27 +46,27 @@ export default async function addEntries(
       const insertEntriesTx = podDb.transaction((entries: LogEntry[]) => {
         // Get the last item
         const lastItemStmt = podDb.prepare(
-          "SELECT id, commit FROM entries ORDER BY id DESC LIMIT 1"
+          "SELECT id, commit_id FROM entries ORDER BY id DESC LIMIT 1"
         );
 
-        let { id: lastId, commit: lastCommitId } = lastItemStmt.get() || {
+        let { id: lastId, commit_id: lastCommit } = lastItemStmt.get() || {
           id: 0,
-          lastCommitId: "",
+          lastCommit: "",
         };
 
         for (const entry of entries) {
-          const commitAndData = `${lastCommitId};${entry.data}`;
+          const commitAndData = `${lastCommit};${entry.data}`;
 
-          const newCommitId = createHash("sha256")
+          const newCommit = createHash("sha256")
             .update(commitAndData)
             .digest("base64");
 
           const insertLogStmt = podDb.prepare(
-            "INSERT INTO entries (commit, log, data, created_at) VALUES (@commit, @log, @data, @created_at)"
+            "INSERT INTO entries (commit_id, log, data, created_at) VALUES (@commit_id, @log, @data, @created_at)"
           );
 
           insertLogStmt.run({
-            commit: newCommitId,
+            commit_id: newCommit,
             log,
             data: entry.data,
             created_at: Date.now(),
@@ -74,11 +74,11 @@ export default async function addEntries(
 
           savedEntryIds.push({
             id: lastId + 1,
-            commit: newCommitId,
+            commit: newCommit,
           });
 
           lastId++;
-          lastCommitId = newCommitId;
+          lastCommit = newCommit;
         }
       });
 

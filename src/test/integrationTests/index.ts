@@ -10,6 +10,7 @@ import { AddPermissionAPIResult } from "../../api/logs/addPermission";
 import { CreateLogAPIResult } from "../../api/logs/createLog";
 import { AddEntriesAPIResult } from "../../api/logs/addEntries";
 import { GetPermissionsAPIResult } from "../../api/logs/getPermissions";
+import { GetEntriesAPIResult } from "../../api/logs/getEntries";
 
 let app: any;
 
@@ -107,6 +108,17 @@ export default function run(
       response.status.should.equal(200);
       const apiResult: AddEntriesAPIResult = JSON.parse(response.text);
       should.exist(apiResult.entries);
+      apiResult.entries.length.should.be.greaterThan(0);
+    });
+
+    it("gets entries from a log", async () => {
+      const response = await request(app)
+        .get(`/logs/${log}/entries`)
+        .set("Host", hostname)
+        .set("Authorization", `Bearer ${jwt}`);
+
+      response.status.should.equal(200);
+      const apiResult: GetEntriesAPIResult = JSON.parse(response.text);
       apiResult.entries.length.should.be.greaterThan(0);
     });
 

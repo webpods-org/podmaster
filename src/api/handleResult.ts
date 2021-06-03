@@ -16,6 +16,7 @@ export default async function handleResult<T>(
       ctx.body = { error: result.error, code: result.code };
     }
   } catch (ex: any) {
+    console.log(ex);
     ctx.status = 500;
     ctx.body = { error: "Internal server error.", code: UNKNOWN_ERROR };
   }
