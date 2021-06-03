@@ -1,7 +1,4 @@
-export type APIResult<T> =
-  | ({ success: true } & T)
-  | {
-      success: false;
-      error: string;
-      code: string;
-    };
+export type OkResult<T> = { ok: true } & T;
+export type ErrResult = { ok: false; error: string; code: string };
+
+export type Result<T> = OkResult<T> | ErrResult;

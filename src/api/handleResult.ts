@@ -1,20 +1,22 @@
 import { IRouterContext } from "koa-router";
-import DomainError from "../domain/DomainError";
 import { UNKNOWN_ERROR } from "../errors/codes";
+import { OkResult, Result } from "../types/api";
 
 export default async function handleResult<T>(
   ctx: IRouterContext,
-  fn: () => Promise<T>
+  fn: () => Promise<Result<T>>,
+  then: (x: OkResult<T>) => void
 ) {
   try {
-    return await fn();
-  } catch (ex: any) {
-    if (ex instanceof DomainError) {
-      ctx.status = 500;
-      ctx.body = { error: ex.message, code: ex.code };
+    const result = await fn();
+    if (result.ok) {
+      return then(result);
     } else {
       ctx.status = 500;
-      ctx.body = { error: "Internal server error.", code: UNKNOWN_ERROR };
+      ctx.body = { error: result.error, code: result.code };
     }
+  } catch (ex: any) {
+    ctx.status = 500;
+    ctx.body = { error: "Internal server error.", code: UNKNOWN_ERROR };
   }
 }

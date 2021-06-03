@@ -2,6 +2,7 @@ import * as db from "../../db";
 import * as path from "path";
 import * as config from "../../config";
 import mapper from "../../mappers/pod";
+import { Result } from "../../types/api";
 
 export type GetPodsResult = {
   pods: {
@@ -14,7 +15,7 @@ export type GetPodsResult = {
 export async function getPods(
   issuer: string,
   subject: string
-): Promise<GetPodsResult> {
+): Promise<Result<GetPodsResult>> {
   const appConfig = config.get();
   const systemDb = db.getSystemDb();
   const podInfoStmt = systemDb.prepare(
@@ -46,5 +47,5 @@ export async function getPods(
       dataDir: `${path.join(appConfig.storage.dataDir, x.dataDir)}`,
     }));
 
-  return { pods };
+  return { ok: true, pods };
 }

@@ -6,7 +6,7 @@ import random from "../../utils/random";
 import { getPodByHostname } from "../pod/getPodByHostname";
 import { Files } from "formidable";
 import { createHash } from "crypto";
-import DomainError from "../DomainError";
+import { Result } from "../../types/api";
 
 export type AddEntriesResult = {
   entries: {
@@ -28,7 +28,7 @@ export default async function addEntries(
   log: string,
   entries: LogEntry[] | undefined,
   files: Files | undefined
-): Promise<AddEntriesResult> {
+): Promise<Result<AddEntriesResult>> {
   const appConfig = config.get();
 
   const pod = await getPodByHostname(issuer, subject, hostname);
@@ -86,15 +86,21 @@ export default async function addEntries(
       insertEntriesTx.immediate(entries);
 
       return {
+        ok: true,
         entries: savedEntryIds,
       };
     } else {
       return {
+        ok: true,
         entries: [],
       };
     }
   } else {
-    throw new DomainError("Pod not found.", MISSING_POD);
+    return {
+      ok: false,
+      code: MISSING_POD,
+      error: "Pod not found.",
+    };
   }
 }
 

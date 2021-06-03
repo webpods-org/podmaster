@@ -12,18 +12,22 @@ export type AddEntriesAPIResult = {
 export default async function addEntriesAPI(ctx: IRouterContext) {
   const hostname = ctx.URL.hostname;
 
-  await handleResult(ctx, async () => {
-    const result = await addEntries(
+ await handleResult(ctx, () =>
+    addEntries(
       ctx.state.jwt.claims.iss,
       ctx.state.jwt.claims.sub,
       hostname,
       ctx.params.log,
       ctx.request.body.entries,
       ctx.request.files
-    );
-    const body: AddEntriesAPIResult = {
-      entries: result.entries,
-    };
-    ctx.body = body;
-  });
+    ),
+    (result) => {
+      const body: AddEntriesAPIResult = {
+        entries: result.entries,
+      };
+      ctx.body = body;
+    }
+  );
+
+  
 }

@@ -5,7 +5,7 @@ import { join } from "path";
 import random from "../../utils/random";
 import { getPodByHostname } from "../pod/getPodByHostname";
 import { Permission } from "../../types/types";
-import DomainError from "../DomainError";
+import { Result } from "../../types/api";
 
 export type AddPermissionResult = {
   added: boolean;
@@ -23,7 +23,7 @@ export default async function addPermission(
   hostname: string,
   log: string,
   permission: Permission
-): Promise<AddPermissionResult> {
+): Promise<Result<AddPermissionResult>> {
   const appConfig = config.get();
 
   const pod = await getPodByHostname(issuer, subject, hostname);
@@ -62,13 +62,21 @@ export default async function addPermission(
       });
 
       return {
+        ok: true,
         added: true,
       };
     } else {
-      return { added: false };
+      return {
+        ok: true,
+        added: false,
+      };
     }
   } else {
-    throw new DomainError("Pod not found.", MISSING_POD);
+    return {
+      ok: false,
+      code: MISSING_POD,
+      error: "Pod not found.",
+    };
   }
 }
 

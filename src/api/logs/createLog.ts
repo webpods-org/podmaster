@@ -11,17 +11,20 @@ export default async function createLogAPI(ctx: IRouterContext) {
   const appConfig = config.get();
   const hostname = ctx.URL.hostname;
 
-  await handleResult(ctx, async () => {
-    const result = await createLog(
-      ctx.state.jwt.claims.iss,
-      ctx.state.jwt.claims.sub,
-      hostname,
-      ctx.request.body.tags
-    );
-
-    const body: CreateLogAPIResult = {
-      log: result.log,
-    };
-    ctx.body = body;
-  });
+  await handleResult(
+    ctx,
+    () =>
+      createLog(
+        ctx.state.jwt.claims.iss,
+        ctx.state.jwt.claims.sub,
+        hostname,
+        ctx.request.body.tags
+      ),
+    (result) => {
+      const body: CreateLogAPIResult = {
+        log: result.log,
+      };
+      ctx.body = body;
+    }
+  );
 }

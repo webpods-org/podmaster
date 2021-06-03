@@ -5,7 +5,7 @@ import { join } from "path";
 import random from "../../utils/random";
 import mkdirp = require("mkdirp");
 import { getPodByHostname } from "../pod/getPodByHostname";
-import DomainError from "../DomainError";
+import { Result } from "../../types/api";
 
 export type CreateLogResult = {
   log: string;
@@ -16,7 +16,7 @@ export default async function createLog(
   subject: string,
   hostname: string,
   tags: string
-): Promise<CreateLogResult> {
+): Promise<Result<CreateLogResult>> {
   const appConfig = config.get();
 
   const pod = await getPodByHostname(issuer, subject, hostname);
@@ -43,10 +43,15 @@ export default async function createLog(
     await mkdirp(logDir);
 
     return {
+      ok: true,
       log: log,
     };
   } else {
-    throw new DomainError("Pod not found.", MISSING_POD);
+    return {
+      ok: false,
+      code: MISSING_POD,
+      error: "Pod not found.",
+    };
   }
 }
 

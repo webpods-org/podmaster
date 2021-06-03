@@ -16,19 +16,19 @@ export default async function getPodsAPI(ctx: IRouterContext) {
   const hostname = ctx.URL.hostname;
 
   if (hostname === appConfig.hostname) {
-    await handleResult(ctx, async () => {
-      const result = await getPods(
-        ctx.state.jwt.claims.iss,
-        ctx.state.jwt.claims.sub
-      );
-      const body: GetPodsAPIResult = {
-        pods: result.pods.map((x) => ({
-          hostname: x.hostname,
-          hostnameAlias: x.hostnameAlias,
-        })),
-      };
-      ctx.body = body;
-    });
+    await handleResult(
+      ctx,
+      () => getPods(ctx.state.jwt.claims.iss, ctx.state.jwt.claims.sub),
+      (result) => {
+        const body: GetPodsAPIResult = {
+          pods: result.pods.map((x) => ({
+            hostname: x.hostname,
+            hostnameAlias: x.hostnameAlias,
+          })),
+        };
+        ctx.body = body;
+      }
+    );
   } else {
     ctx.status = 404;
     ctx.body = {

@@ -11,18 +11,21 @@ export default async function addPermissionAPI(ctx: IRouterContext) {
   const appConfig = config.get();
   const hostname = ctx.URL.hostname;
 
-  await handleResult(ctx, async () => {
-    const result = await addPermission(
-      ctx.state.jwt.claims.iss,
-      ctx.state.jwt.claims.sub,
-      hostname,
-      ctx.params.log,
-      ctx.request.body
-    );
-
-    const body: AddPermissionAPIResult = {
-      added: result.added,
-    };
-    ctx.body = body;
-  });
+  await handleResult(
+    ctx,
+    () =>
+      addPermission(
+        ctx.state.jwt.claims.iss,
+        ctx.state.jwt.claims.sub,
+        hostname,
+        ctx.params.log,
+        ctx.request.body
+      ),
+    (result) => {
+      const body: AddPermissionAPIResult = {
+        added: result.added,
+      };
+      ctx.body = body;
+    }
+  );
 }

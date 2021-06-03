@@ -5,7 +5,7 @@ import { join } from "path";
 import random from "../../utils/random";
 import { getPodByHostname } from "../pod/getPodByHostname";
 import { LogsRow } from "../../types/db";
-import DomainError from "../DomainError";
+import { Result } from "../../types/api";
 
 export type GetLogsResult = {
   logs: {
@@ -18,7 +18,7 @@ export default async function getLogs(
   subject: string,
   hostname: string,
   tags: string | undefined
-): Promise<GetLogsResult> {
+): Promise<Result<GetLogsResult>> {
   const appConfig = config.get();
   const systemDb = db.getSystemDb();
   const pod = await getPodByHostname(issuer, subject, hostname);
@@ -45,9 +45,9 @@ export default async function getLogs(
         }
       });
 
-    return { logs };
+    return { ok: true, logs };
   } else {
-    throw new DomainError("Pod not found.", MISSING_POD);
+    return { ok: false, code: MISSING_POD, error: "Pod not found." };
   }
 }
 

@@ -4,17 +4,15 @@ import { ACCESS_DENIED, INVALID_CLAIM } from "../../errors/codes";
 import matchObject from "../../utils/matchObject";
 import random from "../../utils/random";
 import * as db from "../../db";
-import { APIResult } from "../../types/api";
 import { join } from "path";
 import mkdirp = require("mkdirp");
-import { readFileSync } from "fs";
-import DomainError from "../DomainError";
+import { Result } from "../../types/api";
 
 export type CreatePodResult = { hostname: string; pod: string };
 
 export default async function createPod(
   userClaims: JwtClaims
-): Promise<CreatePodResult> {
+): Promise<Result<CreatePodResult>> {
   const appConfig = config.get();
 
   // Check if the user already has a pod.
@@ -63,17 +61,24 @@ export default async function createPod(
       await db.initPodDb(podDb);
 
       return {
+        ok: true,
         pod,
         hostname,
       };
     } else {
-      throw new DomainError("Access denied.", ACCESS_DENIED);
+      return {
+        ok: false,
+        code: ACCESS_DENIED,
+        error: "Access denied.",
+      };
     }
   } else {
-    throw new DomainError(
-      "Cannot create user id from claims. Check the authentication token.",
-      INVALID_CLAIM
-    );
+    return {
+      ok: false,
+      code: INVALID_CLAIM,
+      error:
+        "Cannot create user id from claims. Check the authentication token.",
+    };
   }
 }
 
