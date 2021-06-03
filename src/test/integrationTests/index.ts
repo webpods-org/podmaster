@@ -109,7 +109,7 @@ export default function run(
       apiResult.entries.length.should.be.greaterThan(0);
     });
 
-    it("adds a permissions to a log", async () => {
+    it("adds a permission to a log", async () => {
       const response = await request(app)
         .post(`/logs/${log}/permissions`)
         .send({
@@ -129,7 +129,7 @@ export default function run(
 
       response.status.should.equal(200);
       const apiResult: AddPermissionAPIResult = JSON.parse(response.text);
-      response.status.should.equal(200);
+      apiResult.added.should.be.true();
     });
 
     // it("says missing userid is missing", async () => {
