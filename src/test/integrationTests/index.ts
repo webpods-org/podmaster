@@ -9,6 +9,7 @@ import { GetLogsAPIResult } from "../../api/logs/getLogs";
 import { AddPermissionAPIResult } from "../../api/logs/addPermission";
 import { CreateLogAPIResult } from "../../api/logs/createLog";
 import { AddEntriesAPIResult } from "../../api/logs/addEntries";
+import { GetPermissionsAPIResult } from "../../api/logs/getPermissions";
 
 let app: any;
 
@@ -130,6 +131,17 @@ export default function run(
       response.status.should.equal(200);
       const apiResult: AddPermissionAPIResult = JSON.parse(response.text);
       apiResult.added.should.be.true();
+    });
+
+    it("gets all permissions for a log", async () => {
+      const response = await request(app)
+        .get(`/logs/${log}/permissions`)
+        .set("Host", hostname)
+        .set("Authorization", `Bearer ${jwt}`);
+
+      response.status.should.equal(200);
+      const apiResult: GetPermissionsAPIResult = JSON.parse(response.text);
+      apiResult.permissions.length.should.be.greaterThan(0);
     });
 
     // it("says missing userid is missing", async () => {

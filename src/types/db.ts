@@ -15,3 +15,22 @@ export type LogsRow = {
   created_at: number;
   tags: string | null;
 };
+
+export type EntriesRow = {
+  id: number;
+  commit_id: string;
+  log: string;
+  data: string;
+  created_at: number;
+};
+
+export type PermissionsRow = {
+  log: string;
+  iss: string;
+  sub: string;
+  read: number;
+  write: number;
+  admin: number;
+  metadata: number;
+  created_at: number;
+};

@@ -7,6 +7,7 @@ import { getPodByHostname } from "../pod/getPodByHostname";
 import { Files } from "formidable";
 import { createHash } from "crypto";
 import { Result } from "../../types/api";
+import ensurePod from "./ensurePod";
 
 export type AddEntriesResult = {
   entries: {
@@ -31,14 +32,12 @@ export default async function addEntries(
 ): Promise<Result<AddEntriesResult>> {
   const appConfig = config.get();
 
-  const pod = await getPodByHostname(issuer, subject, hostname);
+  return ensurePod(issuer, subject, hostname, async (pod) => {
+    const savedEntryIds: {
+      id: number;
+      commitId: string;
+    }[] = [];
 
-  const savedEntryIds: {
-    id: number;
-    commitId: string;
-  }[] = [];
-
-  if (pod) {
     if (entries) {
       // Let's see if the log already exists.
       const podDataDir = join(appConfig.storage.dataDir, pod.dataDir);
@@ -95,13 +94,7 @@ export default async function addEntries(
         entries: [],
       };
     }
-  } else {
-    return {
-      ok: false,
-      code: MISSING_POD,
-      error: "Pod not found.",
-    };
-  }
+  });
 }
 
 function generateLogId() {

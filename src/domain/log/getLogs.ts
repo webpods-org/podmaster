@@ -6,6 +6,7 @@ import random from "../../utils/random";
 import { getPodByHostname } from "../pod/getPodByHostname";
 import { LogsRow } from "../../types/db";
 import { Result } from "../../types/api";
+import ensurePod from "./ensurePod";
 
 export type GetLogsResult = {
   logs: {
@@ -20,10 +21,8 @@ export default async function getLogs(
   tags: string | undefined
 ): Promise<Result<GetLogsResult>> {
   const appConfig = config.get();
-  const systemDb = db.getSystemDb();
-  const pod = await getPodByHostname(issuer, subject, hostname);
 
-  if (pod) {
+  return ensurePod(issuer, subject, hostname, async (pod) => {
     const tagsList = tags ? tags.split(",") : [];
 
     const podDataDir = join(appConfig.storage.dataDir, pod.dataDir);
@@ -46,9 +45,7 @@ export default async function getLogs(
       });
 
     return { ok: true, logs };
-  } else {
-    return { ok: false, code: MISSING_POD, error: "Pod not found." };
-  }
+  });
 }
 
 function generateLogId() {

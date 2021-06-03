@@ -113,3 +113,9 @@ export type Permission = {
     metadata: boolean;
   };
 };
+
+export type LogEntry = {
+  id: number;
+  commitId: string;
+  data: string;
+};

@@ -3,47 +3,38 @@ import * as db from "../../db";
 import { MISSING_POD } from "../../errors/codes";
 import { join } from "path";
 import random from "../../utils/random";
-import mkdirp = require("mkdirp");
 import { getPodByHostname } from "../pod/getPodByHostname";
+import { Permission } from "../../types/types";
 import { Result } from "../../types/api";
+import mapper from "../../mappers/permission";
 import ensurePod from "./ensurePod";
 
-export type CreateLogResult = {
-  log: string;
+export type GetPermissionsResult = {
+  permissions: Permission[];
 };
 
-export default async function createLog(
+export default async function getPermissions(
   issuer: string,
   subject: string,
   hostname: string,
-  tags: string
-): Promise<Result<CreateLogResult>> {
+  log: string
+): Promise<Result<GetPermissionsResult>> {
   const appConfig = config.get();
 
   return ensurePod(issuer, subject, hostname, async (pod) => {
-    // Let's see if the log already exists.
     const podDataDir = join(appConfig.storage.dataDir, pod.dataDir);
-
-    const log = generateLogId();
-    const logDir = join(podDataDir, log);
-
     const podDb = db.getPodDb(podDataDir);
 
-    const insertLogStmt = podDb.prepare(
-      "INSERT INTO logs VALUES (@log, @created_at, @tags)"
+    // See if the permission already exists.
+    const existingPermStmt = podDb.prepare(
+      "SELECT * FROM permissions WHERE log=@log"
     );
 
-    insertLogStmt.run({
-      log: log,
-      created_at: Date.now(),
-      tags: tags || "",
-    });
-
-    await mkdirp(logDir);
+    const permissions = existingPermStmt.all({ log }).map(mapper);
 
     return {
       ok: true,
-      log: log,
+      permissions,
     };
   });
 }

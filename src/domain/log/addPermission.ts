@@ -6,6 +6,7 @@ import random from "../../utils/random";
 import { getPodByHostname } from "../pod/getPodByHostname";
 import { Permission } from "../../types/types";
 import { Result } from "../../types/api";
+import ensurePod from "./ensurePod";
 
 export type AddPermissionResult = {
   added: boolean;
@@ -25,10 +26,8 @@ export default async function addPermission(
   permission: Permission
 ): Promise<Result<AddPermissionResult>> {
   const appConfig = config.get();
-
-  const pod = await getPodByHostname(issuer, subject, hostname);
-
-  if (pod) {
+  
+  return ensurePod(issuer, subject, hostname, async (pod) => {
     // Let's see if the log already exists.
     const podDataDir = join(appConfig.storage.dataDir, pod.dataDir);
     const podDb = db.getPodDb(podDataDir);
@@ -71,13 +70,7 @@ export default async function addPermission(
         added: false,
       };
     }
-  } else {
-    return {
-      ok: false,
-      code: MISSING_POD,
-      error: "Pod not found.",
-    };
-  }
+  });
 }
 
 function generateLogId() {
