@@ -1,14 +1,12 @@
 import * as config from "../../config";
 import * as db from "../../db";
-import mapper from "../../mappers/pod";
-import { DomainResult as DomainResult } from "../../types/api";
 import { MISSING_POD } from "../../errors/codes";
 import { join } from "path";
 import random from "../../utils/random";
-import mkdirp = require("mkdirp");
 import { getPodByHostname } from "../pod/getPodByHostname";
 import { Files } from "formidable";
 import { createHash } from "crypto";
+import DomainError from "../DomainError";
 
 export type AddEntriesResult = {
   entries: {
@@ -30,7 +28,7 @@ export default async function addEntries(
   log: string,
   entries: LogEntry[] | undefined,
   files: Files | undefined
-): Promise<DomainResult<AddEntriesResult>> {
+): Promise<AddEntriesResult> {
   const appConfig = config.get();
 
   const pod = await getPodByHostname(issuer, subject, hostname);
@@ -88,21 +86,15 @@ export default async function addEntries(
       insertEntriesTx.immediate(entries);
 
       return {
-        success: true,
         entries: savedEntryIds,
       };
     } else {
       return {
-        success: true,
         entries: [],
       };
     }
   } else {
-    return {
-      success: false,
-      code: MISSING_POD,
-      error: "Pod not found.",
-    };
+    throw new DomainError("Pod not found.", MISSING_POD);
   }
 }
 

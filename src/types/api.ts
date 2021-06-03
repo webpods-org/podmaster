@@ -1,4 +1,4 @@
-export type DomainResult<T> =
+export type APIResult<T> =
   | ({ success: true } & T)
   | {
       success: false;

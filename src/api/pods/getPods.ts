@@ -1,7 +1,8 @@
 import { IRouterContext } from "koa-router";
 import * as config from "../../config";
-import { NOT_FOUND, UNKNOWN_ERROR } from "../../errors/codes";
+import { NOT_FOUND } from "../../errors/codes";
 import { getPods } from "../../domain/pod/getPods";
+import handleResult from "../handleResult";
 
 export type GetPodsAPIResult = {
   pods: {
@@ -13,24 +14,21 @@ export type GetPodsAPIResult = {
 export default async function getPodsAPI(ctx: IRouterContext) {
   const appConfig = config.get();
   const hostname = ctx.URL.hostname;
+
   if (hostname === appConfig.hostname) {
-    const result = await getPods(
-      ctx.state.jwt.claims.iss,
-      ctx.state.jwt.claims.sub
-    );
-    if (result.success) {
-      const apiResult: GetPodsAPIResult = {
+    await handleResult(ctx, async () => {
+      const result = await getPods(
+        ctx.state.jwt.claims.iss,
+        ctx.state.jwt.claims.sub
+      );
+      const body: GetPodsAPIResult = {
         pods: result.pods.map((x) => ({
           hostname: x.hostname,
           hostnameAlias: x.hostnameAlias,
         })),
       };
-      ctx.body = apiResult;
-    } else {
-      // TODO - fill this by checking error code.
-      ctx.status = 500;
-      ctx.body = { error: "Internal server error.", code: UNKNOWN_ERROR };
-    }
+      ctx.body = body;
+    });
   } else {
     ctx.status = 404;
     ctx.body = {
