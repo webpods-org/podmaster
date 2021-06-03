@@ -30,11 +30,11 @@ export default async function getEntries(
 
     function getEntriesAfterId(id: number) {
       const getEntriesStmt = podDb.prepare(
-        "SELECT id, commit_id, data FROM entries WHERE log = @log AND id > @id LIMIT @count"
+        `SELECT "id", "commit", "data" FROM entries WHERE "log" = @log AND "id" > @id LIMIT @count`
       );
 
       return getEntriesStmt.all({
-        id: fromId,
+        id,
         log,
         count: count || 100,
       }) as EntriesRow[];
@@ -42,19 +42,19 @@ export default async function getEntries(
 
     function getEntriesAfterCommit(commit: string) {
       const getCommitStmt = podDb.prepare(
-        "SELECT id FROM entries WHERE log = @log AND commit_id = @commit_id"
+        `SELECT "id" FROM entries WHERE log = @log AND "commit" = @commit`
       );
 
       const commitRow: EntriesRow = getCommitStmt.get({
         log,
-        commit_id: fromCommit,
+        commit,
       });
 
       if (commitRow) {
         const id = commitRow.id;
 
         const getEntriesStmt = podDb.prepare(
-          "SELECT id, commit_id, data FROM entries WHERE log = @log AND id > @id LIMIT @count"
+          `SELECT "id", "commit", "data" FROM entries WHERE "log" = @log AND "id" > @id LIMIT @count`
         );
 
         return getEntriesStmt.all({
@@ -74,10 +74,10 @@ export default async function getEntries(
 
       for (const commit of commitList) {
         const getSingleCommitStmt = podDb.prepare(
-          "SELECT id, commit_id, data FROM entries WHERE log = @log AND commit_id = @commit_id"
+          `SELECT "id", "commit", "data" FROM entries WHERE "log" = @log AND "commit" = @commit`
         );
 
-        const commitRow = getSingleCommitStmt.get({ log, commit_id: commit });
+        const commitRow = getSingleCommitStmt.get({ log, commit: commit });
 
         if (commitRow) {
           commitRows.push(commitRow);
