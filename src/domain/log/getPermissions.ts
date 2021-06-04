@@ -14,14 +14,14 @@ export type GetPermissionsResult = {
 };
 
 export default async function getPermissions(
-  issuer: string,
-  subject: string,
+  iss: string,
+  sub: string,
   hostname: string,
   log: string
 ): Promise<Result<GetPermissionsResult>> {
   const appConfig = config.get();
 
-  return ensurePod(issuer, subject, hostname, async (pod) => {
+  return ensurePod(hostname, async (pod) => {
     const podDataDir = join(appConfig.storage.dataDir, pod.dataDir);
     const podDb = db.getPodDb(podDataDir);
 

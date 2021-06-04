@@ -5,7 +5,6 @@ import mount = require("koa-mount");
 import Router = require("koa-router");
 import bodyParser = require("koa-body");
 import yargs = require("yargs");
-import { join } from "path";
 import jwtMiddleware from "./lib/jwt/middleware";
 import { init as jwksMiddlewareInit } from "./lib/jwt/middleware";
 import * as db from "./db";

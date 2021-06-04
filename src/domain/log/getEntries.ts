@@ -12,8 +12,8 @@ export type GetEntriesResult = {
 };
 
 export default async function getEntries(
-  issuer: string,
-  subject: string,
+  iss: string,
+  sub: string,
   hostname: string,
   log: string,
   fromId?: number,
@@ -24,7 +24,7 @@ export default async function getEntries(
   const limit = maxResults || 100;
   const appConfig = config.get();
 
-  return ensurePod(issuer, subject, hostname, async (pod) => {
+  return ensurePod(hostname, async (pod) => {
     // Let's see if the log already exists.
     const podDataDir = join(appConfig.storage.dataDir, pod.dataDir);
     const podDb = db.getPodDb(podDataDir);

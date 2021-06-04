@@ -136,16 +136,16 @@ async function getJwtParameters(
 
   const appConfig = config.get();
 
-  const { iss: issuer, kid } = payload;
-  if (payload && issuer && kid) {
-    const issuerIsUrl = issuer.startsWith("http://" || "https://");
-    const issuerHostname = issuerIsUrl ? new URL(issuer).hostname : issuer;
+  const { iss, kid } = payload;
+  if (payload && iss && kid) {
+    const issuerIsUrl = iss.startsWith("http://" || "https://");
+    const issuerHostname = issuerIsUrl ? new URL(iss).hostname : iss;
 
-    if (issuer) {
+    if (iss) {
       // Check if in allowList/denyList.
       if (appConfig.externalAuthServers.allowList) {
         if (
-          ![issuer, issuerHostname].some((x) =>
+          ![iss, issuerHostname].some((x) =>
             appConfig.externalAuthServers.allowList?.includes(x)
           )
         ) {
@@ -157,7 +157,7 @@ async function getJwtParameters(
       }
       if (appConfig.externalAuthServers.denyList) {
         if (
-          [issuer, issuerHostname].some((x) =>
+          [iss, issuerHostname].some((x) =>
             appConfig.externalAuthServers.denyList?.includes(x)
           )
         ) {
@@ -171,7 +171,7 @@ async function getJwtParameters(
       // First check if the key is statically defined in appConfig
       if (appConfig.jwtKeys) {
         const signingKey = appConfig.jwtKeys.find(
-          (x) => x.issuer === issuer && x.kid === kid && x.alg === alg
+          (x) => x.iss === iss && x.kid === kid && x.alg === alg
         );
 
         if (signingKey) {
@@ -184,7 +184,7 @@ async function getJwtParameters(
         }
       }
 
-      const cacheKey = `${issuer}::${kid}`;
+      const cacheKey = `${iss}::${kid}`;
       const cacheEntry = getItemFromCache(cacheKey);
 
       if (cacheEntry) {
@@ -202,7 +202,7 @@ async function getJwtParameters(
           );
         }
       } else {
-        const issuerWithoutTrailingSlash = issuer.replace(/\/$/, "");
+        const issuerWithoutTrailingSlash = iss.replace(/\/$/, "");
         const issuerUrl = issuerIsUrl
           ? issuerWithoutTrailingSlash
           : "https://" + issuerWithoutTrailingSlash;

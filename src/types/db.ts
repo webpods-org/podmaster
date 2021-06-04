@@ -1,6 +1,6 @@
 export type PodsRow = {
-  issuer: string;
-  subject: string;
+  iss: string;
+  sub: string;
   pod: string;
   hostname: string;
   hostname_alias: string | null;

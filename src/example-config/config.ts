@@ -32,7 +32,7 @@ const externalAuthServers = {
 const jwksEndpoints = [
   {
     type: "jwks" as const,
-    issuer: "https://abc.example.com",
+    iss: "https://abc.example.com",
     url: "https://example.com/oauth2/v3/certs",
   },
 ];
@@ -76,7 +76,7 @@ const config: AppConfig = {
   jwtKeys: [
     {
       alg: "RS256",
-      issuer: "https://issuer.example.com",
+      iss: "https://issuer.example.com",
       kid: "007",
       publicKey: "mysecretkey",
     },

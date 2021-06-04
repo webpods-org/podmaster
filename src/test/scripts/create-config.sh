@@ -17,7 +17,7 @@ REPLACE_LIST=$(cat <<"EOF"
   
   [`"/path/to/data/dir"`, `path.join(process.env.WEBPODS_TEST_CONFIG_DIR, "data")`],
   
-  [`issuer: "https://issuer.example.com"`, `issuer: "https://" + process.env.WEBPODS_TEST_JWT_ISSUER_HOSTNAME + "/"`], 
+  [`iss: "https://issuer.example.com"`, `iss: "https://" + process.env.WEBPODS_TEST_JWT_ISSUER_HOSTNAME + "/"`], 
   
   [`publicKey: "mysecretkey"`, `publicKey: process.env.WEBPODS_TEST_JWT_PUBLIC_KEY`]
 ]

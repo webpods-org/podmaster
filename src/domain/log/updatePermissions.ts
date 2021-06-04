@@ -18,8 +18,8 @@ export type LogEntry = {
 };
 
 export default async function updatePermissions(
-  issuer: string,
-  subject: string,
+  iss: string,
+  sub: string,
   hostname: string,
   log: string,
   {
@@ -29,7 +29,7 @@ export default async function updatePermissions(
 ): Promise<Result<UpdatePermissionsResult>> {
   const appConfig = config.get();
 
-  return ensurePod(issuer, subject, hostname, async (pod) => {
+  return ensurePod(hostname, async (pod) => {
     // Let's see if the log already exists.
     const podDataDir = join(appConfig.storage.dataDir, pod.dataDir);
     const podDb = db.getPodDb(podDataDir);

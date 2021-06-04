@@ -22,8 +22,8 @@ export type LogEntry = {
 };
 
 export default async function addEntries(
-  issuer: string,
-  subject: string,
+  iss: string,
+  sub: string,
   hostname: string,
   log: string,
   entries: LogEntry[] | undefined,
@@ -31,7 +31,7 @@ export default async function addEntries(
 ): Promise<Result<AddEntriesResult>> {
   const appConfig = config.get();
 
-  return ensurePod(issuer, subject, hostname, async (pod) => {
+  return ensurePod(hostname, async (pod) => {
     const savedEntryIds: {
       id: number;
       commit: string;

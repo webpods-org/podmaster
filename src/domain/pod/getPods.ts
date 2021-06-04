@@ -13,30 +13,30 @@ export type GetPodsResult = {
 };
 
 export async function getPods(
-  issuer: string,
-  subject: string
+  iss: string,
+  sub: string
 ): Promise<Result<GetPodsResult>> {
   const appConfig = config.get();
   const systemDb = db.getSystemDb();
   const podInfoStmt = systemDb.prepare(
-    `SELECT * FROM "pods" WHERE "issuer"=@issuer AND "subject"=@subject`
+    `SELECT * FROM "pods" WHERE "iss"=@iss AND "sub"=@sub`
   );
 
   // See if it's already in predefined.
   function getPodsFromConfig() {
     return appConfig.pods
       ? appConfig.pods.filter(
-          (x) => x.issuer === issuer && x.subject === subject
+          (x) => x.claims.iss === iss && x.claims.sub === sub
         )
       : [];
   }
 
   function getPodsFromDb() {
     const podInfoStmt = systemDb.prepare(
-      `SELECT * FROM "pods" WHERE "issuer"=@issuer AND "subject"=@subject`
+      `SELECT * FROM "pods" WHERE "iss"=@iss AND "sub"=@sub`
     );
 
-    return podInfoStmt.all({ issuer, subject: subject }).map(mapper);
+    return podInfoStmt.all({ iss, sub }).map(mapper);
   }
 
   const pods = getPodsFromConfig()

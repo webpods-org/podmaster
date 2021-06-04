@@ -5,13 +5,10 @@ import { PodInfo } from "../../types/types";
 import { ErrResult, OkResult, Result } from "../../types/api";
 
 export default async function ensurePod<T>(
-  issuer: string,
-  subject: string,
   hostname: string,
-  then: (pod: PodInfo) => Promise<OkResult<T>>
+  then: (pod: PodInfo) => Promise<OkResult<T> | ErrResult>
 ): Promise<OkResult<T> | ErrResult> {
-  const appConfig = config.get();
-  const pod = await getPodByHostname(issuer, subject, hostname);
+  const pod = await getPodByHostname(hostname);
 
   if (pod) {
     return then(pod);

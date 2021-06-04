@@ -8,7 +8,7 @@ export type ExternalAuthServers = {
 
 export type JwksEndpoint = {
   type: "jwks";
-  issuer: string;
+  iss: string;
   url: string;
 };
 
@@ -61,14 +61,16 @@ export type Tier = {
 
 export type LocallyDefinedAsymmetricJwtKey = {
   kid: string;
-  issuer: string;
+  iss: string;
   alg: AsymmetricAlgorithm;
   publicKey: string;
 };
 
 export type PodInfo = {
-  issuer: string;
-  subject: string;
+  claims: {
+    iss: string;
+    sub: string;  
+  },
   pod: string;
   hostname: string;
   hostnameAlias: string | null;

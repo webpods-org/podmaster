@@ -3,8 +3,7 @@ import { PodsRow } from "../types/db";
 
 export default function map(row: PodsRow): PodInfo {
   return {
-    issuer: row.issuer,
-    subject: row.subject,
+    claims: { iss: row.iss, sub: row.sub },
     pod: row.pod,
     hostname: row.hostname,
     hostnameAlias: row.hostname_alias,

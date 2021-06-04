@@ -33,7 +33,7 @@ export default async function createPod(
           Create a randomly named pod.
       */
       const insertPodStmt = systemDb.prepare(
-        `INSERT INTO "pods" VALUES (@issuer, @subject, @pod, @hostname, @hostname_alias, @created_at, @data_dir, @tier)`
+        `INSERT INTO "pods" VALUES (@iss, @sub, @pod, @hostname, @hostname_alias, @created_at, @data_dir, @tier)`
       );
 
       const pod = generatePodId();
@@ -44,8 +44,8 @@ export default async function createPod(
       const podDataDir = join(appConfig.storage.dataDir, pod);
 
       insertPodStmt.run({
-        issuer: userClaims.iss,
-        subject: userClaims.sub,
+        iss: userClaims.iss,
+        sub: userClaims.sub,
         pod: pod,
         hostname,
         hostname_alias: null,
