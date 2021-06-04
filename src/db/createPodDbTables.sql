@@ -1,5 +1,6 @@
 CREATE TABLE IF NOT EXISTS logs (
 	"log" TEXT NOT NULL UNIQUE,
+  "public" INTEGER NOT NULL,
   "created_at" INTEGER NOT NULL,
   "tags" TEXT NOT NULL,
   PRIMARY KEY (log)

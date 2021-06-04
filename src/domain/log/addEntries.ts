@@ -5,8 +5,10 @@ import random from "../../utils/random";
 import { Files } from "formidable";
 import { createHash } from "crypto";
 import { Result } from "../../types/api";
-import ensureOwnPod from "./ensureOwnPod";
 import { EntriesRow } from "../../types/db";
+import ensurePod from "./ensurePod";
+import { getPermissionsForLog } from "./checkPermissionsForLog";
+import { ACCESS_DENIED } from "../../errors/codes";
 
 export type AddEntriesResult = {
   entries: {
@@ -31,69 +33,79 @@ export default async function addEntries(
 ): Promise<Result<AddEntriesResult>> {
   const appConfig = config.get();
 
-  return ensureOwnPod(iss, sub, hostname, async (pod) => {
+  return ensurePod(hostname, async (pod) => {
     const savedEntryIds: {
       id: number;
       commit: string;
     }[] = [];
 
-    if (entries) {
-      // Let's see if the log already exists.
-      const podDataDir = join(appConfig.storage.dataDir, pod.dataDir);
-      const podDb = db.getPodDb(podDataDir);
+    // Let's see if the log already exists.
+    const podDataDir = join(appConfig.storage.dataDir, pod.dataDir);
+    const podDb = db.getPodDb(podDataDir);
 
-      const insertEntriesTx = podDb.transaction((entries: LogEntry[]) => {
-        // Get the last item
-        const lastItemStmt = podDb.prepare(
-          `SELECT "id", "commit" FROM "entries" ORDER BY id DESC LIMIT 1`
-        );
+    const permissions = await getPermissionsForLog(pod, iss, sub, log, podDb);
 
-        let { id: lastId, commit: lastCommit } = (lastItemStmt.get() as
-          | EntriesRow
-          | undefined) || {
-          id: 0,
-          commit: "",
-        };
-
-        for (const entry of entries) {
-          const commitAndData = `${lastCommit};${entry.data}`;
-
-          const newCommit = createHash("sha256")
-            .update(commitAndData)
-            .digest("hex");
-
-          const insertLogStmt = podDb.prepare(
-            `INSERT INTO "entries" ("commit", "previous_commit", "log", "data", "created_at") VALUES (@commit, @previous_commit, @log, @data, @created_at)`
+    if (permissions.admin || permissions.write) {
+      if (entries) {
+        const insertEntriesTx = podDb.transaction((entries: LogEntry[]) => {
+          // Get the last item
+          const lastItemStmt = podDb.prepare(
+            `SELECT "id", "commit" FROM "entries" ORDER BY id DESC LIMIT 1`
           );
 
-          insertLogStmt.run({
-            commit: newCommit,
-            log,
-            data: entry.data,
-            previous_commit: lastCommit,
-            created_at: Date.now(),
-          });
+          let { id: lastId, commit: lastCommit } = (lastItemStmt.get() as
+            | EntriesRow
+            | undefined) || {
+            id: 0,
+            commit: "",
+          };
 
-          savedEntryIds.push({
-            id: lastId + 1,
-            commit: newCommit,
-          });
+          for (const entry of entries) {
+            const commitAndData = `${lastCommit};${entry.data}`;
 
-          lastId++;
-          lastCommit = newCommit;
-        }
-      });
+            const newCommit = createHash("sha256")
+              .update(commitAndData)
+              .digest("hex");
 
-      insertEntriesTx.immediate(entries);
+            const insertLogStmt = podDb.prepare(
+              `INSERT INTO "entries" ("commit", "previous_commit", "log", "data", "created_at") VALUES (@commit, @previous_commit, @log, @data, @created_at)`
+            );
 
-      return {
-        ok: true,
-        entries: savedEntryIds,
-      };
+            insertLogStmt.run({
+              commit: newCommit,
+              log,
+              data: entry.data,
+              previous_commit: lastCommit,
+              created_at: Date.now(),
+            });
+
+            savedEntryIds.push({
+              id: lastId + 1,
+              commit: newCommit,
+            });
+
+            lastId++;
+            lastCommit = newCommit;
+          }
+        });
+
+        insertEntriesTx.immediate(entries);
+
+        return {
+          ok: true,
+          entries: savedEntryIds,
+        };
+      } else {
+        return {
+          ok: true,
+          entries: [],
+        };
+      }
     } else {
       return {
-        ok: true,
-        entries: [],
+        ok: false,
+        code: ACCESS_DENIED,
+        error: "Access denied.",
       };
     }
   });

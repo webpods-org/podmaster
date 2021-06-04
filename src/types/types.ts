@@ -83,6 +83,7 @@ export type PodInfo = {
 export type LogInfo = {
   pod: string;
   log: string;
+  public: boolean;
   createdAt: number;
   tags: string | null;
 };

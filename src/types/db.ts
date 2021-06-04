@@ -12,6 +12,7 @@ export type PodsRow = {
 export type LogsRow = {
   pod: string;
   log: string;
+  public: number;
   created_at: number;
   tags: string | null;
 };
