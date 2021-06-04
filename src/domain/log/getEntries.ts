@@ -19,8 +19,9 @@ export default async function getEntries(
   fromId?: number,
   fromCommit?: string,
   commaSeperatedCommits?: string,
-  count?: number
+  maxResults?: number
 ): Promise<Result<GetEntriesResult>> {
+  const limit = maxResults || 100;
   const appConfig = config.get();
 
   return ensurePod(issuer, subject, hostname, async (pod) => {
@@ -36,7 +37,7 @@ export default async function getEntries(
       return getEntriesStmt.all({
         id,
         log,
-        count: count || 100,
+        count: limit,
       }) as EntriesRow[];
     }
 
@@ -71,6 +72,10 @@ export default async function getEntries(
 
         if (commitRow) {
           commitRows.push(commitRow);
+
+          if (commitRows.length === limit) {
+            return commitRows;
+          }
         }
       }
 

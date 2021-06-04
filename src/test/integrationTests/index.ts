@@ -103,7 +103,7 @@ export default function run(
               data: "world",
             },
             {
-              data: "forever",
+              data: "mask",
             },
           ],
         })
@@ -130,7 +130,7 @@ export default function run(
 
     it("gets entries from a log after id", async () => {
       const response = await request(app)
-        .get(`/logs/${log}/entries?fromId=1`)
+        .get(`/logs/${log}/entries?sinceId=1`)
         .set("Host", hostname)
         .set("Authorization", `Bearer ${jwt}`);
 
@@ -141,7 +141,7 @@ export default function run(
 
     it("gets entries from a log after commit", async () => {
       const response = await request(app)
-        .get(`/logs/${log}/entries?fromCommit=${entries[1].commit}`)
+        .get(`/logs/${log}/entries?sinceCommit=${entries[1].commit}`)
         .set("Host", hostname)
         .set("Authorization", `Bearer ${jwt}`);
 
@@ -163,6 +163,18 @@ export default function run(
       response.status.should.equal(200);
       const apiResult: GetEntriesAPIResult = JSON.parse(response.text);
       apiResult.entries.length.should.equal(2);
+    });
+
+    it("limit results by count", async () => {
+      const response = await request(app)
+        .get(`/logs/${log}/entries?limit=2`)
+        .set("Host", hostname)
+        .set("Authorization", `Bearer ${jwt}`);
+
+      response.status.should.equal(200);
+      const apiResult: GetEntriesAPIResult = JSON.parse(response.text);
+      apiResult.entries.length.should.equal(2);
+      entries.push(...apiResult.entries);
     });
 
     it("adds a permission to a log", async () => {

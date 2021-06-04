@@ -20,10 +20,10 @@ export default async function getEntriesAPI(ctx: IRouterContext) {
         ctx.state.jwt.claims.sub,
         hostname,
         ctx.params.log,
-        transformQuery(ctx.request.query.fromId, parseInt),
-        getQuery(ctx.request.query.fromCommit),
+        transformQuery(ctx.request.query.sinceId, parseInt),
+        getQuery(ctx.request.query.sinceCommit),
         getQuery(ctx.request.query.commits),
-        transformQuery(ctx.request.query.count, parseInt)
+        transformQuery(ctx.request.query.limit, parseInt)
       ),
     (result) => {
       const body: GetEntriesAPIResult = {
