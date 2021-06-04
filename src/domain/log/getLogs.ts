@@ -27,7 +27,7 @@ export default async function getLogs(
 
     const podDataDir = join(appConfig.storage.dataDir, pod.dataDir);
     const podDb = db.getPodDb(podDataDir);
-    const getLogsStmt = podDb.prepare("SELECT * FROM logs");
+    const getLogsStmt = podDb.prepare(`SELECT * FROM "logs"`);
 
     const logs = getLogsStmt
       .all()

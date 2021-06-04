@@ -26,7 +26,7 @@ export default async function addPermission(
   permission: Permission
 ): Promise<Result<AddPermissionResult>> {
   const appConfig = config.get();
-  
+
   return ensurePod(issuer, subject, hostname, async (pod) => {
     // Let's see if the log already exists.
     const podDataDir = join(appConfig.storage.dataDir, pod.dataDir);
@@ -34,7 +34,7 @@ export default async function addPermission(
 
     // See if the permission already exists.
     const existingPermStmt = podDb.prepare(
-      "SELECT * FROM permissions WHERE log=@log AND iss=@iss AND sub=@sub"
+      `SELECT * FROM "permissions" WHERE "log"=@log AND "iss"=@iss AND "sub"=@sub`
     );
 
     const existingItem = existingPermStmt.get({
@@ -46,7 +46,7 @@ export default async function addPermission(
     // Don't insert if it already exists.
     if (!existingItem) {
       const insertPermStmt = podDb.prepare(
-        "INSERT INTO permissions (log, iss, sub, read, write, admin, metadata, created_at) VALUES (@log, @iss, @sub, @read, @write, @admin, @metadata, @created_at)"
+        `INSERT INTO "permissions" ("log", "iss", "sub", "read", "write", "admin", "metadata", "created_at") VALUES (@log, @iss, @sub, @read, @write, @admin, @metadata, @created_at)`
       );
 
       insertPermStmt.run({

@@ -24,7 +24,7 @@ export async function getPodByHostname(
 
   function getPodFromDb() {
     const podInfoStmt = systemDb.prepare(
-      "SELECT * FROM pods WHERE issuer=@issuer AND subject=@subject AND (hostname=@hostname OR hostname_alias=@hostname)"
+      `SELECT * FROM "pods" WHERE "issuer"=@issuer AND "subject"=@subject AND ("hostname"=@hostname OR "hostname_alias"=@hostname)`
     );
 
     const dbRow = podInfoStmt.get({

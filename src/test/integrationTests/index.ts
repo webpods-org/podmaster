@@ -11,6 +11,7 @@ import { CreateLogAPIResult } from "../../api/logs/createLog";
 import { AddEntriesAPIResult } from "../../api/logs/addEntries";
 import { GetPermissionsAPIResult } from "../../api/logs/getPermissions";
 import { GetEntriesAPIResult } from "../../api/logs/getEntries";
+import { LogEntry } from "../../types/types";
 
 let app: any;
 
@@ -39,6 +40,7 @@ export default function run(
     let hostname: string;
     let pod: string;
     let log: string;
+    let entries: LogEntry[] = [];
 
     it("creates a pod", async () => {
       const response = await request(app)
@@ -89,7 +91,7 @@ export default function run(
       should.exist(apiResult.logs);
     });
 
-    it("writes a log entry", async () => {
+    it("writes log entries", async () => {
       const response = await request(app)
         .post(`/logs/${log}/entries`)
         .send({
@@ -99,6 +101,9 @@ export default function run(
             },
             {
               data: "world",
+            },
+            {
+              data: "forever",
             },
           ],
         })
@@ -119,7 +124,45 @@ export default function run(
 
       response.status.should.equal(200);
       const apiResult: GetEntriesAPIResult = JSON.parse(response.text);
-      apiResult.entries.length.should.be.greaterThan(0);
+      apiResult.entries.length.should.equal(3);
+      entries.push(...apiResult.entries);
+    });
+
+    it("gets entries from a log after id", async () => {
+      const response = await request(app)
+        .get(`/logs/${log}/entries?fromId=1`)
+        .set("Host", hostname)
+        .set("Authorization", `Bearer ${jwt}`);
+
+      response.status.should.equal(200);
+      const apiResult: GetEntriesAPIResult = JSON.parse(response.text);
+      apiResult.entries.length.should.equal(2);
+    });
+
+    it("gets entries from a log after commit", async () => {
+      const response = await request(app)
+        .get(`/logs/${log}/entries?fromCommit=${entries[1].commit}`)
+        .set("Host", hostname)
+        .set("Authorization", `Bearer ${jwt}`);
+
+      response.status.should.equal(200);
+      const apiResult: GetEntriesAPIResult = JSON.parse(response.text);
+      apiResult.entries.length.should.equal(1);
+    });
+
+    it("gets entries by commits", async () => {
+      const commits = entries
+        .slice(1)
+        .map((x) => x.commit)
+        .join(",");
+      const response = await request(app)
+        .get(`/logs/${log}/entries?commits=${commits}`)
+        .set("Host", hostname)
+        .set("Authorization", `Bearer ${jwt}`);
+
+      response.status.should.equal(200);
+      const apiResult: GetEntriesAPIResult = JSON.parse(response.text);
+      apiResult.entries.length.should.equal(2);
     });
 
     it("adds a permission to a log", async () => {

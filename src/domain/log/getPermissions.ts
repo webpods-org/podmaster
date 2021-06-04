@@ -27,7 +27,7 @@ export default async function getPermissions(
 
     // See if the permission already exists.
     const existingPermStmt = podDb.prepare(
-      "SELECT * FROM permissions WHERE log=@log"
+      `SELECT * FROM "permissions" WHERE "log"=@log`
     );
 
     const permissions = existingPermStmt.all({ log }).map(mapper);

@@ -30,7 +30,7 @@ export default async function getEntries(
 
     function getEntriesAfterId(id: number) {
       const getEntriesStmt = podDb.prepare(
-        `SELECT "id", "commit", "data" FROM entries WHERE "log" = @log AND "id" > @id LIMIT @count`
+        `SELECT * FROM "entries" WHERE "log" = @log AND "id" > @id LIMIT @count`
       );
 
       return getEntriesStmt.all({
@@ -42,7 +42,7 @@ export default async function getEntries(
 
     function getEntriesAfterCommit(commit: string) {
       const getCommitStmt = podDb.prepare(
-        `SELECT "id" FROM entries WHERE log = @log AND "commit" = @commit`
+        `SELECT "id" FROM "entries" WHERE "log" = @log AND "commit" = @commit`
       );
 
       const commitRow: EntriesRow = getCommitStmt.get({
@@ -51,30 +51,20 @@ export default async function getEntries(
       });
 
       if (commitRow) {
-        const id = commitRow.id;
-
-        const getEntriesStmt = podDb.prepare(
-          `SELECT "id", "commit", "data" FROM entries WHERE "log" = @log AND "id" > @id LIMIT @count`
-        );
-
-        return getEntriesStmt.all({
-          id: fromId,
-          log,
-          count: count || 100,
-        }) as EntriesRow[];
+        return getEntriesAfterId(commitRow.id);
       } else {
         return [] as EntriesRow[];
       }
     }
 
-    function getEntriesByCommit(commaSeperatedCommits: string) {
+    function getEntriesByCommits(commaSeperatedCommits: string) {
       const commitList = commaSeperatedCommits.split(",").map((x) => x.trim());
 
       const commitRows: EntriesRow[] = [];
 
       for (const commit of commitList) {
         const getSingleCommitStmt = podDb.prepare(
-          `SELECT "id", "commit", "data" FROM entries WHERE "log" = @log AND "commit" = @commit`
+          `SELECT * FROM "entries" WHERE "log" = @log AND "commit" = @commit`
         );
 
         const commitRow = getSingleCommitStmt.get({ log, commit: commit });
@@ -92,7 +82,7 @@ export default async function getEntries(
       : fromCommit
       ? getEntriesAfterCommit(fromCommit)
       : commaSeperatedCommits
-      ? getEntriesByCommit(commaSeperatedCommits)
+      ? getEntriesByCommits(commaSeperatedCommits)
       : getEntriesAfterId(0);
 
     if (dbEntries) {

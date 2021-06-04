@@ -19,7 +19,7 @@ export async function getPods(
   const appConfig = config.get();
   const systemDb = db.getSystemDb();
   const podInfoStmt = systemDb.prepare(
-    "SELECT * FROM pods WHERE issuer=@issuer AND subject=@subject"
+    `SELECT * FROM "pods" WHERE "issuer"=@issuer AND "subject"=@subject`
   );
 
   // See if it's already in predefined.
@@ -33,7 +33,7 @@ export async function getPods(
 
   function getPodsFromDb() {
     const podInfoStmt = systemDb.prepare(
-      "SELECT * FROM pods WHERE issuer=@issuer AND subject=@subject"
+      `SELECT * FROM "pods" WHERE "issuer"=@issuer AND "subject"=@subject`
     );
 
     return podInfoStmt.all({ issuer, subject: subject }).map(mapper);

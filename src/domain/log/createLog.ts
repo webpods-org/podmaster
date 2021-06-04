@@ -30,7 +30,7 @@ export default async function createLog(
     const podDb = db.getPodDb(podDataDir);
 
     const insertLogStmt = podDb.prepare(
-      "INSERT INTO logs VALUES (@log, @created_at, @tags)"
+      `INSERT INTO "logs" VALUES (@log, @created_at, @tags)`
     );
 
     insertLogStmt.run({

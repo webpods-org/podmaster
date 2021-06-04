@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS logs (
 CREATE TABLE IF NOT EXISTS entries (
   "id" INTEGER,
   "commit" TEXT NOT NULL UNIQUE,
+  "previous_commit" TEXT NOT NULL UNIQUE,
 	"log" TEXT NOT NULL,
   "data" TEXT NOT NULL,
   "created_at" INTEGER NOT NULL,

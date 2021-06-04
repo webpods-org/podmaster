@@ -3,13 +3,10 @@ import getEntries from "../../domain/log/getEntries";
 import transformQuery from "../utils/transformQuery";
 import handleResult from "../handleResult";
 import getQuery from "../utils/getParam";
+import { LogEntry } from "../../types/types";
 
 export type GetEntriesAPIResult = {
-  entries: {
-    id: number;
-    commit: string;
-    data: string;
-  }[];
+  entries: LogEntry[];
 };
 
 export default async function getEntriesAPI(ctx: IRouterContext) {
