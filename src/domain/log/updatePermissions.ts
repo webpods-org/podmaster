@@ -5,6 +5,7 @@ import random from "../../utils/random";
 import { Permission } from "../../types/types";
 import { Result } from "../../types/api";
 import ensurePod from "./ensurePod";
+import ensureOwnPod from "./ensureOwnPod";
 
 export type UpdatePermissionsResult = {
   added: number;
@@ -29,7 +30,7 @@ export default async function updatePermissions(
 ): Promise<Result<UpdatePermissionsResult>> {
   const appConfig = config.get();
 
-  return ensurePod(hostname, async (pod) => {
+  return ensureOwnPod(iss, sub, hostname, async (pod) => {
     // Let's see if the log already exists.
     const podDataDir = join(appConfig.storage.dataDir, pod.dataDir);
     const podDb = db.getPodDb(podDataDir);

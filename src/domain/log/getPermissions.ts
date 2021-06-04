@@ -8,6 +8,7 @@ import { Permission } from "../../types/types";
 import { Result } from "../../types/api";
 import mapper from "../../mappers/permission";
 import ensurePod from "./ensurePod";
+import ensureOwnPod from "./ensureOwnPod";
 
 export type GetPermissionsResult = {
   permissions: Permission[];
@@ -21,7 +22,7 @@ export default async function getPermissions(
 ): Promise<Result<GetPermissionsResult>> {
   const appConfig = config.get();
 
-  return ensurePod(hostname, async (pod) => {
+  return ensureOwnPod(iss,sub, hostname, async (pod) => {
     const podDataDir = join(appConfig.storage.dataDir, pod.dataDir);
     const podDb = db.getPodDb(podDataDir);
 

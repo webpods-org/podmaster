@@ -7,6 +7,7 @@ import { getPodByHostname } from "../pod/getPodByHostname";
 import { LogsRow } from "../../types/db";
 import { Result } from "../../types/api";
 import ensurePod from "./ensurePod";
+import ensureOwnPod from "./ensureOwnPod";
 
 export type GetLogsResult = {
   logs: {
@@ -22,7 +23,7 @@ export default async function getLogs(
 ): Promise<Result<GetLogsResult>> {
   const appConfig = config.get();
 
-  return ensurePod(hostname, async (pod) => {
+  return ensureOwnPod(iss, sub, hostname, async (pod) => {
     const tagsList = tags ? tags.split(",") : [];
 
     const podDataDir = join(appConfig.storage.dataDir, pod.dataDir);

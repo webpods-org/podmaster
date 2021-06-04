@@ -5,7 +5,7 @@ import random from "../../utils/random";
 import { Files } from "formidable";
 import { createHash } from "crypto";
 import { Result } from "../../types/api";
-import ensurePod from "./ensurePod";
+import ensureOwnPod from "./ensureOwnPod";
 import { EntriesRow } from "../../types/db";
 
 export type AddEntriesResult = {
@@ -31,7 +31,7 @@ export default async function addEntries(
 ): Promise<Result<AddEntriesResult>> {
   const appConfig = config.get();
 
-  return ensurePod(hostname, async (pod) => {
+  return ensureOwnPod(iss, sub, hostname, async (pod) => {
     const savedEntryIds: {
       id: number;
       commit: string;
