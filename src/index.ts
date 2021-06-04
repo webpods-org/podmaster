@@ -48,20 +48,7 @@ export async function startApp(port: number, configFile: string) {
 
   // Set up a custom hostname
   // router.put("/settings/hostname", podsApi.createPodAPI);
-
   // router.get("/profile", userApi.getProfile);
-  // router.delete("/pods", podsApi.removePodAPI);
-
-  // router.get("/pods/:name/permissions", podsApi.getPermissionsAPI);
-  // router.post("/pods/:name/permissions/updates", podsApi.updatePermissionsAPI);
-  // router.delete("/pods/:name/permissions", podsApi.removePermissionsAPI);
-
-  // router.post("/logs", logsApi.createLogAPI);
-  // router.delete("/logs", logsApi.removeLogAPI);
-  // router.post("/logs/:id/entries", logsApi.addEntriesAPI);
-  // router.get("/logs/:id/permissions", podsApi.getPermissionsAPI);
-  // router.post("/logs/:id/permissions/updates", podsApi.updatePermissionsAPI);
-  // router.delete("/logs/:id/permissions", podsApi.removePermissionsAPI);
 
   if (appConfig.streams && appConfig.streams.includes("websocket")) {
     // TODO: Setup web sockets...
