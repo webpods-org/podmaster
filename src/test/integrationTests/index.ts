@@ -6,7 +6,7 @@ import should = require("should");
 import { GetPodsAPIResult } from "../../api/pods/getPods";
 import { CreatePodAPIResult } from "../../api/pods/createPod";
 import { GetLogsAPIResult } from "../../api/logs/getLogs";
-import { AddPermissionAPIResult } from "../../api/logs/addPermission";
+import { UpdatePermissionsAPIResult } from "../../api/logs/updatePermissions";
 import { CreateLogAPIResult } from "../../api/logs/createLog";
 import { AddEntriesAPIResult } from "../../api/logs/addEntries";
 import { GetPermissionsAPIResult } from "../../api/logs/getPermissions";
@@ -179,25 +179,29 @@ export default function run(
 
     it("adds a permission to a log", async () => {
       const response = await request(app)
-        .post(`/logs/${log}/permissions`)
+        .post(`/logs/${log}/permissions/updates`)
         .send({
-          claims: {
-            iss: "https://example.com",
-            sub: "alice",
-          },
-          access: {
-            read: true,
-            write: false,
-            admin: false,
-            metadata: false,
-          },
+          add: [
+            {
+              claims: {
+                iss: "https://example.com",
+                sub: "alice",
+              },
+              access: {
+                read: true,
+                write: false,
+                admin: false,
+                metadata: false,
+              },
+            },
+          ],
         })
         .set("Host", hostname)
         .set("Authorization", `Bearer ${jwt}`);
 
       response.status.should.equal(200);
-      const apiResult: AddPermissionAPIResult = JSON.parse(response.text);
-      apiResult.added.should.be.true();
+      const apiResult: UpdatePermissionsAPIResult = JSON.parse(response.text);
+      apiResult.added.should.equal(1);
     });
 
     it("gets all permissions for a log", async () => {
