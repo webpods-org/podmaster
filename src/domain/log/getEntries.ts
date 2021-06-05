@@ -34,24 +34,7 @@ export default async function getEntries(
 
     const permissions = await getPermissionsForLog(pod, iss, sub, log, podDb);
 
-    // Entries can be read if either a) is owner, or b) granted permissions.
-    function checkPermissions() {
-      const getPermissionsStmt = podDb.prepare(
-        `SELECT * FROM "permissions" WHERE "log" = @log`
-      );
-
-      const permissions = getPermissionsStmt
-        .all({ log })
-        .map(permissionsMapper);
-
-      return permissions.some(
-        (x) => x.claims.iss === iss && x.claims.sub === sub && x.access.read
-      );
-    }
-
-    const hasPermissions =
-      (pod.claims.iss === iss && pod.claims.sub === sub) || checkPermissions();
-    if (hasPermissions) {
+    if (permissions.read) {
       function getEntriesAfterId(id: number) {
         const getEntriesStmt = podDb.prepare(
           `SELECT * FROM "entries" WHERE "log" = @log AND "id" > @id LIMIT @count`

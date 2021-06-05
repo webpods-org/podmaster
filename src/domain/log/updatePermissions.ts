@@ -98,7 +98,3 @@ export default async function updatePermissions(
     }
   });
 }
-
-function generateLogId() {
-  return random(8);
-}

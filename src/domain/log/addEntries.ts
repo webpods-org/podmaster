@@ -110,7 +110,3 @@ export default async function addEntries(
     }
   });
 }
-
-function generateLogId() {
-  return random(8);
-}
