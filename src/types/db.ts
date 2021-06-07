@@ -19,6 +19,7 @@ export type LogsRow = {
 
 export type EntriesRow = {
   id: number;
+  content_hash: string;
   commit: string;
   previous_commit: string;
   log: string;

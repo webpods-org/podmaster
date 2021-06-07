@@ -56,7 +56,7 @@ export async function startApp(port: number, configFile: string) {
   // Start app
   var app = new Koa();
   app.use(jwtMiddleware({ exclude: [/^\/\.well-known\//] }));
-  app.use(bodyParser());
+  app.use(bodyParser({ multipart: true }));
   app.use(router.routes());
   app.use(router.allowedMethods());
   app.listen(port);

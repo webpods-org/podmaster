@@ -116,6 +116,23 @@ export default function run(
       apiResult.entries.length.should.be.greaterThan(0);
     });
 
+    it("writes files", async () => {
+      const file1 = join(__dirname, "fixtures/hello.txt");
+      const file2 = join(__dirname, "fixtures/world.txt");
+
+      const response = await request(app)
+        .post(`/logs/${log}/entries`)
+        .set("Host", hostname)
+        .set("Authorization", `Bearer ${jwt}`)
+        .attach("hello.txt", file1)
+        .attach("world.txt", file2);
+
+      response.status.should.equal(200);
+      const apiResult: AddEntriesAPIResult = JSON.parse(response.text);
+      should.exist(apiResult.entries);
+      apiResult.entries.length.should.be.greaterThan(0);
+    });
+
     it("gets entries from a log", async () => {
       const response = await request(app)
         .get(`/logs/${log}/entries`)
@@ -124,7 +141,7 @@ export default function run(
 
       response.status.should.equal(200);
       const apiResult: GetEntriesAPIResult = JSON.parse(response.text);
-      apiResult.entries.length.should.equal(3);
+      apiResult.entries.length.should.equal(5);
       entries.push(...apiResult.entries);
     });
 
@@ -136,7 +153,7 @@ export default function run(
 
       response.status.should.equal(200);
       const apiResult: GetEntriesAPIResult = JSON.parse(response.text);
-      apiResult.entries.length.should.equal(2);
+      apiResult.entries.length.should.equal(4);
     });
 
     it("gets entries from a log after commit", async () => {
@@ -147,7 +164,7 @@ export default function run(
 
       response.status.should.equal(200);
       const apiResult: GetEntriesAPIResult = JSON.parse(response.text);
-      apiResult.entries.length.should.equal(1);
+      apiResult.entries.length.should.equal(3);
     });
 
     it("gets entries by commits", async () => {
@@ -162,7 +179,7 @@ export default function run(
 
       response.status.should.equal(200);
       const apiResult: GetEntriesAPIResult = JSON.parse(response.text);
-      apiResult.entries.length.should.equal(2);
+      apiResult.entries.length.should.equal(4);
     });
 
     it("limit results by count", async () => {

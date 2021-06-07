@@ -1,9 +1,10 @@
-import { LogEntry, LogInfo, Permission } from "../types/types";
-import { EntriesRow, LogsRow, PermissionsRow } from "../types/db";
+import { LogEntry } from "../types/types";
+import { EntriesRow } from "../types/db";
 
 export default function map(row: EntriesRow): LogEntry {
   return {
     id: row.id,
+    contentHash: row.content_hash,
     commit: row.commit,
     previousCommit: row.previous_commit,
     data: row.data,

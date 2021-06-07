@@ -119,6 +119,7 @@ export type Permission = {
 
 export type LogEntry = {
   id: number;
+  contentHash: string;
   commit: string;
   previousCommit: string;
   data: string;
