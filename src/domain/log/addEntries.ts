@@ -68,7 +68,7 @@ export default async function addEntries(
           const file = Array.isArray(fileOrFiles)
             ? fileOrFiles[0]
             : fileOrFiles;
-          const extension = extname(file.path);
+          const extension = file.name ? extname(file.name) : undefined;
           const randomFilename = random(12);
           const newFilename = extension
             ? `${randomFilename}${extension}`
