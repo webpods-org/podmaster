@@ -11,6 +11,7 @@ import { getPermissionsForLog } from "./checkPermissionsForLog";
 
 export type GetInfoResult = {
   count: number;
+  commit: string;
   notifiers: Notifier[];
 };
 
@@ -32,14 +33,18 @@ export default async function getInfo(
     if (permissions.read) {
       // Get the last item
       const lastItemStmt = podDb.prepare(
-        `SELECT "id" FROM "entries" ORDER BY id DESC LIMIT 1`
+        `SELECT "id", "commit" FROM "entries" ORDER BY id DESC LIMIT 1`
       );
 
-      let { id } = (lastItemStmt.get() as EntriesRow | undefined) || { id: 0 };
+      let { id, commit } = (lastItemStmt.get() as EntriesRow | undefined) || {
+        id: 0,
+        commit: "",
+      };
 
       return {
         ok: true,
         count: id,
+        commit,
         notifiers: appConfig.notifiers || [],
       };
     } else {
