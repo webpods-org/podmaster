@@ -11,7 +11,7 @@ import { ACCESS_DENIED } from "../../errors/codes";
 import mv = require("mv");
 import random from "../../utils/random";
 import { promisify } from "util";
-import { readFileSync } from "fs";
+import { existsSync, readFileSync } from "fs";
 
 const moveFile = promisify(mv);
 
@@ -64,22 +64,53 @@ export default async function addEntries(
         for (const field in files) {
           const fileOrFiles = files[field];
 
-          // Move the file...
+          /*
+            Move the file...
+            First, we'll try to use the incoming file name.
+            But have to check if it already exists.
+          */
           const file = Array.isArray(fileOrFiles)
             ? fileOrFiles[0]
             : fileOrFiles;
-          const extension = file.name ? extname(file.name) : undefined;
-          const randomFilename = random(12);
-          const newFilename = extension
-            ? `${randomFilename}${extension}`
-            : randomFilename;
 
-          const newPath = join(
-            appConfig.storage.dataDir,
-            pod.dataDir,
-            log,
-            newFilename
-          );
+          // Remove this check if not needed.
+          if (file.name?.includes("..") || file.name?.includes("/")) {
+            throw new Error(
+              `Filename has invalid characters. iss=${iss}, sub=${sub}.`
+            );
+          }
+
+          function getRandomFilePath() {
+            const extension = file.name ? extname(file.name) : undefined;
+            const randomFilename = random(12);
+            const newFilename = extension
+              ? `${randomFilename}${extension}`
+              : randomFilename;
+
+            return join(
+              appConfig.storage.dataDir,
+              pod.dataDir,
+              log,
+              newFilename
+            );
+          }
+
+          function getFilePathBasedOnOriginalName(filename: string) {
+            const preferredFilePath = join(
+              appConfig.storage.dataDir,
+              pod.dataDir,
+              log,
+              filename
+            );
+
+            return !existsSync(preferredFilePath)
+              ? preferredFilePath
+              : getRandomFilePath();
+          }
+
+          const newPath = file.name
+            ? getFilePathBasedOnOriginalName(file.name)
+            : getRandomFilePath();
 
           await moveFile(file.path, newPath);
 
