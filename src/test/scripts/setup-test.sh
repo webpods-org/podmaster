@@ -1,5 +1,5 @@
-if [[ ! $# -eq 3 ]] ; then
-    echo 'Usage is ./setup-test $CONFIG_DIR $HOSTNAME $JWT_ISSUER_HOSTNAME'
+if [[ ! $# -eq 4 ]] ; then
+    echo 'Usage is ./setup-test $CONFIG_DIR $HOSTNAME $JWT_ISSUER_HOSTNAME $NOTIFIER_HOSTNAME'
     exit 1
 fi
 
@@ -13,6 +13,7 @@ CONFIG_DIR=${1%/}
 
 HOSTNAME=$2
 JWT_ISSUER_HOSTNAME=$3
+NOTIFIER_HOSTNAME=$4
 
 # Get script directory
 SCRIPT_PATH=$(dirname "$0")
@@ -26,7 +27,7 @@ ssh-keygen -f "$CONFIG_DIR/jwtRS256.key.pub" -e -m pem > "$CONFIG_DIR/jwtRS256.k
 "$SCRIPT_PATH/create-jwt.sh" $CONFIG_DIR $HOSTNAME $JWT_ISSUER_HOSTNAME > "$CONFIG_DIR/jwt"
 
 # Create the config file.
-"$SCRIPT_PATH/create-config.sh" $CONFIG_DIR $HOSTNAME $JWT_ISSUER_HOSTNAME
+"$SCRIPT_PATH/create-config.sh" $CONFIG_DIR 
 
 # Create the env variables file.
-"$SCRIPT_PATH/create-env.sh" $CONFIG_DIR $HOSTNAME $JWT_ISSUER_HOSTNAME
+"$SCRIPT_PATH/create-env.sh" $CONFIG_DIR $HOSTNAME $JWT_ISSUER_HOSTNAME $NOTIFIER_HOSTNAME

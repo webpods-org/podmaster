@@ -40,6 +40,7 @@ export async function startApp(port: number, configFile: string) {
   // logs
   router.get("/logs", logsApi.getLogsAPI);
   router.post("/logs", logsApi.createLogAPI);
+  router.get("/logs/:log/info", logsApi.getInfoAPI);
   router.get("/logs/:log/entries", logsApi.getEntriesAPI);
   router.post("/logs/:log/entries", logsApi.addEntriesAPI);
   router.get("/logs/:log/permissions", logsApi.getPermissionsAPI);
@@ -48,10 +49,6 @@ export async function startApp(port: number, configFile: string) {
   // Set up a custom hostname
   // router.put("/settings/hostname", podsApi.createPodAPI);
   // router.get("/profile", userApi.getProfile);
-
-  if (appConfig.streams && appConfig.streams.includes("websocket")) {
-    // TODO: Setup web sockets...
-  }
 
   // Start app
   var app = new Koa();

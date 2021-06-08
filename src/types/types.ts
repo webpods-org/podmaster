@@ -12,8 +12,6 @@ export type JwksEndpoint = {
   url: string;
 };
 
-export type StreamType = "websocket";
-
 export type JwtClaims = {
   iss: string;
   sub: string;
@@ -69,8 +67,8 @@ export type LocallyDefinedAsymmetricJwtKey = {
 export type PodInfo = {
   claims: {
     iss: string;
-    sub: string;  
-  },
+    sub: string;
+  };
   pod: string;
   hostname: string;
   hostnameAlias: string | null;
@@ -97,11 +95,11 @@ export type AppConfig = {
   };
   jwksCacheSize?: number;
   jwtKeys?: LocallyDefinedAsymmetricJwtKey[];
-  streams: StreamType[];
   tiers: Tier[];
   storage: StorageConfig;
   pods?: PodInfo[];
   podDbCacheSize?: number;
+  notifiers?: Notifier[];
 };
 
 export type Permission = {
@@ -123,4 +121,9 @@ export type LogEntry = {
   commit: string;
   previousCommit: string;
   data: string;
+};
+
+export type Notifier = {
+  type: "websocket";
+  hostname: string;
 };

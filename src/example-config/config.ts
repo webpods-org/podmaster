@@ -104,7 +104,7 @@ const config: AppConfig = {
       type: "free",
       maxSpaceMB: 64,
       claims: {
-        iss: "https://auth.example.com/"
+        iss: "https://auth.example.com/",
       },
     },
   ],
@@ -129,11 +129,15 @@ const config: AppConfig = {
   },
 
   /*
-    Optional. Whether live streaming updates are enabled.
-    Only websocket is supported as of now.
-    This enables streaming updates for all pods.
+    Optionally, notifiers provide live updates for writes.
+    See the notifier specification.
   */
-  streams: ["websocket"],
+  notifiers: [
+    {
+      type: "websocket",
+      hostname: "notifier.example.com",
+    },
+  ],
 };
 
 /* 

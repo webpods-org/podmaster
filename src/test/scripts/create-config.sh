@@ -1,6 +1,4 @@
 CONFIG_DIR=$1
-HOSTNAME=$2
-JWT_ISSUER_HOSTNAME=$3
 
 # Get script directory
 SCRIPT_PATH=$(dirname "$0")
@@ -11,7 +9,9 @@ cp "$SCRIPT_PATH/../../../dist/example-config/config.js" "$CONFIG_DIR/config-sou
 # make a list of strings to replace
 REPLACE_LIST=$(cat <<"EOF"
 [
-  [`"pods.example.com"`, `process.env.WEBPODS_TEST_HOSTNAME`], 
+  [`"pods.example.com"`, `process.env.WEBPODS_TEST_HOSTNAME`],
+
+  [`"notifier.example.com"`, `process.env.WEBPODS_TEST_NOTIFIER_HOSTNAME`], 
   
   [`"https://auth.example.com/"`, `"https://" + process.env.WEBPODS_TEST_JWT_ISSUER_HOSTNAME + "/"`],
   
