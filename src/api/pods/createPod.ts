@@ -15,7 +15,7 @@ export default async function createPodAPI(ctx: IRouterContext) {
   if (hostname === appConfig.hostname) {
     await handleResult(
       ctx,
-      () => createPod(ctx.state.jwt.claims),
+      () => createPod(ctx.state.jwt?.claims),
       (result) => {
         const body: CreatePodAPIResult = {
           pod: result.pod,

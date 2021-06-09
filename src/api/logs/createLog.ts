@@ -4,12 +4,13 @@ import { IRouterContext } from "koa-router";
 import handleResult from "../handleResult";
 import getQuery from "../utils/getParam";
 import transformQuery from "../utils/transformQuery";
+import { IKoaAppContext } from "../../types/koa";
 
 export type CreateLogAPIResult = {
   log: string;
 };
 
-export default async function createLogAPI(ctx: IRouterContext) {
+export default async function createLogAPI(ctx: IKoaAppContext) {
   const appConfig = config.get();
   const hostname = ctx.URL.hostname;
 
@@ -17,8 +18,8 @@ export default async function createLogAPI(ctx: IRouterContext) {
     ctx,
     () =>
       createLog(
-        ctx.state.jwt.claims.iss,
-        ctx.state.jwt.claims.sub,
+        ctx.state.jwt?.claims.iss,
+        ctx.state.jwt?.claims.sub,
         hostname,
         transformQuery(ctx.request.body.public, x => !!x),
         ctx.request.body.tags

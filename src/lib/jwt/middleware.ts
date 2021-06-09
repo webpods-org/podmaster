@@ -9,6 +9,7 @@ import * as jsonwebtoken from "jsonwebtoken";
 import { ParameterizedContext, Next } from "koa";
 import { AsymmetricAlgorithm } from "../../types/crypto";
 import { LRUMap } from "../lruCache/lru";
+import { Result } from "../../types/api";
 
 // Only this for now.
 const supportedAlgorithms: string[] = ["RS256"];
@@ -41,41 +42,32 @@ export default function jwtMiddleware(options: { exclude: RegExp[] }) {
     if (options.exclude.some((regex) => regex.test(ctx.path))) {
       next();
     } else {
+      if (!(ctx as any).state) {
+        ctx.state = {};
+      }
+
       try {
         const jwtParams = await getJwtParameters(ctx);
 
-        if (!(ctx as any).state) {
-          ctx.state = {};
+        if (jwtParams.ok) {
+          const claims = jsonwebtoken.verify(
+            jwtParams.token,
+            jwtParams.publicKey,
+            {
+              algorithms: [jwtParams.alg],
+            }
+          );
+
+          ctx.state.jwt = {
+            claims,
+          };
+        } else {
+          console.log(jwtParams);
         }
-
-        const claims = jsonwebtoken.verify(
-          jwtParams.token,
-          jwtParams.publicKey,
-          {
-            algorithms: [jwtParams.alg],
-          }
-        );
-
-        ctx.state.jwt = {
-          claims,
-        };
 
         return next();
       } catch (ex) {
         console.log(ex);
-        if (ex instanceof AuthenticationError) {
-          ctx.throw(401, {
-            success: false,
-            error: "Access denied.",
-            code: ACCESS_DENIED,
-          });
-        } else {
-          ctx.throw(401, {
-            success: false,
-            error: "Authentication error.",
-            code: ACCESS_DENIED,
-          });
-        }
       }
     }
   };
@@ -91,14 +83,15 @@ type JwtParamsForAsymmetricAlgorithm = {
 
 async function getJwtParameters(
   ctx: ParameterizedContext
-): Promise<JwtParamsForAsymmetricAlgorithm> {
+): Promise<Result<JwtParamsForAsymmetricAlgorithm>> {
   const token = resolveAuthorizationHeader(ctx);
 
   if (token === null) {
-    throw new AuthenticationError(
-      "Authentication error. Missing JWT.",
-      INVALID_JWT
-    );
+    return {
+      ok: false,
+      error: "Authentication error. Missing JWT.",
+      code: INVALID_JWT,
+    };
   }
 
   const decodeResult = jsonwebtoken.decode(token, {
@@ -106,10 +99,11 @@ async function getJwtParameters(
   });
 
   if (decodeResult === null) {
-    throw new AuthenticationError(
-      "Authentication error. Missing JWT.",
-      INVALID_JWT
-    );
+    return {
+      ok: false,
+      error: "Authentication error. Missing JWT.",
+      code: INVALID_JWT,
+    };
   }
 
   const {
@@ -128,10 +122,11 @@ async function getJwtParameters(
 
   //
   if (!supportedAlgorithms.includes(alg.toUpperCase())) {
-    throw new AuthenticationError(
-      `Authentication error. Unsupported algorithm ${alg}.`,
-      JWT_INVALID_ALGORITHM
-    );
+    return {
+      ok: false,
+      error: `Authentication error. Unsupported algorithm ${alg}.`,
+      code: JWT_INVALID_ALGORITHM,
+    };
   }
 
   const appConfig = config.get();
@@ -149,10 +144,11 @@ async function getJwtParameters(
             appConfig.externalAuthServers.allowList?.includes(x)
           )
         ) {
-          throw new AuthenticationError(
-            "Authentication Error. Issuer not in allowList.",
-            ACCESS_DENIED
-          );
+          return {
+            ok: false,
+            error: "Authentication Error. Issuer not in allowList.",
+            code: ACCESS_DENIED,
+          };
         }
       }
       if (appConfig.externalAuthServers.denyList) {
@@ -161,10 +157,11 @@ async function getJwtParameters(
             appConfig.externalAuthServers.denyList?.includes(x)
           )
         ) {
-          throw new AuthenticationError(
-            "Authentication Error. Issuer is in denyList.",
-            ACCESS_DENIED
-          );
+          return {
+            ok: false,
+            error: "Authentication Error. Issuer is in denyList.",
+            code: ACCESS_DENIED,
+          };
         }
       }
 
@@ -176,6 +173,7 @@ async function getJwtParameters(
 
         if (signingKey) {
           return {
+            ok: true,
             ...signingKey,
             token,
             payload,
@@ -190,16 +188,18 @@ async function getJwtParameters(
       if (cacheEntry) {
         if (alg === cacheEntry.alg) {
           return {
+            ok: true,
             ...cacheEntry,
             token,
             payload,
             signature,
           };
         } else {
-          throw new AuthenticationError(
-            "Authentication error. Invalid JWT.",
-            INVALID_JWT
-          );
+          return {
+            ok: false,
+            error: "Authentication error. Invalid JWT.",
+            code: INVALID_JWT,
+          };
         }
       } else {
         const issuerWithoutTrailingSlash = iss.replace(/\/$/, "");
@@ -224,6 +224,7 @@ async function getJwtParameters(
             publicKey,
           });
           return {
+            ok: true,
             token,
             alg: key.alg as AsymmetricAlgorithm,
             publicKey,
@@ -231,23 +232,26 @@ async function getJwtParameters(
             signature,
           };
         } else {
-          throw new AuthenticationError(
-            `Authentication error. Unsupported algorithm ${key.alg}.`,
-            JWT_INVALID_ALGORITHM
-          );
+          return {
+            ok: false,
+            error: `Authentication error. Unsupported algorithm ${key.alg}.`,
+            code: JWT_INVALID_ALGORITHM,
+          };
         }
       }
     } else {
-      throw new AuthenticationError(
-        "Authentication error. Invalid JWT.",
-        INVALID_JWT
-      );
+      return {
+        ok: false,
+        error: "Authentication error. Invalid JWT.",
+        code: INVALID_JWT,
+      };
     }
   } else {
-    throw new AuthenticationError(
-      "Authentication error. Invalid JWT.",
-      INVALID_JWT
-    );
+    return {
+      ok: false,
+      error: "Authentication error. Invalid JWT.",
+      code: INVALID_JWT,
+    };
   }
 }
 

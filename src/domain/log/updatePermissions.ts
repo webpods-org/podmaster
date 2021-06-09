@@ -19,8 +19,8 @@ export type LogEntry = {
 };
 
 export default async function updatePermissions(
-  iss: string,
-  sub: string,
+  iss: string | undefined,
+  sub: string | undefined,
   hostname: string,
   log: string,
   {

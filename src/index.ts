@@ -45,6 +45,7 @@ export async function startApp(port: number, configFile: string) {
   router.post("/logs/:log/entries", logsApi.addEntriesAPI);
   router.get("/logs/:log/permissions", logsApi.getPermissionsAPI);
   router.post("/logs/:log/permissions/updates", logsApi.updatePermissions);
+  router.get("/logs/:log/files", logsApi.getFile);
 
   // Set up a custom hostname
   // router.put("/settings/hostname", podsApi.createPodAPI);

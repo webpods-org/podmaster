@@ -13,8 +13,8 @@ export type GetLogsResult = {
 };
 
 export default async function getLogs(
-  iss: string,
-  sub: string,
+  iss: string | undefined,
+  sub: string | undefined,
   hostname: string,
   tags: string | undefined
 ): Promise<Result<GetLogsResult>> {

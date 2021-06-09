@@ -13,8 +13,8 @@ const noPermissions = {
 
 export async function getPermissionsForLog(
   pod: PodInfo,
-  iss: string,
-  sub: string,
+  iss: string | undefined,
+  sub: string | undefined,
   log: string,
   podDb: Sqlite3.Database
 ): Promise<{

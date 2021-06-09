@@ -12,8 +12,8 @@ export type GetPermissionsResult = {
 };
 
 export default async function getPermissions(
-  iss: string,
-  sub: string,
+  iss: string | undefined,
+  sub: string | undefined,
   hostname: string,
   log: string
 ): Promise<Result<GetPermissionsResult>> {

@@ -11,8 +11,8 @@ export type CreateLogResult = {
 };
 
 export default async function createLog(
-  iss: string,
-  sub: string,
+  iss: string | undefined,
+  sub: string | undefined,
   hostname: string,
   publik?: boolean,
   tags?: string

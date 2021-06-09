@@ -16,8 +16,8 @@ export type GetInfoResult = {
 };
 
 export default async function getInfo(
-  iss: string,
-  sub: string,
+  iss: string | undefined,
+  sub: string | undefined,
   hostname: string,
   log: string
 ): Promise<Result<GetInfoResult>> {

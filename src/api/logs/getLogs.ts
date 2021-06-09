@@ -2,6 +2,7 @@ import * as config from "../../config";
 import { IRouterContext } from "koa-router";
 import getLogs from "../../domain/log/getLogs";
 import handleResult from "../handleResult";
+import { IKoaAppContext } from "../../types/koa";
 
 export type GetLogsAPIResult = {
   logs: {
@@ -9,7 +10,7 @@ export type GetLogsAPIResult = {
   }[];
 };
 
-export default async function getLogsAPI(ctx: IRouterContext) {
+export default async function getLogsAPI(ctx: IKoaAppContext) {
   const appConfig = config.get();
   const hostname = ctx.URL.hostname;
 
@@ -17,8 +18,8 @@ export default async function getLogsAPI(ctx: IRouterContext) {
     ctx,
     () =>
       getLogs(
-        ctx.state.jwt.claims.iss,
-        ctx.state.jwt.claims.sub,
+        ctx.state.jwt?.claims.iss,
+        ctx.state.jwt?.claims.sub,
         hostname,
         ctx.request.body.tags
       ),

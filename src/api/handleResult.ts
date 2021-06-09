@@ -1,5 +1,5 @@
 import { IRouterContext } from "koa-router";
-import { UNKNOWN_ERROR } from "../errors/codes";
+import { ACCESS_DENIED, UNKNOWN_ERROR } from "../errors/codes";
 import { OkResult, Result } from "../types/api";
 
 export default async function handleResult<T>(
@@ -12,8 +12,16 @@ export default async function handleResult<T>(
     if (result.ok) {
       return then(result);
     } else {
-      ctx.status = 500;
-      ctx.body = { error: result.error, code: result.code };
+      if (result.code === ACCESS_DENIED) {
+        ctx.status = 401;
+        ctx.body = {
+          error: "Access denied.",
+          code: ACCESS_DENIED,
+        };
+      } else {
+        ctx.status = 500;
+        ctx.body = { error: result.error, code: result.code };
+      }
     }
   } catch (ex: any) {
     console.log(ex);

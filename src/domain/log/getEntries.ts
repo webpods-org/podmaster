@@ -15,8 +15,8 @@ export type GetEntriesResult = {
 };
 
 export default async function getEntries(
-  iss: string,
-  sub: string,
+  iss: string | undefined,
+  sub: string | undefined,
   hostname: string,
   log: string,
   fromId?: number,

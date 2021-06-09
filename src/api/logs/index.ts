@@ -5,4 +5,5 @@ export { default as addEntriesAPI } from "./addEntries";
 export { default as getEntriesAPI } from "./getEntries";
 export { default as updatePermissions } from "./updatePermissions";
 export { default as getPermissionsAPI } from "./getPermissions";
+export { default as getFile } from "./getFile";
 

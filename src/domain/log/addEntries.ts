@@ -29,8 +29,8 @@ export type LogEntry = {
 };
 
 export default async function addEntries(
-  iss: string,
-  sub: string,
+  iss: string | undefined,
+  sub: string | undefined,
   hostname: string,
   log: string,
   entries: LogEntry[] | undefined,
