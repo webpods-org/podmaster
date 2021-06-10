@@ -6,6 +6,8 @@ import mkdirp = require("mkdirp");
 import { Result } from "../../types/api";
 import ensurePod from "./ensurePod";
 import { ACCESS_DENIED } from "../../errors/codes";
+import { LogsRow } from "../../types/db";
+import { generateInsertStatement } from "../../lib/sqlite";
 export type CreateLogResult = {
   log: string;
 };
@@ -30,16 +32,18 @@ export default async function createLog(
 
       const podDb = db.getPodDb(podDataDir);
 
-      const insertLogStmt = podDb.prepare(
-        `INSERT INTO "logs" (log, created_at, public, tags) VALUES (@log, @created_at, @public, @tags)`
-      );
-
-      insertLogStmt.run({
+      const logsRow: LogsRow = {
         log: log,
         created_at: Date.now(),
         public: publik ? 1 : 0,
         tags: tags || "",
-      });
+      };
+
+      const insertLogStmt = podDb.prepare(
+        generateInsertStatement("logs", logsRow)
+      );
+
+      insertLogStmt.run(logsRow);
 
       await mkdirp(logDir);
 

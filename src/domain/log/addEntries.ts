@@ -13,6 +13,7 @@ import random from "../../utils/random";
 import { promisify } from "util";
 import { existsSync, readFileSync } from "fs";
 import isFilenameValid from "../../lib/validation/checkFilename";
+import { generateInsertStatement } from "../../lib/sqlite";
 
 const moveFile = promisify(mv);
 
@@ -158,11 +159,7 @@ export default async function addEntries(
               .update(lastCommitAndContentHash)
               .digest("hex");
 
-            const insertLogStmt = podDb.prepare(
-              `INSERT INTO "entries" ("content_hash", "commit", "previous_commit", "log", "type", "data", "created_at") VALUES (@content_hash, @commit, @previous_commit, @log, @type, @data, @created_at)`
-            );
-
-            insertLogStmt.run({
+            const entriesRow: Omit<EntriesRow, "id"> = {
               content_hash: contentHash,
               commit: newCommit,
               previous_commit: lastCommit,
@@ -170,7 +167,13 @@ export default async function addEntries(
               data: entry.data,
               type: "data",
               created_at: Date.now(),
-            });
+            };
+
+            const insertEntryStmt = podDb.prepare(
+              generateInsertStatement("entries", entriesRow)
+            );
+
+            insertEntryStmt.run(entriesRow);
 
             savedEntryIds.push({
               id: lastId + 1,
@@ -193,17 +196,13 @@ export default async function addEntries(
 
             const movedFile = movedFiles[file.path];
 
-            const insertLogStmt = podDb.prepare(
-              `INSERT INTO "entries" ("content_hash", "commit", "previous_commit", "log", "type", "data", "created_at") VALUES (@content_hash, @commit, @previous_commit, @log, @type, @data, @created_at)`
-            );
-
             const lastCommitAndContentHash = `${lastCommit};${movedFile.hash}`;
 
             const newCommit = createHash("sha256")
               .update(lastCommitAndContentHash)
               .digest("hex");
 
-            insertLogStmt.run({
+            const entryRow: Omit<EntriesRow, "id"> = {
               commit: newCommit,
               content_hash: movedFile.hash,
               log,
@@ -211,7 +210,13 @@ export default async function addEntries(
               type: "file",
               previous_commit: lastCommit,
               created_at: Date.now(),
-            });
+            };
+
+            const insertEntryStmt = podDb.prepare(
+              generateInsertStatement("entries", entryRow)
+            );
+
+            insertEntryStmt.run(entryRow);
 
             savedEntryIds.push({
               id: lastId + 1,

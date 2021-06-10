@@ -7,6 +7,8 @@ import * as db from "../../db";
 import { join } from "path";
 import mkdirp = require("mkdirp");
 import { Result } from "../../types/api";
+import { PodsRow } from "../../types/db";
+import { generateInsertStatement } from "../../lib/sqlite";
 
 export type CreatePodResult = { hostname: string; pod: string };
 
@@ -32,10 +34,6 @@ export default async function createPod(
         If not:
           Create a randomly named pod.
       */
-      const insertPodStmt = systemDb.prepare(
-        `INSERT INTO "pods" (iss, sub, pod, hostname, hostname_alias, created_at, data_dir, tier) VALUES (@iss, @sub, @pod, @hostname, @hostname_alias, @created_at, @data_dir, @tier)`
-      );
-
       const pod = generatePodId();
 
       // Gotta make a directory.
@@ -43,7 +41,7 @@ export default async function createPod(
 
       const podDataDir = join(appConfig.storage.dataDir, pod);
 
-      insertPodStmt.run({
+      const podsRow: PodsRow = {
         iss: userClaims.iss,
         sub: userClaims.sub,
         pod: pod,
@@ -52,7 +50,13 @@ export default async function createPod(
         created_at: Date.now(),
         tier: "free",
         data_dir: pod,
-      });
+      };
+
+      const insertPodStmt = systemDb.prepare(
+        generateInsertStatement("pods", podsRow)
+      );
+
+      insertPodStmt.run(podsRow);
 
       await mkdirp(podDataDir);
 

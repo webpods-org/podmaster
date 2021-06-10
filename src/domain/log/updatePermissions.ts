@@ -6,6 +6,8 @@ import { Permission } from "../../types/types";
 import { Result } from "../../types/api";
 import ensurePod from "./ensurePod";
 import { ACCESS_DENIED } from "../../errors/codes";
+import { PermissionsRow } from "../../types/db";
+import { generateInsertStatement } from "../../lib/sqlite";
 
 export type UpdatePermissionsResult = {
   added: number;
@@ -51,11 +53,7 @@ export default async function updatePermissions(
 
           // Don't insert if it already exists.
           if (!existingItem) {
-            const insertPermStmt = podDb.prepare(
-              `INSERT INTO "permissions" ("log", "iss", "sub", "read", "write", "admin", "metadata", "created_at") VALUES (@log, @iss, @sub, @read, @write, @admin, @metadata, @created_at)`
-            );
-
-            insertPermStmt.run({
+            const permissionsRow: PermissionsRow = {
               log,
               iss: permission.claims.iss,
               sub: permission.claims.sub,
@@ -64,7 +62,13 @@ export default async function updatePermissions(
               admin: permission.access.admin ? 1 : 0,
               metadata: permission.access.metadata ? 1 : 0,
               created_at: Date.now(),
-            });
+            };
+
+            const insertPermStmt = podDb.prepare(
+              generateInsertStatement("permissions", permissionsRow)
+            );
+
+            insertPermStmt.run(permissionsRow);
           }
         }
       }
