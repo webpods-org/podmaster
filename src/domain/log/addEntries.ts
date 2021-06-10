@@ -3,15 +3,16 @@ import * as db from "../../db";
 import { extname, join } from "path";
 import { Files } from "formidable";
 import { createHash } from "crypto";
-import { Result } from "../../types/api";
+import { ErrResult, Result } from "../../types/api";
 import { EntriesRow } from "../../types/db";
 import ensurePod from "./ensurePod";
 import { getPermissionsForLog } from "./checkPermissionsForLog";
-import { ACCESS_DENIED } from "../../errors/codes";
+import { ACCESS_DENIED, INVALID_FILENAME } from "../../errors/codes";
 import mv = require("mv");
 import random from "../../utils/random";
 import { promisify } from "util";
 import { existsSync, readFileSync } from "fs";
+import isFilenameValid from "../../lib/validation/checkFilename";
 
 const moveFile = promisify(mv);
 
@@ -73,11 +74,13 @@ export default async function addEntries(
             ? fileOrFiles[0]
             : fileOrFiles;
 
-          // Remove this check if not needed.
-          if (file.name?.includes("..") || file.name?.includes("/")) {
-            throw new Error(
-              `Filename has invalid characters. iss=${iss}, sub=${sub}.`
-            );
+          if (file.name && !isFilenameValid(file.name)) {
+            const fileError: ErrResult = {
+              ok: false,
+              code: INVALID_FILENAME,
+              error: "Invalid filename.",
+            };
+            return fileError;
           }
 
           function getRandomFilePath() {

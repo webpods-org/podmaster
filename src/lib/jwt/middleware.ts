@@ -10,6 +10,9 @@ import { ParameterizedContext, Next } from "koa";
 import { AsymmetricAlgorithm } from "../../types/crypto";
 import { LRUMap } from "../lruCache/lru";
 import { Result } from "../../types/api";
+import { log, logException } from "../logger/log";
+import { IKoaAppContext } from "../../types/koa";
+import { JwtClaims } from "../../types/types";
 
 // Only this for now.
 const supportedAlgorithms: string[] = ["RS256"];
@@ -38,12 +41,12 @@ export class AuthenticationError extends Error {
 }
 
 export default function jwtMiddleware(options: { exclude: RegExp[] }) {
-  return async (ctx: ParameterizedContext, next: Next): Promise<void> => {
+  return async (ctx: IKoaAppContext, next: Next): Promise<void> => {
     if (options.exclude.some((regex) => regex.test(ctx.path))) {
       next();
     } else {
       if (!(ctx as any).state) {
-        ctx.state = {};
+        ctx.state = { jwt: undefined };
       }
 
       try {
@@ -58,19 +61,33 @@ export default function jwtMiddleware(options: { exclude: RegExp[] }) {
             }
           );
 
-          ctx.state.jwt = {
-            claims,
-          };
+          // We only support claims which are JSON objects.
+          if (areClaimsValid(claims)) {
+            ctx.state.jwt = {
+              claims,
+            };
+          } else {
+            log(
+              "info",
+              JSON.stringify({ error: "Claim was a string.", jwtParams })
+            );
+          }
         } else {
-          console.log(jwtParams);
+          log("info", JSON.stringify(jwtParams));
         }
 
         return next();
       } catch (ex) {
-        console.log(ex);
+        logException(ex);
       }
     }
   };
+}
+
+function areClaimsValid(claims: object | string): claims is JwtClaims {
+  return (
+    typeof claims === "object" && (claims as any).iss && (claims as any).sub
+  );
 }
 
 type JwtParamsForAsymmetricAlgorithm = {
@@ -267,8 +284,4 @@ function resolveAuthorizationHeader(ctx: ParameterizedContext): string | null {
       ? parts[1]
       : null
     : null;
-}
-
-function removeTrailingSlash(str: string) {
-  return str.replace(/\/$/, "");
 }

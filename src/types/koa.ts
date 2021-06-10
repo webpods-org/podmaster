@@ -1,14 +1,15 @@
 import { IRouterContext } from "koa-router";
 
+export type JwtIdentityClaims = {
+  iss: string;
+  sub: string;
+};
+
 export interface IKoaAppContext extends IRouterContext {
   state: {
     jwt:
       | {
-          claims: {
-            iss: string;
-            sub: string;
-            [key: string]: string;
-          };
+          claims: JwtIdentityClaims;
         }
       | undefined;
   };

@@ -1,17 +1,16 @@
 #!/usr/bin/env node
 
 import Koa = require("koa");
-import mount = require("koa-mount");
 import Router = require("koa-router");
 import bodyParser = require("koa-body");
 import yargs = require("yargs");
 import jwtMiddleware from "./lib/jwt/middleware";
 import { init as jwksMiddlewareInit } from "./lib/jwt/middleware";
 import * as db from "./db";
+import { init as loggerInit } from "./lib/logger/log";
 
 import * as podsApi from "./api/pods";
 import * as logsApi from "./api/logs";
-import * as userApi from "./api/user";
 // import * as logsApi from "./api/logs";
 
 import * as config from "./config";
@@ -24,6 +23,8 @@ const argv = yargs.options({
   p: { type: "number", default: 8080, alias: "port" },
   v: { type: "boolean", alias: "version" },
 }).argv;
+
+const MEGABYTE = 1024 * 1024;
 
 export async function startApp(port: number, configFile: string) {
   const appConfig: AppConfig = require(configFile);
@@ -45,7 +46,7 @@ export async function startApp(port: number, configFile: string) {
   router.post("/logs/:log/entries", logsApi.addEntriesAPI);
   router.get("/logs/:log/permissions", logsApi.getPermissionsAPI);
   router.post("/logs/:log/permissions/updates", logsApi.updatePermissions);
-  router.get("/logs/:log/files", logsApi.getFile);
+  router.get("/logs/:log/files/(.*)", logsApi.getFile);
 
   // Set up a custom hostname
   // router.put("/settings/hostname", podsApi.createPodAPI);
@@ -54,7 +55,12 @@ export async function startApp(port: number, configFile: string) {
   // Start app
   var app = new Koa();
   app.use(jwtMiddleware({ exclude: [/^\/\.well-known\//] }));
-  app.use(bodyParser({ multipart: true }));
+  app.use(
+    bodyParser({
+      multipart: true,
+      formidable: { maxFieldsSize: appConfig.maxFileSize || 8 * MEGABYTE },
+    })
+  );
   app.use(router.routes());
   app.use(router.allowedMethods());
   app.listen(port);
@@ -68,6 +74,7 @@ async function init(appConfig: AppConfig) {
   await config.init(appConfig);
   await db.init();
   await jwksMiddlewareInit();
+  await loggerInit();
 }
 
 if (require.main === module) {

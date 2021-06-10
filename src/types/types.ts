@@ -100,6 +100,7 @@ export type AppConfig = {
   pods?: PodInfo[];
   podDbCacheSize?: number;
   notifiers?: Notifier[];
+  maxFileSize?: number;
 };
 
 export type Permission = {

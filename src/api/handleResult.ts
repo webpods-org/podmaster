@@ -1,5 +1,6 @@
 import { IRouterContext } from "koa-router";
 import { ACCESS_DENIED, UNKNOWN_ERROR } from "../errors/codes";
+import { log, logException } from "../lib/logger/log";
 import { OkResult, Result } from "../types/api";
 
 export default async function handleResult<T>(
@@ -24,7 +25,7 @@ export default async function handleResult<T>(
       }
     }
   } catch (ex: any) {
-    console.log(ex);
+    logException(ex);
     ctx.status = 500;
     ctx.body = { error: "Internal server error.", code: UNKNOWN_ERROR };
   }
