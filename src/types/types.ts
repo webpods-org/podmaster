@@ -121,6 +121,8 @@ export type LogEntry = {
   commit: string;
   previousCommit: string;
   data: string;
+  iss: string;
+  sub: string;
 };
 
 export type Notifier = {

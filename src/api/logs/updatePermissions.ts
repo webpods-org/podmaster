@@ -3,6 +3,7 @@ import { IRouterContext } from "koa-router";
 import updatePermissions from "../../domain/log/updatePermissions";
 import handleResult from "../handleResult";
 import { IKoaAppContext } from "../../types/koa";
+import { ACCESS_DENIED } from "../../errors/codes";
 
 export type UpdatePermissionsAPIResult = {
   added: number;
@@ -15,13 +16,19 @@ export default async function updatePermissionsAPI(ctx: IKoaAppContext) {
   await handleResult(
     ctx,
     () =>
-      updatePermissions(
-        ctx.state.jwt?.claims.iss,
-        ctx.state.jwt?.claims.sub,
-        hostname,
-        ctx.params.log,
-        ctx.request.body
-      ),
+      ctx.state.jwt?.claims.iss && ctx.state.jwt?.claims.sub
+        ? updatePermissions(
+            ctx.state.jwt?.claims.iss,
+            ctx.state.jwt?.claims.sub,
+            hostname,
+            ctx.params.log,
+            ctx.request.body
+          )
+        : Promise.resolve({
+            ok: false,
+            error: "Access Denied.",
+            code: ACCESS_DENIED,
+          }),
     (result) => {
       const body: UpdatePermissionsAPIResult = {
         added: result.added,

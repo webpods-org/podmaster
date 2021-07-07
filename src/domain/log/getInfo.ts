@@ -2,7 +2,7 @@ import * as config from "../../config";
 import * as db from "../../db";
 import { join } from "path";
 import { Result } from "../../types/api";
-import ensurePod from "./ensurePod";
+import ensurePod from "../pod/ensurePod";
 import { EntriesRow } from "../../types/db";
 import mapper from "../../mappers/entry";
 import { LogEntry, Notifier } from "../../types/types";

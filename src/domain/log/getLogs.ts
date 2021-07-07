@@ -3,7 +3,7 @@ import * as db from "../../db";
 import { join } from "path";
 import { LogsRow } from "../../types/db";
 import { Result } from "../../types/api";
-import ensurePod from "./ensurePod";
+import ensurePod from "../pod/ensurePod";
 import { ACCESS_DENIED } from "../../errors/codes";
 
 export type GetLogsResult = {
@@ -13,8 +13,8 @@ export type GetLogsResult = {
 };
 
 export default async function getLogs(
-  iss: string | undefined,
-  sub: string | undefined,
+  iss: string,
+  sub: string,
   hostname: string,
   tags: string | undefined
 ): Promise<Result<GetLogsResult>> {

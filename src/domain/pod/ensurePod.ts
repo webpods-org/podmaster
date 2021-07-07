@@ -1,5 +1,5 @@
 import { MISSING_POD } from "../../errors/codes";
-import { getPodByHostname } from "../pod/getPodByHostname";
+import { getPodByHostname } from "./getPodByHostname";
 import { PodInfo } from "../../types/types";
 import { ErrResult, OkResult } from "../../types/api";
 

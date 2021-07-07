@@ -15,6 +15,8 @@ CREATE TABLE IF NOT EXISTS entries (
 	"log" TEXT NOT NULL,
   "data" TEXT NOT NULL,
   "created_at" INTEGER NOT NULL,
+  "iss" TEXT NOT NULL,
+  "sub" TEXT NOT NULL,
   PRIMARY KEY (id)
 );
 

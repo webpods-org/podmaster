@@ -4,7 +4,7 @@ import { join } from "path";
 import random from "../../utils/random";
 import mkdirp = require("mkdirp");
 import { Result } from "../../types/api";
-import ensurePod from "./ensurePod";
+import ensurePod from "../pod/ensurePod";
 import { ACCESS_DENIED } from "../../errors/codes";
 import { LogsRow } from "../../types/db";
 import { generateInsertStatement } from "../../lib/sqlite";
@@ -13,8 +13,8 @@ export type CreateLogResult = {
 };
 
 export default async function createLog(
-  iss: string | undefined,
-  sub: string | undefined,
+  iss: string,
+  sub: string,
   hostname: string,
   publik?: boolean,
   tags?: string

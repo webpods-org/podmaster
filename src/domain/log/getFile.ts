@@ -2,7 +2,7 @@ import * as config from "../../config";
 import * as db from "../../db";
 import { join } from "path";
 import { Result } from "../../types/api";
-import ensurePod from "./ensurePod";
+import ensurePod from "../pod/ensurePod";
 import { ACCESS_DENIED, NOT_FOUND } from "../../errors/codes";
 import { getPermissionsForLog } from "./checkPermissionsForLog";
 import isFilenameValid from "../../lib/validation/checkFilename";

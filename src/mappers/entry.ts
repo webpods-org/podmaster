@@ -8,5 +8,7 @@ export default function map(row: EntriesRow): LogEntry {
     commit: row.commit,
     previousCommit: row.previous_commit,
     data: row.data,
+    iss: row.iss,
+    sub: row.sub,
   };
 }

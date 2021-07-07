@@ -27,6 +27,8 @@ export type EntriesRow = {
   type: "data" | "file";
   data: string;
   created_at: number;
+  iss: string;
+  sub: string;
 };
 
 export type PermissionsRow = {

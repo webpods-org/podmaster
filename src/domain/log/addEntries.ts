@@ -5,7 +5,7 @@ import { Files } from "formidable";
 import { createHash } from "crypto";
 import { ErrResult, Result } from "../../types/api";
 import { EntriesRow } from "../../types/db";
-import ensurePod from "./ensurePod";
+import ensurePod from "../pod/ensurePod";
 import { getPermissionsForLog } from "./checkPermissionsForLog";
 import { ACCESS_DENIED, INVALID_FILENAME } from "../../errors/codes";
 import mv = require("mv");
@@ -31,8 +31,8 @@ export type LogEntry = {
 };
 
 export default async function addEntries(
-  iss: string | undefined,
-  sub: string | undefined,
+  iss: string,
+  sub: string,
   hostname: string,
   log: string,
   entries: LogEntry[] | undefined,
@@ -167,6 +167,8 @@ export default async function addEntries(
               data: entry.data,
               type: "data",
               created_at: Date.now(),
+              iss,
+              sub,
             };
 
             const insertEntryStmt = podDb.prepare(
@@ -210,6 +212,8 @@ export default async function addEntries(
               type: "file",
               previous_commit: lastCommit,
               created_at: Date.now(),
+              iss,
+              sub,
             };
 
             const insertEntryStmt = podDb.prepare(

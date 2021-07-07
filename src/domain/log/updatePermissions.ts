@@ -4,7 +4,7 @@ import { join } from "path";
 import random from "../../utils/random";
 import { Permission } from "../../types/types";
 import { Result } from "../../types/api";
-import ensurePod from "./ensurePod";
+import ensurePod from "../pod/ensurePod";
 import { ACCESS_DENIED } from "../../errors/codes";
 import { PermissionsRow } from "../../types/db";
 import { generateInsertStatement } from "../../lib/sqlite";
@@ -21,8 +21,8 @@ export type LogEntry = {
 };
 
 export default async function updatePermissions(
-  iss: string | undefined,
-  sub: string | undefined,
+  iss: string,
+  sub: string,
   hostname: string,
   log: string,
   {
@@ -80,7 +80,7 @@ export default async function updatePermissions(
             `DELETE FROM "permissions" WHERE "log"=@log AND "iss"=@iss AND "sub"=@sub`
           );
 
-          const existingItem = deletePermStmt.get({
+          deletePermStmt.get({
             log,
             iss: item.claims.iss,
             sub: item.claims.sub,

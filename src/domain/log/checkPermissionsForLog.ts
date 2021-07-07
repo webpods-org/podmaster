@@ -1,4 +1,3 @@
-import * as config from "../../config";
 import { PodInfo } from "../../types/types";
 import permissionMapper from "../../mappers/permission";
 import logMapper from "../../mappers/log";
@@ -46,7 +45,8 @@ export async function getPermissionsForLog(
       const permissions = existingPermStmt.all({ log }).map(permissionMapper);
 
       const matchingPerm = permissions.find(
-        (x) => x.claims.iss === iss && x.claims.sub === sub
+        (x) =>
+          x.claims.iss === iss && (x.claims.sub === sub || x.claims.sub === "*")
       );
 
       if (matchingPerm) {

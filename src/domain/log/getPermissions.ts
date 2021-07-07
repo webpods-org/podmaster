@@ -4,7 +4,7 @@ import { join } from "path";
 import { Permission } from "../../types/types";
 import { Result } from "../../types/api";
 import mapper from "../../mappers/permission";
-import ensurePod from "./ensurePod";
+import ensurePod from "../pod/ensurePod";
 import { ACCESS_DENIED } from "../../errors/codes";
 
 export type GetPermissionsResult = {
@@ -12,8 +12,8 @@ export type GetPermissionsResult = {
 };
 
 export default async function getPermissions(
-  iss: string | undefined,
-  sub: string | undefined,
+  iss: string,
+  sub: string,
   hostname: string,
   log: string
 ): Promise<Result<GetPermissionsResult>> {
