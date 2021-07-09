@@ -11,8 +11,6 @@ REPLACE_LIST=$(cat <<"EOF"
 [
   [`"pods.example.com"`, `process.env.WEBPODS_TEST_HOSTNAME`],
 
-  [`"notifier.example.com"`, `process.env.WEBPODS_TEST_NOTIFIER_HOSTNAME`], 
-  
   [`"https://auth.example.com/"`, `"https://" + process.env.WEBPODS_TEST_JWT_ISSUER_HOSTNAME + "/"`],
   
   [`"/path/to/data/dir"`, `path.join(process.env.WEBPODS_TEST_CONFIG_DIR, "data")`],

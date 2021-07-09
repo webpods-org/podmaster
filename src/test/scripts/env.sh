@@ -1,6 +1,5 @@
 export WEBPODS_TEST_PORT="11666"
 export WEBPODS_TEST_CONFIG_DIR="/some/path"
 export WEBPODS_TEST_HOSTNAME="pod.example.com"
-export WEBPODS_TEST_NOTIFIER_HOSTNAME="notifier.example.com"
 export WEBPODS_TEST_JWT_ISSUER_HOSTNAME="issuer.example.com"
 export WEBPODS_TEST_JWT_PUBLIC_KEY="abcdef"

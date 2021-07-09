@@ -4,15 +4,12 @@ import { join } from "path";
 import { Result } from "../../types/api";
 import ensurePod from "../pod/ensurePod";
 import { EntriesRow } from "../../types/db";
-import mapper from "../../mappers/entry";
-import { LogEntry, Notifier } from "../../types/types";
 import { ACCESS_DENIED } from "../../errors/codes";
 import { getPermissionsForLog } from "./checkPermissionsForLog";
 
 export type GetInfoResult = {
   count: number;
   commit: string;
-  notifiers: Notifier[];
 };
 
 export default async function getInfo(
@@ -43,7 +40,7 @@ export default async function getInfo(
 
       return {
         ok: true,
-        value: { count: id, commit, notifiers: appConfig.notifiers || [] },
+        value: { count: id, commit },
       };
     } else {
       return {

@@ -143,8 +143,6 @@ export default function run(
       const apiResult: GetInfoAPIResult = JSON.parse(response.text);
       should.exist(apiResult.count);
       apiResult.count.should.equal(5);
-      apiResult.notifiers[0].type.should.equal("websocket");
-      apiResult.notifiers[0].hostname.should.equal("notifier.local.disks.app");
     });
 
     it("gets entries from a log", async () => {

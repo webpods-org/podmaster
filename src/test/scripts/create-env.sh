@@ -1,7 +1,6 @@
 CONFIG_DIR=$1
 HOSTNAME=$2
 JWT_ISSUER_HOSTNAME=$3
-NOTIFIER_HOSTNAME=$4
 
 # Get script directory
 SCRIPT_PATH=$(dirname "$0")
@@ -19,8 +18,6 @@ REPLACE_LIST=$(cat <<"EOF"
   
   [`WEBPODS_TEST_HOSTNAME="pod.example.com"`, `WEBPODS_TEST_HOSTNAME="${k.hostname}"`],
 
-  [`WEBPODS_TEST_NOTIFIER_HOSTNAME="notifier.example.com"`, `WEBPODS_TEST_NOTIFIER_HOSTNAME="${k.notifierHostname}"`],
-  
   [`WEBPODS_TEST_JWT_ISSUER_HOSTNAME="issuer.example.com"`, `WEBPODS_TEST_JWT_ISSUER_HOSTNAME="${k.jwtIssuer}"`],
   
   [`WEBPODS_TEST_JWT_PUBLIC_KEY="abcdef"`, `WEBPODS_TEST_JWT_PUBLIC_KEY="${k.publicKey}"`], 
@@ -37,7 +34,6 @@ basho \
 -i path path \
 -d configDir "\"$CONFIG_DIR\"" \
 -d hostname "\"$HOSTNAME\"" \
--d notifierHostname "\"$NOTIFIER_HOSTNAME\"" \
 -d jwtIssuer "\"$JWT_ISSUER_HOSTNAME\"" \
 -d publicKey "\"$PUBLIC_KEY\"" \
 -d filename "\"$CONFIG_DIR/env-source.sh\"" \

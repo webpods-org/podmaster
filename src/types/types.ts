@@ -104,7 +104,6 @@ export type AppConfig = {
   storage: StorageConfig;
   pods?: PodInfo[];
   podDbCacheSize?: number;
-  notifiers?: Notifier[];
   maxFileSize?: number;
   useHttps?: HttpsConfig;
 };
@@ -130,9 +129,4 @@ export type LogEntry = {
   data: string;
   iss: string;
   sub: string;
-};
-
-export type Notifier = {
-  type: "websocket";
-  hostname: string;
 };

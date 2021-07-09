@@ -129,17 +129,6 @@ const config: AppConfig = {
   },
 
   /*
-    Optionally, notifiers provide live updates for writes.
-    See the notifier specification.
-  */
-  notifiers: [
-    {
-      type: "websocket",
-      hostname: "notifier.example.com",
-    },
-  ],
-
-  /*
     Optional HTTPS config
   */
   // useHttps: {
