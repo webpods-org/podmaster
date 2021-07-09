@@ -49,7 +49,7 @@ export default async function createLog(
 
       return {
         ok: true,
-        log: log,
+        value: { log: log },
       };
     } else {
       return {

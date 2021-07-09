@@ -43,9 +43,7 @@ export default async function getInfo(
 
       return {
         ok: true,
-        count: id,
-        commit,
-        notifiers: appConfig.notifiers || [],
+        value: { count: id, commit, notifiers: appConfig.notifiers || [] },
       };
     } else {
       return {

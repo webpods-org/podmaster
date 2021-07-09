@@ -5,16 +5,17 @@ import Router = require("koa-router");
 import bodyParser = require("koa-body");
 import yargs = require("yargs");
 import jwtMiddleware from "./lib/jwt/middleware";
-import { init as jwksMiddlewareInit } from "./lib/jwt/middleware";
+import { init as libJwtInit } from "./lib/jwt/getJwtParams";
 import * as db from "./db";
 import { init as loggerInit } from "./lib/logger/log";
 
 import * as podsApi from "./api/pods";
 import * as logsApi from "./api/logs";
-// import * as logsApi from "./api/logs";
 
 import * as config from "./config";
 import { AppConfig } from "./types/types";
+import { createHttpServer } from "./lib/servers/http";
+import { attachWebSocketServer } from "./lib/servers/webSocket";
 
 const packageJson = require("../package.json");
 
@@ -26,7 +27,7 @@ const argv = yargs.options({
 
 const MEGABYTE = 1024 * 1024;
 
-export async function startApp(port: number, configFile: string) {
+export async function startApp(configFile: string) {
   const appConfig: AppConfig = require(configFile);
 
   await init(appConfig);
@@ -52,20 +53,22 @@ export async function startApp(port: number, configFile: string) {
   // router.put("/settings/hostname", podsApi.createPodAPI);
   // router.get("/profile", userApi.getProfile);
 
-  // Start app
-  var app = new Koa();
-  app.use(jwtMiddleware({ exclude: [/^\/\.well-known\//] }));
-  app.use(
+  // Setup Koa
+  var koa = new Koa();
+  koa.use(jwtMiddleware({ exclude: [/^\/\.well-known\//] }));
+  koa.use(
     bodyParser({
       multipart: true,
       formidable: { maxFieldsSize: appConfig.maxFileSize || 8 * MEGABYTE },
     })
   );
-  app.use(router.routes());
-  app.use(router.allowedMethods());
-  app.listen(port);
+  koa.use(router.routes());
+  koa.use(router.allowedMethods());
 
-  return app;
+  const koaCallback = koa.callback();
+
+  const server = createHttpServer(koaCallback, appConfig);
+  return server;
 }
 
 async function init(appConfig: AppConfig) {
@@ -73,7 +76,7 @@ async function init(appConfig: AppConfig) {
   // Init everything.
   await config.init(appConfig);
   await db.init();
-  await jwksMiddlewareInit();
+  await libJwtInit();
   await loggerInit();
 }
 
@@ -97,7 +100,9 @@ if (require.main === module) {
     const configFile = argv.c;
     const port = argv.p;
 
-    startApp(port, configFile);
-    console.log(`listening on port ${port}`);
+    startApp(configFile).then((server) => {
+      server.listen(port);
+      console.log(`listening on port ${port}`);
+    });
   }
 }

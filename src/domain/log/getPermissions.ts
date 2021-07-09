@@ -34,7 +34,7 @@ export default async function getPermissions(
 
       return {
         ok: true,
-        permissions,
+        value: { permissions },
       };
     } else {
       return {

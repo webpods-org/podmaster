@@ -28,7 +28,7 @@ export default async function getEntriesAPI(ctx: IKoaAppContext) {
       ),
     (result) => {
       const body: GetEntriesAPIResult = {
-        entries: result.entries,
+        entries: result.value.entries,
       };
       ctx.body = body;
     }

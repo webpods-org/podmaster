@@ -32,7 +32,7 @@ export default async function getLogsAPI(ctx: IKoaAppContext) {
           }),
     (result) => {
       const body: GetLogsAPIResult = {
-        logs: result.logs,
+        logs: result.value.logs,
       };
       ctx.body = body;
     }

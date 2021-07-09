@@ -33,7 +33,7 @@ export default async function createLogAPI(ctx: IKoaAppContext) {
           }),
     (result) => {
       const body: CreateLogAPIResult = {
-        log: result.log,
+        log: result.value.log,
       };
       ctx.body = body;
     }

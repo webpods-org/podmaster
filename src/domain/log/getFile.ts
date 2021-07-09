@@ -39,7 +39,10 @@ export default async function getFile(
         isFilenameValid(fileName)
       ) {
         const filePath = join(pod.dataDir, log, fileName);
-        return { ok: true, root: appConfig.storage.dataDir, filePath };
+        return {
+          ok: true,
+          value: { root: appConfig.storage.dataDir, filePath },
+        };
       } else {
         return {
           ok: false,

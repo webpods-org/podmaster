@@ -66,8 +66,7 @@ export default async function createPod(
 
       return {
         ok: true,
-        pod,
-        hostname,
+        value: { pod, hostname },
       };
     } else {
       return {

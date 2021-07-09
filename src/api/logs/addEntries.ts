@@ -32,7 +32,7 @@ export default async function addEntriesAPI(ctx: IKoaAppContext) {
           }),
     (result) => {
       const body: AddEntriesAPIResult = {
-        entries: result.entries,
+        entries: result.value.entries,
       };
       ctx.body = body;
     }

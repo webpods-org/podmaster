@@ -138,6 +138,15 @@ const config: AppConfig = {
       hostname: "notifier.example.com",
     },
   ],
+
+  /*
+    Optional HTTPS config
+  */
+  // useHttps: {
+  //   key: "key...",
+  //   cert: "cert..",
+  //   ca: "ca...",
+  // },
 };
 
 /* 

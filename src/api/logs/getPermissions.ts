@@ -29,7 +29,7 @@ export default async function addPermissionAPI(ctx: IKoaAppContext) {
           }),
     (result) => {
       const body: GetPermissionsAPIResult = {
-        permissions: result.permissions,
+        permissions: result.value.permissions,
       };
       ctx.body = body;
     }

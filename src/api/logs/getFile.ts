@@ -17,7 +17,7 @@ export default async function getFileAPI(ctx: IKoaAppContext) {
         ctx.url
       ),
     async (result) => {
-      await send(ctx, result.filePath, { root: result.root });
+      await send(ctx, result.value.filePath, { root: result.value.root });
     }
   );
 }

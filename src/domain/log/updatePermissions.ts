@@ -90,8 +90,10 @@ export default async function updatePermissions(
 
       return {
         ok: true,
-        added: add ? add.length : 0,
-        removed: remove ? remove.length : 0,
+        value: {
+          added: add ? add.length : 0,
+          removed: remove ? remove.length : 0,
+        },
       };
     } else {
       return {

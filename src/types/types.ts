@@ -85,6 +85,12 @@ export type LogInfo = {
   tags: string | null;
 };
 
+export type HttpsConfig = {
+  key: string;
+  cert: string;
+  ca: string;
+};
+
 export type AppConfig = {
   hostname: string;
   externalAuthServers: ExternalAuthServers;
@@ -100,6 +106,7 @@ export type AppConfig = {
   podDbCacheSize?: number;
   notifiers?: Notifier[];
   maxFileSize?: number;
+  useHttps?: HttpsConfig;
 };
 
 export type Permission = {

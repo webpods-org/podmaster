@@ -44,7 +44,7 @@ export default async function getLogs(
           }
         });
 
-      return { ok: true, logs };
+      return { ok: true, value: { logs } };
     } else {
       return {
         ok: false,

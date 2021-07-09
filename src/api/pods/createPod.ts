@@ -18,8 +18,8 @@ export default async function createPodAPI(ctx: IRouterContext) {
       () => createPod(ctx.state.jwt?.claims),
       (result) => {
         const body: CreatePodAPIResult = {
-          pod: result.pod,
-          hostname: result.hostname,
+          pod: result.value.pod,
+          hostname: result.value.hostname,
         };
         ctx.body = body;
       }

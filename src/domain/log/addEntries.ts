@@ -237,7 +237,7 @@ export default async function addEntries(
 
       return {
         ok: true,
-        entries: savedEntryIds,
+        value: { entries: savedEntryIds },
       };
     } else {
       return {

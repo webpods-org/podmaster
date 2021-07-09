@@ -47,5 +47,5 @@ export async function getPods(
       dataDir: `${path.join(appConfig.storage.dataDir, x.dataDir)}`,
     }));
 
-  return { ok: true, pods };
+  return { ok: true, value: { pods } };
 }

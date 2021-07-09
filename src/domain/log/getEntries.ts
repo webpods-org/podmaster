@@ -100,9 +100,9 @@ export default async function getEntries(
 
       if (dbEntries) {
         const entries = dbEntries.map(mapper);
-        return { ok: true, entries };
+        return { ok: true, value: { entries } };
       } else {
-        return { ok: true, entries: [] };
+        return { ok: true, value: { entries: [] } };
       }
     } else {
       return {

@@ -31,9 +31,8 @@ export default function run(
     let port: number;
 
     before(async () => {
-      const service = await startApp(port, configFilePath);
-      app = service.listen();
-      port = app.address().port;
+      const service = await startApp(configFilePath);
+      app = service.listen(port);
     });
 
     beforeEach(() => {});

@@ -31,8 +31,8 @@ export default async function updatePermissionsAPI(ctx: IKoaAppContext) {
           }),
     (result) => {
       const body: UpdatePermissionsAPIResult = {
-        added: result.added,
-        removed: result.removed,
+        added: result.value.added,
+        removed: result.value.removed,
       };
       ctx.body = body;
     }

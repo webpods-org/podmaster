@@ -21,7 +21,7 @@ export default async function getPodsAPI(ctx: IRouterContext) {
       () => getPods(ctx.state.jwt?.claims.iss, ctx.state.jwt?.claims.sub),
       (result) => {
         const body: GetPodsAPIResult = {
-          pods: result.pods.map((x) => ({
+          pods: result.value.pods.map((x) => ({
             hostname: x.hostname,
             hostnameAlias: x.hostnameAlias,
           })),
