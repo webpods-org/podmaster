@@ -6,6 +6,7 @@ import { log, logException } from "../logger/log";
 import { IKoaAppContext } from "../../types/koa";
 import { JwtClaims } from "../../types/types";
 import getJwtParams, { JwtParamsForAsymmetricAlgorithm } from "./getJwtParams";
+import validateClaims from "./validateClaims";
 
 export class AuthenticationError extends Error {
   code: string;
@@ -39,7 +40,7 @@ export default function jwtMiddleware(options: { exclude: RegExp[] }) {
           );
 
           // We only support claims which are JSON objects.
-          if (areClaimsValid(claims)) {
+          if (validateClaims(claims)) {
             ctx.state.jwt = {
               claims,
             };
@@ -59,12 +60,6 @@ export default function jwtMiddleware(options: { exclude: RegExp[] }) {
       }
     }
   };
-}
-
-function areClaimsValid(claims: object | string): claims is JwtClaims {
-  return (
-    typeof claims === "object" && (claims as any).iss && (claims as any).sub
-  );
 }
 
 async function getJwtParametersFromContext(

@@ -8,6 +8,8 @@ const noPermissions = {
   write: false,
   admin: false,
   metadata: false,
+  publish: false,
+  subscribe: false,
 };
 
 export async function getPermissionsForLog(
@@ -21,6 +23,8 @@ export async function getPermissionsForLog(
   write: boolean;
   admin: boolean;
   metadata: boolean;
+  publish: boolean;
+  subscribe: boolean;
 }> {
   const isOwnPod = pod.claims.iss === iss && pod.claims.sub === sub;
 
@@ -30,6 +34,8 @@ export async function getPermissionsForLog(
       write: true,
       admin: true,
       metadata: true,
+      publish: true,
+      subscribe: true,
     };
   } else {
     const getLogStmt = podDb.prepare(`SELECT * from "logs" WHERE "log"=@log`);

@@ -28,6 +28,8 @@ CREATE TABLE IF NOT EXISTS permissions (
   "write" INTEGER NOT NULL,
   "admin" INTEGER NOT NULL,
   "metadata" INTEGER NOT NULL,
+  "publish" INTEGER NOT NULL,
+  "subscribe" INTEGER NOT NULL,
   "created_at" INTEGER NOT NULL,
   PRIMARY KEY (iss, sub, log)
 );

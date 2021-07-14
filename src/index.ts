@@ -68,6 +68,11 @@ export async function startApp(configFile: string) {
   const koaCallback = koa.callback();
 
   const server = createHttpServer(koaCallback, appConfig);
+  
+  // Attach websocket server only if pubsub is enabled.
+  if (appConfig.pubsub) {
+    attachWebSocketServer(server, appConfig);
+  }
   return server;
 }
 

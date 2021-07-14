@@ -39,5 +39,7 @@ export type PermissionsRow = {
   write: SqliteBoolean;
   admin: SqliteBoolean;
   metadata: SqliteBoolean;
+  publish: SqliteBoolean;
+  subscribe: SqliteBoolean;
   created_at: number;
 };

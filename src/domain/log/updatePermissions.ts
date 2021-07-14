@@ -61,6 +61,8 @@ export default async function updatePermissions(
               write: permission.access.write ? 1 : 0,
               admin: permission.access.admin ? 1 : 0,
               metadata: permission.access.metadata ? 1 : 0,
+              publish: permission.access.publish ? 1 : 0,
+              subscribe: permission.access.subscribe ? 1 : 0,
               created_at: Date.now(),
             };
 

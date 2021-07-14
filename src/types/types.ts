@@ -91,6 +91,10 @@ export type HttpsConfig = {
   ca: string;
 };
 
+export type PubSubConfig = {
+  maxConnections?: number;
+}
+
 export type AppConfig = {
   hostname: string;
   externalAuthServers: ExternalAuthServers;
@@ -106,6 +110,7 @@ export type AppConfig = {
   podDbCacheSize?: number;
   maxFileSize?: number;
   useHttps?: HttpsConfig;
+  pubsub?: PubSubConfig
 };
 
 export type Permission = {
@@ -118,6 +123,8 @@ export type Permission = {
     write: boolean;
     admin: boolean;
     metadata: boolean;
+    publish: boolean;
+    subscribe: boolean;
   };
 };
 

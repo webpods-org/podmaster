@@ -1,5 +1,5 @@
-import { LogInfo, Permission } from "../types/types";
-import { LogsRow, PermissionsRow } from "../types/db";
+import { Permission } from "../types/types";
+import { PermissionsRow } from "../types/db";
 
 export default function map(row: PermissionsRow): Permission {
   return {
@@ -8,10 +8,19 @@ export default function map(row: PermissionsRow): Permission {
       sub: row.sub,
     },
     access: {
-      read: row.read === 1 ? true : false,
-      write: row.write === 1 ? true : false,
-      admin: row.admin === 1 ? true : false,
-      metadata: row.metadata === 1 ? true : false,
+      read: row.read === 1,
+      write: row.write === 1,
+      admin: row.admin === 1,
+      metadata: row.metadata === 1,
+      publish: row.publish === 1,
+      subscribe:
+        row.publish === 1 || row.subscribe === 1
+          ? true
+          : row.subscribe === 0
+          ? false
+          : row.read === 1
+          ? true
+          : false,
     },
   };
 }
