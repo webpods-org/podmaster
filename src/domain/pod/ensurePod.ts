@@ -15,7 +15,7 @@ export default async function ensurePod<T>(
     return {
       ok: false,
       code: MISSING_POD,
-      error: "Pod not found.",
+      error: `Pod ${hostname} not found.`,
     };
   }
 }

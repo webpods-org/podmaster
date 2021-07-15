@@ -13,15 +13,13 @@ import { GetPermissionsAPIResult } from "../../api/logs/getPermissions";
 import { GetEntriesAPIResult } from "../../api/logs/getEntries";
 import { LogEntry } from "../../types/types";
 import { GetInfoAPIResult } from "../../api/logs/getInfo";
+import WebSocket = require("ws");
+import promiseSignal from "../../lib/promiseSignal";
 
 let app: any;
+let port: number;
 
-export default function run(
-  port: number,
-  configDir: string,
-  configFilePath: string,
-  dbConfig: { path: string }
-) {
+export default function run(configDir: string, configFilePath: string) {
   const jwt = readFileSync(join(configDir, "jwt"))
     .toString()
     .replace(/\r?\n|\r/g, "");
@@ -29,23 +27,29 @@ export default function run(
   describe("integration tests", async () => {
     let app: any;
     let port: number;
-
-    before(async () => {
-      const service = await startApp(configFilePath);
-      app = service.listen(port);
-    });
-
-    beforeEach(() => {});
+    let mainHostname: string = process.env.WEBPODS_TEST_HOSTNAME as string;
+    let mainHostnameAndPort: string;
 
     let hostname: string;
+    let hostnameAndPort: string;
     let pod: string;
     let log: string;
     let entries: LogEntry[] = [];
 
+    before(async () => {
+      const service = await startApp(configFilePath);
+      app = service.listen(port);
+      port = app.address().port;
+      mainHostname =
+        port === 80 || port === 443 ? mainHostname : `${mainHostname}:${port}`;
+    });
+
+    beforeEach(() => {});
+
     it("creates a pod", async () => {
       const response = await request(app)
         .post("/pods")
-        .set("Host", process.env.WEBPODS_TEST_HOSTNAME as string)
+        .set("Host", mainHostname)
         .set("Authorization", `Bearer ${jwt}`);
 
       response.status.should.equal(200);
@@ -53,6 +57,8 @@ export default function run(
       should.exist(apiResult.pod);
       should.exist(apiResult.hostname);
       hostname = apiResult.hostname;
+      hostnameAndPort =
+        port === 80 || port === 443 ? hostname : `${hostname}:${port}`;
       pod = apiResult.pod;
     });
 
@@ -71,7 +77,7 @@ export default function run(
     it("creates a log", async () => {
       const response = await request(app)
         .post("/logs")
-        .set("Host", hostname)
+        .set("Host", hostnameAndPort)
         .set("Authorization", `Bearer ${jwt}`);
 
       response.status.should.equal(200);
@@ -83,7 +89,7 @@ export default function run(
     it("gets all logs", async () => {
       const response = await request(app)
         .get("/logs")
-        .set("Host", hostname)
+        .set("Host", hostnameAndPort)
         .set("Authorization", `Bearer ${jwt}`);
 
       response.status.should.equal(200);
@@ -107,7 +113,7 @@ export default function run(
             },
           ],
         })
-        .set("Host", hostname)
+        .set("Host", hostnameAndPort)
         .set("Authorization", `Bearer ${jwt}`);
 
       response.status.should.equal(200);
@@ -122,7 +128,7 @@ export default function run(
 
       const response = await request(app)
         .post(`/logs/${log}/entries`)
-        .set("Host", hostname)
+        .set("Host", hostnameAndPort)
         .set("Authorization", `Bearer ${jwt}`)
         .attach("hello.txt", file1)
         .attach("world.txt", file2);
@@ -136,7 +142,7 @@ export default function run(
     it("gets info about a log", async () => {
       const response = await request(app)
         .get(`/logs/${log}/info`)
-        .set("Host", hostname)
+        .set("Host", hostnameAndPort)
         .set("Authorization", `Bearer ${jwt}`);
 
       response.status.should.equal(200);
@@ -148,7 +154,7 @@ export default function run(
     it("gets entries from a log", async () => {
       const response = await request(app)
         .get(`/logs/${log}/entries`)
-        .set("Host", hostname)
+        .set("Host", hostnameAndPort)
         .set("Authorization", `Bearer ${jwt}`);
 
       response.status.should.equal(200);
@@ -160,7 +166,7 @@ export default function run(
     it("gets entries from a log after id", async () => {
       const response = await request(app)
         .get(`/logs/${log}/entries?sinceId=1`)
-        .set("Host", hostname)
+        .set("Host", hostnameAndPort)
         .set("Authorization", `Bearer ${jwt}`);
 
       response.status.should.equal(200);
@@ -171,7 +177,7 @@ export default function run(
     it("gets entries from a log after commit", async () => {
       const response = await request(app)
         .get(`/logs/${log}/entries?sinceCommit=${entries[1].commit}`)
-        .set("Host", hostname)
+        .set("Host", hostnameAndPort)
         .set("Authorization", `Bearer ${jwt}`);
 
       response.status.should.equal(200);
@@ -186,7 +192,7 @@ export default function run(
         .join(",");
       const response = await request(app)
         .get(`/logs/${log}/entries?commits=${commits}`)
-        .set("Host", hostname)
+        .set("Host", hostnameAndPort)
         .set("Authorization", `Bearer ${jwt}`);
 
       response.status.should.equal(200);
@@ -197,7 +203,7 @@ export default function run(
     it("limit results by count", async () => {
       const response = await request(app)
         .get(`/logs/${log}/entries?limit=2`)
-        .set("Host", hostname)
+        .set("Host", hostnameAndPort)
         .set("Authorization", `Bearer ${jwt}`);
 
       response.status.should.equal(200);
@@ -225,7 +231,7 @@ export default function run(
             },
           ],
         })
-        .set("Host", hostname)
+        .set("Host", hostnameAndPort)
         .set("Authorization", `Bearer ${jwt}`);
 
       response.status.should.equal(200);
@@ -236,7 +242,7 @@ export default function run(
     it("gets all permissions for a log", async () => {
       const response = await request(app)
         .get(`/logs/${log}/permissions`)
-        .set("Host", hostname)
+        .set("Host", hostnameAndPort)
         .set("Authorization", `Bearer ${jwt}`);
 
       response.status.should.equal(200);
@@ -244,43 +250,63 @@ export default function run(
       apiResult.permissions.length.should.be.greaterThan(0);
     });
 
-    // it("says missing userid is missing", async () => {
-    //   const response = await request(app).get("/user-ids/alice");
-    //   response.status.should.equal(200);
-    //   JSON.parse(response.text).should.deepEqual({
-    //     exists: false,
-    //   });
-    // });
+    it("adds a web socket subscription", async () => {
+      const wsSender = new WebSocket(`ws://${hostname}:${port}/channels`);
+      const wsReceiver = new WebSocket(`ws://${hostname}:${port}/channels`);
 
-    // it("redirects to connect", async () => {
-    //   const response = await request(app).get(
-    //     "/authenticate/github?success=http://test.example.com/success&newuser=http://test.example.com/newuser"
-    //   );
-    //   response.header["set-cookie"].should.containEql(
-    //     "border-patrol-success-redirect=http://test.example.com/success; path=/; domain=test.example.com"
-    //   );
-    //   response.header["set-cookie"].should.containEql(
-    //     "border-patrol-newuser-redirect=http://test.example.com/newuser; path=/; domain=test.example.com"
-    //   );
-    //   response.text.should.equal(
-    //     `Redirecting to <a href="/connect/github">/connect/github</a>.`
-    //   );
-    // });
+      const authMessage = JSON.stringify({ token: jwt });
+      const result = await new Promise<string>((resolve, reject) => {
+        wsSender.addEventListener("open", function (event) {
+          wsSender.send(authMessage);
+        });
 
-    // it("creates a user", async () => {
-    //   const response = await request(app)
-    //     .post("/users")
-    //     .send({ userId: "jeswin" })
-    //     .set("border-patrol-jwt", "some_jwt");
+        wsReceiver.addEventListener("open", function (event) {
+          wsReceiver.send(authMessage);
+        });
 
-    //   const cookies = (response.header["set-cookie"] as Array<
-    //     string
-    //   >).flatMap((x) => x.split(";"));
-    //   cookies.should.containEql("border-patrol-jwt=some_other_jwt");
-    //   cookies.should.containEql("border-patrol-domain=test.example.com");
-    //   response.text.should.equal(
-    //     `{"border-patrol-jwt":"some_other_jwt","border-patrol-user-id":"jeswin","border-patrol-domain":"test.example.com"}`
-    //   );
-    // });
+        const {
+          promise: receiverSubscribe,
+          resolve: receiverSubscribeResolve,
+        } = promiseSignal();
+
+        wsSender.addEventListener("message", async (message) => {
+          if (message.data) {
+            const data = JSON.parse(message.data);
+            if (data.event === "connect") {
+              // Wait for receiver to be subscribed.
+              await receiverSubscribe;
+
+              wsSender.send(
+                JSON.stringify({
+                  type: "message",
+                  channels: ["test-channel"],
+                  message: "hello world 2021",
+                })
+              );
+            }
+          }
+        });
+
+        wsReceiver.addEventListener("message", async (message) => {
+          if (message.data) {
+            const data = JSON.parse(message.data);
+            if (data.event === "connect") {
+              wsReceiver.send(
+                JSON.stringify({
+                  type: "subscribe",
+                  channels: ["test-channel"],
+                })
+              );
+            } else if (data.event === "subscribe") {
+              receiverSubscribeResolve();
+            } else if (data.event === "message") {
+              resolve(data.data.message);
+            }
+          }
+        });
+      });
+
+      result.should.equal("hello world 2021");
+    });
   });
 }

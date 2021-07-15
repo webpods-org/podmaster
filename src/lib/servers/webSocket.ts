@@ -6,6 +6,7 @@ import WebSocket = require("ws");
 import { TrackedWebSocket } from "../../types/webSocket";
 import { handleMessage } from "../../domain/pubsub/handleMessage";
 import { handleClose } from "../../domain/pubsub/handleClose";
+import { INACTIVE, MISSING_POD, SERVER_BUSY } from "../../errors/codes";
 
 // Check WS client connection status every 30s.
 const TRACKING_INTERVAL_MS = 30000;
@@ -30,12 +31,24 @@ export function attachWebSocketServer(
 
   function checkConnectionValidity(ws: TrackedWebSocket) {
     if (ws.isAlive === false || !ws.webpodsTracking) {
+      ws.send(
+        JSON.stringify({
+          error: "Inactive for too long.",
+          code: INACTIVE,
+        })
+      );
       ws.terminate();
     } else {
       ws.isAlive = false;
       ws.ping(function noop() {});
       // Client has not asked for any connection yet. Terminate.
       if (ws.webpodsTracking.status === "WAITING_TO_CONNECT") {
+        ws.send(
+          JSON.stringify({
+            error: "Inactive for too long.",
+            code: INACTIVE,
+          })
+        );
         ws.terminate();
       } else if (ws.webpodsTracking.status === "VALIDATED_JWT") {
         ws.webpodsTracking.status = "WAITING_TO_CONNECT";
@@ -45,18 +58,23 @@ export function attachWebSocketServer(
 
   function requestHandler(ws: WebSocket, request: IncomingMessage) {
     const trackedWS = ws as TrackedWebSocket;
-    const hostname = new URL(request.url as string).hostname;
-
+    const hostname = request.headers.host
+      ? request.headers.host.split(":")[0]
+      : "localhost";
     if (
       appConfig.pubsub?.maxConnections &&
       wss.clients.size === appConfig.pubsub?.maxConnections
     ) {
+      trackedWS.send(
+        JSON.stringify({
+          error: "Server is too busy.",
+          code: SERVER_BUSY,
+        })
+      );
       trackedWS.terminate();
     } else {
       if (request.url) {
-        const url = new URL(request.url);
-        const route = url.pathname;
-        if (route === "/channels") {
+        if (request.url === "/channels") {
           // This is for finding dead connections.
           trackedWS.isAlive = true;
           trackedWS.on("pong", function heartbeat() {

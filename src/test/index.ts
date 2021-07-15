@@ -33,7 +33,7 @@ function run() {
   };
 
   describe("webpods", () => {
-    integrationTests(port, configDir, configFilePath, dbConfig);
+    integrationTests(configDir, configFilePath);
     // unitTests(configDir, dbConfig);
   });
 }

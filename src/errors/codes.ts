@@ -8,3 +8,5 @@ export const NOT_FOUND = "NOT_FOUND";
 export const UNKNOWN_ERROR = "UNKNOWN_ERROR";
 export const MISSING_POD = "MISSING_POD";
 export const INVALID_FILENAME = "INVALID_FILENAME";
+export const SERVER_BUSY = "SERVER_BUSY";
+export const INACTIVE = "INACTIVE";

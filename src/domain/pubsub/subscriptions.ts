@@ -59,12 +59,20 @@ export function publish(
   ws: WebSocket,
   message: string
 ) {
+  const payload = JSON.stringify({
+    event: "message",
+    data: {
+      iss,
+      sub,
+      message,
+    },
+  });
   const channelSubscriptions = subscriptions.get(channel);
   if (channelSubscriptions) {
     for (const [, webSockets] of channelSubscriptions.entries()) {
       for (const subscribedSocket of webSockets) {
         if (subscribedSocket !== ws) {
-          subscribedSocket.send(message);
+          subscribedSocket.send(payload);
         }
       }
     }

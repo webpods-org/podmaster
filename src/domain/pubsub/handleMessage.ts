@@ -15,7 +15,12 @@ import * as config from "../../config";
 import * as db from "../../db";
 import { join } from "path";
 import { getPermissionsForLog } from "../log/checkPermissionsForLog";
-import { ACCESS_DENIED } from "../../errors/codes";
+import {
+  ACCESS_DENIED,
+  INVALID_JWT,
+  MISSING_POD,
+  UNKNOWN_ERROR,
+} from "../../errors/codes";
 
 export function handleMessage(
   hostname: string,
@@ -27,8 +32,8 @@ export function handleMessage(
 
     // If this is the first message, it needs to be a JWT
     if (!ws.webpodsTracking) {
-      const authMessage: WebSocketAuthMessage = JSON.parse(message);
       try {
+        const authMessage: WebSocketAuthMessage = JSON.parse(message);
         const jwtResult = await getJwtParams(authMessage.token);
         if (jwtResult.ok) {
           const jwtClaims = jsonwebtoken.verify(
@@ -40,6 +45,11 @@ export function handleMessage(
           );
 
           if (validateClaims(jwtClaims)) {
+            ws.send(
+              JSON.stringify({
+                event: "connect",
+              })
+            );
             ws.webpodsTracking = {
               status: "VALIDATED_JWT",
               jwtClaims,
@@ -47,9 +57,21 @@ export function handleMessage(
             };
           }
         } else {
+          ws.send(
+            JSON.stringify({
+              error: "Invalid JWT.",
+              code: INVALID_JWT,
+            })
+          );
           ws.terminate();
         }
       } catch (ex) {
+        ws.send(
+          JSON.stringify({
+            error: "Unknown Error.",
+            code: UNKNOWN_ERROR,
+          })
+        );
         ws.terminate();
       }
     }
@@ -79,12 +101,19 @@ export function handleMessage(
             );
 
             if (permissions.subscribe) {
-              ws.webpodsTracking.status;
               addSubscription(
                 channel,
                 ws.webpodsTracking.jwtClaims.iss,
                 ws.webpodsTracking.jwtClaims.sub,
                 ws
+              );
+              ws.webpodsTracking.status = "CONNECTED";
+              ws.webpodsTracking.channels.push(channel);
+              ws.send(
+                JSON.stringify({
+                  event: "subscribe",
+                  channel,
+                })
               );
             } else {
               ws.send(
@@ -95,6 +124,12 @@ export function handleMessage(
               );
             }
           } else {
+            ws.send(
+              JSON.stringify({
+                error: `Pod ${hostname} not found.`,
+                code: MISSING_POD,
+              })
+            );
             ws.terminate();
           }
         }
@@ -108,6 +143,15 @@ export function handleMessage(
             ws.webpodsTracking.jwtClaims.iss,
             ws.webpodsTracking.jwtClaims.sub,
             ws
+          );
+          ws.webpodsTracking.channels = ws.webpodsTracking.channels.filter(
+            (x) => x !== channel
+          );
+          ws.send(
+            JSON.stringify({
+              event: "unsubscribe",
+              channel,
+            })
           );
         }
       } else if (data.type === "message") {

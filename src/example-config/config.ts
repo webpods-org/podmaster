@@ -128,6 +128,10 @@ const config: AppConfig = {
     dirNesting: [100, 100],
   },
 
+  pubsub: {
+    maxConnections: 10000,
+  },
+
   /*
     Optional HTTPS config
   */

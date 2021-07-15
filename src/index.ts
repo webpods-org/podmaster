@@ -55,7 +55,7 @@ export async function startApp(configFile: string) {
 
   // Setup Koa
   var koa = new Koa();
-  koa.use(jwtMiddleware({ exclude: [/^\/\.well-known\//] }));
+  koa.use(jwtMiddleware({ exclude: [/^\/\.well-known\//, /^\/channels$/] }));
   koa.use(
     bodyParser({
       multipart: true,
@@ -68,7 +68,7 @@ export async function startApp(configFile: string) {
   const koaCallback = koa.callback();
 
   const server = createHttpServer(koaCallback, appConfig);
-  
+
   // Attach websocket server only if pubsub is enabled.
   if (appConfig.pubsub) {
     attachWebSocketServer(server, appConfig);
