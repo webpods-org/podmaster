@@ -1,4 +1,10 @@
+import pathModule from "path";
+import fsModule from "fs";
+
 import { AppConfig } from "../types/types.js";
+
+const fs = fsModule;
+const path = pathModule;
 
 /*
   This is required if you want to allow external parties to READ your pods.
@@ -144,4 +150,4 @@ const config: AppConfig = {
   this is a self-hosted pod server, or you're a service provider.  
   Set this accordingly.  
 */
-module.exports = config;
+export default config;

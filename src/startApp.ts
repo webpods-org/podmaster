@@ -19,7 +19,7 @@ import { attachWebSocketServer } from "./lib/servers/webSocket.js";
 const MEGABYTE = 1024 * 1024;
 
 export default async function startApp(configFile: string) {
-  const appConfig: AppConfig = await import(configFile);
+  const appConfig: AppConfig = (await import(configFile)).default;
 
   await init(appConfig);
 

@@ -34,4 +34,4 @@ basho \
 -d filecontents 'fs.readFileSync(k.filename).toString()' \
 -j k.replacements \
 -r 'acc.replace(new RegExp(x[0], "g"), x[1])' k.filecontents \
-> "$CONFIG_DIR/config.js"
+> "$CONFIG_DIR/config.mjs"

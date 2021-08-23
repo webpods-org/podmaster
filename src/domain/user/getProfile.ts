@@ -1,3 +1,1 @@
-export default async function getProfile() {
-  console.log("TODO...");
-}
+export default async function getProfile() {}
