@@ -1,13 +1,13 @@
-import * as config from "../../config";
-import * as db from "../../db";
 import { join } from "path";
-import random from "../../utils/random";
-import { Permission } from "../../types/types";
-import { Result } from "../../types/api";
-import ensurePod from "../pod/ensurePod";
-import { ACCESS_DENIED } from "../../errors/codes";
-import { PermissionsRow } from "../../types/db";
-import { generateInsertStatement } from "../../lib/sqlite";
+
+import * as config from "../../config/index.js";
+import * as db from "../../db/index.js";
+import { Permission } from "../../types/types.js";
+import { Result } from "../../types/api.js";
+import ensurePod from "../pod/ensurePod.js";
+import { ACCESS_DENIED } from "../../errors/codes.js";
+import { PermissionsRow } from "../../types/db.js";
+import { generateInsertStatement } from "../../lib/sqlite.js";
 
 export type UpdatePermissionsResult = {
   added: number;

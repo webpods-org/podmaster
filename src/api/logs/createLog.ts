@@ -1,11 +1,9 @@
-import createLog from "../../domain/log/createLog";
-import * as config from "../../config";
-import { IRouterContext } from "koa-router";
-import handleResult from "../handleResult";
-import getQuery from "../utils/getParam";
-import transformQuery from "../utils/transformQuery";
-import { IKoaAppContext } from "../../types/koa";
-import { ACCESS_DENIED } from "../../errors/codes";
+import createLog from "../../domain/log/createLog.js";
+import * as config from "../../config/index.js";
+import handleResult from "../handleResult.js";
+import transformQuery from "../utils/transformQuery.js";
+import { IKoaAppContext } from "../../types/koa.js";
+import { ACCESS_DENIED } from "../../errors/codes.js";
 
 export type CreateLogAPIResult = {
   log: string;

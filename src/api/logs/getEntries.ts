@@ -1,10 +1,10 @@
 import { IRouterContext } from "koa-router";
 import getEntries from "../../domain/log/getEntries";
-import transformQuery from "../utils/transformQuery";
-import handleResult from "../handleResult";
+import transformQuery from "../utils/transformQuery.js";
+import handleResult from "../handleResult.js";
 import getQuery from "../utils/getParam";
-import { LogEntry } from "../../types/types";
-import { IKoaAppContext } from "../../types/koa";
+import { LogEntry } from "../../types/types.js";
+import { IKoaAppContext } from "../../types/koa.js";
 
 export type GetEntriesAPIResult = {
   entries: LogEntry[];

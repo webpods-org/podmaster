@@ -1,12 +1,13 @@
 import { IncomingMessage, Server as HttpServer } from "http";
 import { Server as HttpsServer } from "https";
 import { Socket } from "net";
-import { AppConfig } from "../../types/types";
-import WebSocket = require("ws");
-import { TrackedWebSocket } from "../../types/webSocket";
-import { handleMessage } from "../../domain/pubsub/handleMessage";
-import { handleClose } from "../../domain/pubsub/handleClose";
-import { INACTIVE, MISSING_POD, SERVER_BUSY } from "../../errors/codes";
+import WebSocket from "ws";
+
+import { AppConfig } from "../../types/types.js";
+import { TrackedWebSocket } from "../../types/webSocket.js";
+import { handleMessage } from "../../domain/pubsub/handleMessage.js";
+import { handleClose } from "../../domain/pubsub/handleClose.js";
+import { INACTIVE, SERVER_BUSY } from "../../errors/codes.js";
 
 // Check WS client connection status every 30s.
 const TRACKING_INTERVAL_MS = 30000;

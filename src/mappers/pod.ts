@@ -1,5 +1,5 @@
-import { PodInfo } from "../types/types";
-import { PodsRow } from "../types/db";
+import { PodInfo } from "../types/types.js";
+import { PodsRow } from "../types/db.js";
 
 export default function map(row: PodsRow): PodInfo {
   return {

@@ -1,8 +1,8 @@
 import { IRouterContext } from "koa-router";
-import createPod from "../../domain/pod/createPod";
-import * as config from "../../config";
-import { NOT_FOUND } from "../../errors/codes";
-import handleResult from "../handleResult";
+import createPod from "../../domain/pod/createPod.js";
+import * as config from "../../config/index.js";
+import { NOT_FOUND } from "../../errors/codes.js";
+import handleResult from "../handleResult.js";
 
 export type CreatePodAPIResult = {
   hostname: string;

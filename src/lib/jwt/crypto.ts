@@ -1,4 +1,4 @@
-import { AsymmetricAlgorithm } from "../../types/crypto";
+import { AsymmetricAlgorithm } from "../../types/crypto.js";
 
 const symmetricAlgorithms = ["HS256", "HS384", "HS512"];
 

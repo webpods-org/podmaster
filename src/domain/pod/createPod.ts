@@ -1,14 +1,15 @@
-import { JwtClaims } from "../../types/types";
-import * as config from "../../config";
-import { ACCESS_DENIED, INVALID_CLAIM } from "../../errors/codes";
-import matchObject from "../../utils/matchObject";
-import random from "../../utils/random";
-import * as db from "../../db";
 import { join } from "path";
-import mkdirp = require("mkdirp");
-import { Result } from "../../types/api";
-import { PodsRow } from "../../types/db";
-import { generateInsertStatement } from "../../lib/sqlite";
+import mkdirp from "mkdirp";
+
+import { JwtClaims } from "../../types/types.js";
+import * as config from "../../config/index.js";
+import { ACCESS_DENIED, INVALID_CLAIM } from "../../errors/codes.js";
+import matchObject from "../../utils/matchObject";
+import random from "../../utils/random.js";
+import * as db from "../../db/index.js";
+import { Result } from "../../types/api.js";
+import { PodsRow } from "../../types/db.js";
+import { generateInsertStatement } from "../../lib/sqlite.js";
 
 export type CreatePodResult = { hostname: string; pod: string };
 

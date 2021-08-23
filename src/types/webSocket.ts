@@ -1,5 +1,5 @@
-import WebSocket = require("ws");
-import { JwtClaims } from "./types";
+import WebSocket from "ws";
+import { JwtClaims } from "./types.js";
 
 export type TrackedWebSocket = WebSocket & {
   isAlive?: boolean;

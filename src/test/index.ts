@@ -1,9 +1,8 @@
 import "mocha";
 import "should";
 import integrationTests from "./integrationTests";
-import unitTests from "./unitTests";
 import * as path from "path";
-import { AppConfig } from "../types/types";
+import { AppConfig } from "../types/types.js";
 import { join } from "path";
 
 function run() {

@@ -1,19 +1,20 @@
-import * as config from "../../config";
-import * as db from "../../db";
 import { extname, join } from "path";
 import { Files } from "formidable";
 import { createHash } from "crypto";
-import { ErrResult, Result } from "../../types/api";
-import { EntriesRow } from "../../types/db";
-import ensurePod from "../pod/ensurePod";
-import { getPermissionsForLog } from "./checkPermissionsForLog";
-import { ACCESS_DENIED, INVALID_FILENAME } from "../../errors/codes";
-import mv = require("mv");
-import random from "../../utils/random";
+import mv from "mv";
+import random from "../../utils/random.js";
 import { promisify } from "util";
 import { existsSync, readFileSync } from "fs";
-import isFilenameValid from "../../lib/validation/checkFilename";
-import { generateInsertStatement } from "../../lib/sqlite";
+
+import * as config from "../../config/index.js";
+import * as db from "../../db/index.js";
+import { ErrResult, Result } from "../../types/api.js";
+import { EntriesRow } from "../../types/db.js";
+import ensurePod from "../pod/ensurePod.js";
+import { getPermissionsForLog } from "./checkPermissionsForLog.js";
+import { ACCESS_DENIED, INVALID_FILENAME } from "../../errors/codes.js";
+import isFilenameValid from "../../lib/validation/checkFilename.js";
+import { generateInsertStatement } from "../../lib/sqlite.js";
 
 const moveFile = promisify(mv);
 

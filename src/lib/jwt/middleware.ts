@@ -1,12 +1,12 @@
-import { INVALID_JWT } from "../../errors/codes";
-import * as jsonwebtoken from "jsonwebtoken";
 import { ParameterizedContext, Next } from "koa";
-import { Result } from "../../types/api";
-import { log, logException } from "../logger/log";
-import { IKoaAppContext } from "../../types/koa";
-import { JwtClaims } from "../../types/types";
-import getJwtParams, { JwtParamsForAsymmetricAlgorithm } from "./getJwtParams";
-import validateClaims from "./validateClaims";
+
+import { INVALID_JWT } from "../../errors/codes.js";
+import * as jsonwebtoken from "jsonwebtoken";
+import { Result } from "../../types/api.js";
+import { log, logException } from "../logger/log.js";
+import { IKoaAppContext } from "../../types/koa.js";
+import getJwtParams, { JwtParamsForAsymmetricAlgorithm } from "./getJwtParams.js";
+import validateClaims from "./validateClaims.js";
 
 export class AuthenticationError extends Error {
   code: string;

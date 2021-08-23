@@ -1,6 +1,6 @@
-import handleResult from "../handleResult";
-import getInfo from "../../domain/log/getInfo";
-import { IKoaAppContext } from "../../types/koa";
+import handleResult from "../handleResult.js";
+import getInfo from "../../domain/log/getInfo.js";
+import { IKoaAppContext } from "../../types/koa.js";
 
 export type GetInfoAPIResult = {
   count: number;

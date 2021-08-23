@@ -1,9 +1,8 @@
-import * as config from "../../config";
-import { IRouterContext } from "koa-router";
-import getLogs from "../../domain/log/getLogs";
-import handleResult from "../handleResult";
-import { IKoaAppContext } from "../../types/koa";
-import { ACCESS_DENIED } from "../../errors/codes";
+import * as config from "../../config/index.js";
+import getLogs from "../../domain/log/getLogs.js";
+import handleResult from "../handleResult.js";
+import { IKoaAppContext } from "../../types/koa.js";
+import { ACCESS_DENIED } from "../../errors/codes.js";
 
 export type GetLogsAPIResult = {
   logs: {

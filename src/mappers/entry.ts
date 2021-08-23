@@ -1,5 +1,5 @@
-import { LogEntry } from "../types/types";
-import { EntriesRow } from "../types/db";
+import { LogEntry } from "../types/types.js";
+import { EntriesRow } from "../types/db.js";
 
 export default function map(row: EntriesRow): LogEntry {
   return {

@@ -1,14 +1,15 @@
-import jwksClient = require("jwks-rsa");
-import * as config from "../../config";
+import * as jsonwebtoken from "jsonwebtoken";
+import jwksClient from "jwks-rsa";
+
+import * as config from "../../config/index.js";
 import {
   ACCESS_DENIED,
   INVALID_JWT,
   JWT_INVALID_ALGORITHM,
-} from "../../errors/codes";
-import * as jsonwebtoken from "jsonwebtoken";
-import { AsymmetricAlgorithm } from "../../types/crypto";
-import { LRUMap } from "../lruCache/lru";
-import { Result } from "../../types/api";
+} from "../../errors/codes.js";
+import { AsymmetricAlgorithm } from "../../types/crypto.js";
+import { LRUMap } from "../lruCache/lru.js";
+import { Result } from "../../types/api.js";
 
 // Only this for now.
 const supportedAlgorithms: string[] = ["RS256"];

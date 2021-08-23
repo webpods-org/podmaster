@@ -1,8 +1,9 @@
-import * as db from "../../db";
 import * as path from "path";
-import * as config from "../../config";
-import mapper from "../../mappers/pod";
-import { Result } from "../../types/api";
+
+import * as db from "../../db/index.js";
+import * as config from "../../config/index.js";
+import mapper from "../../mappers/pod.js";
+import { Result } from "../../types/api.js";
 
 export type GetPodsResult = {
   pods: {

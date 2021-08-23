@@ -1,7 +1,9 @@
-import { PodInfo } from "../../types/types";
-import permissionMapper from "../../mappers/permission";
-import logMapper from "../../mappers/log";
-import Sqlite3 = require("better-sqlite3");
+import Sqlite3 from "better-sqlite3";
+
+import { PodInfo } from "../../types/types.js";
+import permissionMapper from "../../mappers/permission.js";
+import logMapper from "../../mappers/log.js";
+
 
 const noPermissions = {
   read: false,

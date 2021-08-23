@@ -1,8 +1,8 @@
 import { IRouterContext } from "koa-router";
-import * as config from "../../config";
-import { NOT_FOUND } from "../../errors/codes";
-import { getPods } from "../../domain/pod/getPods";
-import handleResult from "../handleResult";
+import * as config from "../../config/index.js";
+import { NOT_FOUND } from "../../errors/codes.js";
+import { getPods } from "../../domain/pod/getPods.js";
+import handleResult from "../handleResult.js";
 
 export type GetPodsAPIResult = {
   pods: {

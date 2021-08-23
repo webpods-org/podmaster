@@ -1,5 +1,5 @@
 import { IncomingMessage } from "http";
-import WebSocket = require("ws");
+import WebSocket from "ws";
 
 export function handleClose(
   hostname: string,

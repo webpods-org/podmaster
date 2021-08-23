@@ -1,26 +1,31 @@
+import { join } from "path";
+import * as jsonwebtoken from "jsonwebtoken";
 import { IncomingMessage } from "http";
-import getJwtParams from "../../lib/jwt/getJwtParams";
+
+import getJwtParams from "../../lib/jwt/getJwtParams.js";
 import {
   TrackedWebSocket,
   WebSocketAuthMessage,
   WebSocketPublishMessage,
   WebSocketSubscribeMessage,
   WebSocketUnsubscribeMessage,
-} from "../../types/webSocket";
-import * as jsonwebtoken from "jsonwebtoken";
-import { addSubscription, publish, removeSubscription } from "./subscriptions";
-import validateClaims from "../../lib/jwt/validateClaims";
-import { getPodByHostname } from "../pod/getPodByHostname";
-import * as config from "../../config";
-import * as db from "../../db";
-import { join } from "path";
-import { getPermissionsForLog } from "../log/checkPermissionsForLog";
+} from "../../types/webSocket.js";
+import {
+  addSubscription,
+  publish,
+  removeSubscription,
+} from "./subscriptions.js";
+import validateClaims from "../../lib/jwt/validateClaims.js";
+import { getPodByHostname } from "../pod/getPodByHostname.js";
+import * as config from "../../config/index.js";
+import * as db from "../../db/index.js";
+import { getPermissionsForLog } from "../log/checkPermissionsForLog.js";
 import {
   ACCESS_DENIED,
   INVALID_JWT,
   MISSING_POD,
   UNKNOWN_ERROR,
-} from "../../errors/codes";
+} from "../../errors/codes.js";
 
 export function handleMessage(
   hostname: string,

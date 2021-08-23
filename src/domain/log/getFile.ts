@@ -1,11 +1,12 @@
-import * as config from "../../config";
-import * as db from "../../db";
 import { join } from "path";
-import { Result } from "../../types/api";
-import ensurePod from "../pod/ensurePod";
-import { ACCESS_DENIED, NOT_FOUND } from "../../errors/codes";
-import { getPermissionsForLog } from "./checkPermissionsForLog";
-import isFilenameValid from "../../lib/validation/checkFilename";
+
+import * as config from "../../config/index.js";
+import * as db from "../../db/index.js";
+import { Result } from "../../types/api.js";
+import ensurePod from "../pod/ensurePod.js";
+import { ACCESS_DENIED, NOT_FOUND } from "../../errors/codes.js";
+import { getPermissionsForLog } from "./checkPermissionsForLog.js";
+import isFilenameValid from "../../lib/validation/checkFilename.js";
 
 export type GetFileResult = {
   root: string;

@@ -1,5 +1,5 @@
-import { Permission } from "../types/types";
-import { PermissionsRow } from "../types/db";
+import { Permission } from "../types/types.js";
+import { PermissionsRow } from "../types/db.js";
 
 export default function map(row: PermissionsRow): Permission {
   return {

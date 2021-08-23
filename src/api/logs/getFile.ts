@@ -1,7 +1,7 @@
-import handleResult from "../handleResult";
-import { IKoaAppContext } from "../../types/koa";
-import send = require("koa-send");
-import getFile from "../../domain/log/getFile";
+import send from "koa-send";
+import handleResult from "../handleResult.js";
+import { IKoaAppContext } from "../../types/koa.js";
+import getFile from "../../domain/log/getFile.js";
 
 export default async function getFileAPI(ctx: IKoaAppContext) {
   const hostname = ctx.URL.hostname;

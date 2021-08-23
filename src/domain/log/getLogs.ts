@@ -1,10 +1,11 @@
-import * as config from "../../config";
-import * as db from "../../db";
 import { join } from "path";
-import { LogsRow } from "../../types/db";
-import { Result } from "../../types/api";
-import ensurePod from "../pod/ensurePod";
-import { ACCESS_DENIED } from "../../errors/codes";
+
+import * as config from "../../config/index.js";
+import * as db from "../../db/index.js";
+import { LogsRow } from "../../types/db.js";
+import { Result } from "../../types/api.js";
+import ensurePod from "../pod/ensurePod.js";
+import { ACCESS_DENIED } from "../../errors/codes.js";
 
 export type GetLogsResult = {
   logs: {

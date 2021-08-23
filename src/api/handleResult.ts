@@ -1,7 +1,7 @@
 import { IRouterContext } from "koa-router";
-import { ACCESS_DENIED, UNKNOWN_ERROR } from "../errors/codes";
-import { log, logException } from "../lib/logger/log";
-import { OkResult, Result } from "../types/api";
+import { ACCESS_DENIED, UNKNOWN_ERROR } from "../errors/codes.js";
+import { log, logException } from "../lib/logger/log.js";
+import { OkResult, Result } from "../types/api.js";
 
 export default async function handleResult<T>(
   ctx: IRouterContext,

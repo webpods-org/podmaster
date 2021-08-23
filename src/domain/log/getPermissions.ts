@@ -1,11 +1,12 @@
-import * as config from "../../config";
-import * as db from "../../db";
 import { join } from "path";
-import { Permission } from "../../types/types";
-import { Result } from "../../types/api";
-import mapper from "../../mappers/permission";
-import ensurePod from "../pod/ensurePod";
-import { ACCESS_DENIED } from "../../errors/codes";
+
+import * as config from "../../config/index.js";
+import * as db from "../../db/index.js";
+import { Permission } from "../../types/types.js";
+import { Result } from "../../types/api.js";
+import mapper from "../../mappers/permission.js";
+import ensurePod from "../pod/ensurePod.js";
+import { ACCESS_DENIED } from "../../errors/codes.js";
 
 export type GetPermissionsResult = {
   permissions: Permission[];

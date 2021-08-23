@@ -1,11 +1,12 @@
-import * as config from "../../config";
-import * as db from "../../db";
 import { join } from "path";
-import { Result } from "../../types/api";
-import ensurePod from "../pod/ensurePod";
-import { EntriesRow } from "../../types/db";
-import { ACCESS_DENIED } from "../../errors/codes";
-import { getPermissionsForLog } from "./checkPermissionsForLog";
+
+import * as config from "../../config/index.js";
+import * as db from "../../db/index.js";
+import { Result } from "../../types/api.js";
+import ensurePod from "../pod/ensurePod.js";
+import { EntriesRow } from "../../types/db.js";
+import { ACCESS_DENIED } from "../../errors/codes.js";
+import { getPermissionsForLog } from "./checkPermissionsForLog.js";
 
 export type GetInfoResult = {
   count: number;

@@ -1,20 +1,21 @@
-import { startApp } from "../..";
-import request = require("supertest");
+import request from "supertest";
 import { join } from "path";
 import { readFileSync } from "fs";
-import should = require("should");
-import { GetPodsAPIResult } from "../../api/pods/getPods";
-import { CreatePodAPIResult } from "../../api/pods/createPod";
-import { GetLogsAPIResult } from "../../api/logs/getLogs";
-import { UpdatePermissionsAPIResult } from "../../api/logs/updatePermissions";
-import { CreateLogAPIResult } from "../../api/logs/createLog";
-import { AddEntriesAPIResult } from "../../api/logs/addEntries";
-import { GetPermissionsAPIResult } from "../../api/logs/getPermissions";
-import { GetEntriesAPIResult } from "../../api/logs/getEntries";
-import { LogEntry } from "../../types/types";
-import { GetInfoAPIResult } from "../../api/logs/getInfo";
-import WebSocket = require("ws");
-import promiseSignal from "../../lib/promiseSignal";
+import WebSocket from "ws";
+import should from "should";
+
+import { startApp } from "../..";
+import { GetPodsAPIResult } from "../../api/pods/getPods.js";
+import { CreatePodAPIResult } from "../../api/pods/createPod.js";
+import { GetLogsAPIResult } from "../../api/logs/getLogs.js";
+import { UpdatePermissionsAPIResult } from "../../api/logs/updatePermissions.js";
+import { CreateLogAPIResult } from "../../api/logs/createLog.js";
+import { AddEntriesAPIResult } from "../../api/logs/addEntries.js";
+import { GetPermissionsAPIResult } from "../../api/logs/getPermissions.js";
+import { GetEntriesAPIResult } from "../../api/logs/getEntries.js";
+import { LogEntry } from "../../types/types.js";
+import { GetInfoAPIResult } from "../../api/logs/getInfo.js";
+import promiseSignal from "../../lib/promiseSignal.js";
 
 let app: any;
 let port: number;

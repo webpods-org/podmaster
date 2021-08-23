@@ -1,21 +1,24 @@
 #!/usr/bin/env node
 
-import Koa = require("koa");
-import Router = require("koa-router");
-import bodyParser = require("koa-body");
-import yargs = require("yargs");
-import jwtMiddleware from "./lib/jwt/middleware";
-import { init as libJwtInit } from "./lib/jwt/getJwtParams";
-import * as db from "./db";
-import { init as loggerInit } from "./lib/logger/log";
+import Koa from "koa";
+import Router from "koa-router";
+import bodyParser from "koa-body";
+import yargs from "yargs";
+import * as path from "path";
+import * as fs from "fs";
 
-import * as podsApi from "./api/pods";
-import * as logsApi from "./api/logs";
+import jwtMiddleware from "./lib/jwt/middleware.js";
+import { init as libJwtInit } from "./lib/jwt/getJwtParams.js";
+import * as db from "./db/index.js";
+import { init as loggerInit } from "./lib/logger/log.js";
 
-import * as config from "./config";
-import { AppConfig } from "./types/types";
-import { createHttpServer } from "./lib/servers/http";
-import { attachWebSocketServer } from "./lib/servers/webSocket";
+import * as podsApi from "./api/pods/index.js";
+import * as logsApi from "./api/logs/index.js";
+
+import * as config from "./config/index.js";
+import { AppConfig } from "./types/types.js";
+import { createHttpServer } from "./lib/servers/http.js";
+import { attachWebSocketServer } from "./lib/servers/webSocket.js";
 
 const packageJson = require("../package.json");
 
@@ -88,6 +91,8 @@ async function init(appConfig: AppConfig) {
 if (require.main === module) {
   // Print the version and exit
   if (argv.v) {
+    const pkg = path.join(__dirname, "../package.json");
+    const packageJSON = JSON.parse(fs.readFileSync(pkg, "utf8"));
     console.log(packageJson.version);
   } else {
     if (!argv.p) {

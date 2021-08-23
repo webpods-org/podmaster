@@ -1,5 +1,5 @@
 import * as pathModule from "path";
-import { AppConfig } from "../types/types";
+import { AppConfig } from "../types/types.js";
 
 const path: typeof pathModule = require("path");
 

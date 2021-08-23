@@ -1,9 +1,10 @@
-import Sqlite3 = require("better-sqlite3");
-import * as config from "../config";
 import * as path from "path";
 import { readFileSync } from "fs";
 import { join } from "path";
-import { LRUMap } from "../lib/lruCache/lru";
+import Sqlite3 from "better-sqlite3";
+
+import * as config from "../config/index.js";
+import { LRUMap } from "../lib/lruCache/lru.js";
 
 let podDbCache: LRUMap<string, Sqlite3.Database>;
 

@@ -1,9 +1,9 @@
-import * as config from "../../config";
+import * as config from "../../config/index.js";
 import { IRouterContext } from "koa-router";
 import updatePermissions from "../../domain/log/updatePermissions";
-import handleResult from "../handleResult";
-import { IKoaAppContext } from "../../types/koa";
-import { ACCESS_DENIED } from "../../errors/codes";
+import handleResult from "../handleResult.js";
+import { IKoaAppContext } from "../../types/koa.js";
+import { ACCESS_DENIED } from "../../errors/codes.js";
 
 export type UpdatePermissionsAPIResult = {
   added: number;

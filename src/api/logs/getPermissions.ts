@@ -1,9 +1,9 @@
 import { IRouterContext } from "koa-router";
-import handleResult from "../handleResult";
-import getPermissions from "../../domain/log/getPermissions";
-import { Permission } from "../../types/types";
-import { IKoaAppContext } from "../../types/koa";
-import { ACCESS_DENIED } from "../../errors/codes";
+import handleResult from "../handleResult.js";
+import getPermissions from "../../domain/log/getPermissions.js";
+import { Permission } from "../../types/types.js";
+import { IKoaAppContext } from "../../types/koa.js";
+import { ACCESS_DENIED } from "../../errors/codes.js";
 
 export type GetPermissionsAPIResult = {
   permissions: Permission[];

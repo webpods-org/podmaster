@@ -1,7 +1,7 @@
-import addEntries from "../../domain/log/addEntries";
-import { ACCESS_DENIED } from "../../errors/codes";
-import { IKoaAppContext } from "../../types/koa";
-import handleResult from "../handleResult";
+import addEntries from "../../domain/log/addEntries.js";
+import { ACCESS_DENIED } from "../../errors/codes.js";
+import { IKoaAppContext } from "../../types/koa.js";
+import handleResult from "../handleResult.js";
 
 export type AddEntriesAPIResult = {
   entries: {

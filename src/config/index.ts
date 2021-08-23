@@ -1,4 +1,4 @@
-import { AppConfig } from "../types/types";
+import { AppConfig } from "../types/types.js";
 
 let config: AppConfig;
 

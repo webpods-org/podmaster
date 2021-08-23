@@ -1,4 +1,5 @@
-import WebSocket = require("ws");
+import WebSocket from "ws";
+
 const subscriptions = new Map<string, Map<string, WebSocket[]>>();
 
 export function getSubscriptions() {
