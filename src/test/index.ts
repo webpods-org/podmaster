@@ -5,7 +5,7 @@ import * as path from "path";
 import { AppConfig } from "../types/types.js";
 import { join } from "path";
 
-function run() {
+async function run() {
   /* Sanity check to make sure we don't accidentally run on the server. */
   if (process.env.NODE_ENV !== "development") {
     throw new Error("Tests can only be run with NODE_ENV=development.");
@@ -26,7 +26,9 @@ function run() {
   const port = parseInt(process.env.WEBPODS_TEST_PORT as string);
   const configDir = process.env.WEBPODS_TEST_CONFIG_DIR as string;
   const configFilePath = join(configDir, "config");
-  const appConfig: AppConfig = require(configFilePath);
+
+  const appConfig: AppConfig = await import(configFilePath);
+
   const dbConfig = {
     path: path.join(appConfig.storage.dataDir, "webpodssysdb.sqlite"),
   };

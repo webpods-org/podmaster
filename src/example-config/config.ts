@@ -1,7 +1,4 @@
-import * as pathModule from "path";
 import { AppConfig } from "../types/types.js";
-
-const path: typeof pathModule = require("path");
 
 /*
   This is required if you want to allow external parties to READ your pods.

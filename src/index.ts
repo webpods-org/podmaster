@@ -20,8 +20,6 @@ import { AppConfig } from "./types/types.js";
 import { createHttpServer } from "./lib/servers/http.js";
 import { attachWebSocketServer } from "./lib/servers/webSocket.js";
 
-const packageJson = require("../package.json");
-
 const argv = yargs.options({
   c: { type: "string", alias: "config" },
   p: { type: "number", default: 8080, alias: "port" },
@@ -31,7 +29,7 @@ const argv = yargs.options({
 const MEGABYTE = 1024 * 1024;
 
 export async function startApp(configFile: string) {
-  const appConfig: AppConfig = require(configFile);
+  const appConfig: AppConfig = await import(configFile);
 
   await init(appConfig);
 
@@ -93,7 +91,7 @@ if (require.main === module) {
   if (argv.v) {
     const pkg = path.join(__dirname, "../package.json");
     const packageJSON = JSON.parse(fs.readFileSync(pkg, "utf8"));
-    console.log(packageJson.version);
+    console.log(packageJSON.version);
   } else {
     if (!argv.p) {
       console.log("The port should be specified with the -p option.");

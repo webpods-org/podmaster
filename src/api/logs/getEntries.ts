@@ -1,8 +1,7 @@
-import { IRouterContext } from "koa-router";
 import getEntries from "../../domain/log/getEntries";
 import transformQuery from "../utils/transformQuery.js";
 import handleResult from "../handleResult.js";
-import getQuery from "../utils/getParam";
+import getQuery from "../utils/getParam.js";
 import { LogEntry } from "../../types/types.js";
 import { IKoaAppContext } from "../../types/koa.js";
 
