@@ -1,4 +1,3 @@
-import { IRouterContext } from "koa-router";
 import handleResult from "../handleResult.js";
 import getPermissions from "../../domain/log/getPermissions.js";
 import { Permission } from "../../types/types.js";

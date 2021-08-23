@@ -34,7 +34,7 @@ export default async function getInfo(
         `SELECT "id", "commit" FROM "entries" ORDER BY id DESC LIMIT 1`
       );
 
-      let { id, commit } = (lastItemStmt.get() as EntriesRow | undefined) || {
+      const { id, commit } = (lastItemStmt.get() as EntriesRow | undefined) || {
         id: 0,
         commit: "",
       };

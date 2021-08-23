@@ -8,8 +8,8 @@
     "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
     "sourceMap": true,
-    "strict": true,
-    "resolveJsonModule": true
+    "strict": true
   },
-  "include": ["./src/**/*"]
+  "include": ["./src/**/*"],
+  "exclude": ["./.eslintrc.js"]
 }

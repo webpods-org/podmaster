@@ -4,7 +4,7 @@ import { readFileSync } from "fs";
 import WebSocket from "ws";
 import should from "should";
 
-import { startApp } from "../..";
+import startApp from "../../startApp.js";
 import { GetPodsAPIResult } from "../../api/pods/getPods.js";
 import { CreatePodAPIResult } from "../../api/pods/createPod.js";
 import { GetLogsAPIResult } from "../../api/logs/getLogs.js";
@@ -29,13 +29,12 @@ export default function run(configDir: string, configFilePath: string) {
     let app: any;
     let port: number;
     let mainHostname: string = process.env.WEBPODS_TEST_HOSTNAME as string;
-    let mainHostnameAndPort: string;
 
     let hostname: string;
     let hostnameAndPort: string;
     let pod: string;
     let log: string;
-    let entries: LogEntry[] = [];
+    const entries: LogEntry[] = [];
 
     before(async () => {
       const service = await startApp(configFilePath);

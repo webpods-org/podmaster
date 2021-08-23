@@ -4,7 +4,7 @@ import mkdirp from "mkdirp";
 import { JwtClaims } from "../../types/types.js";
 import * as config from "../../config/index.js";
 import { ACCESS_DENIED, INVALID_CLAIM } from "../../errors/codes.js";
-import matchObject from "../../utils/matchObject";
+import matchObject from "../../utils/matchObject.js";
 import random from "../../utils/random.js";
 import * as db from "../../db/index.js";
 import { Result } from "../../types/api.js";

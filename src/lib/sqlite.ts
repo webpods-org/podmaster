@@ -1,13 +1,16 @@
-export function generateInsertStatement(table: string, row: object) {
+export function generateInsertStatement(
+  table: string,
+  row: Record<string, unknown>
+) {
   const keys = Object.getOwnPropertyNames(row);
-  const columns = keys.map(x => `"${x}"`).join(", ");
+  const columns = keys.map((x) => `"${x}"`).join(", ");
   const values = keys.map((x) => `@${x}`).join(", ");
   return `INSERT INTO "${table}" (${columns}) VALUES (${values})`;
 }
 
 export function generateUpdateStatement(
   table: string,
-  row: object,
+  row: Record<string, unknown>,
   clauses?: string
 ) {
   const keys = Object.getOwnPropertyNames(row);

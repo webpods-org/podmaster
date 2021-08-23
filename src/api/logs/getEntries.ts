@@ -1,4 +1,4 @@
-import getEntries from "../../domain/log/getEntries";
+import getEntries from "../../domain/log/getEntries.js";
 import transformQuery from "../utils/transformQuery.js";
 import handleResult from "../handleResult.js";
 import getQuery from "../utils/getParam.js";

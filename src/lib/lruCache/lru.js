@@ -16,22 +16,12 @@
  *
  *  removed  <--  <--  <--  <--  <--  <--  <--  <--  <--  <--  <--  added
  */
- !function(g,f){
-  if (typeof exports == 'object' && typeof module != "undefined") {
-    f(exports)
-  } else if (typeof define == 'function' && define.amd) {
-    define(["exports"], f)
-  } else {
-    f((g = g || self)["lru_map"] = (g["lru_map"] || {}))
-  }
-}(this, function(exports) {
+const NEWER = Symbol("newer");
+const OLDER = Symbol("older");
 
-const NEWER = Symbol('newer');
-const OLDER = Symbol('older');
-
-class LRUMap {
+export class LRUMap {
   constructor(limit, entries) {
-    if (typeof limit !== 'number') {
+    if (typeof limit !== "number") {
       // called as (entries)
       entries = limit;
       limit = 0;
@@ -77,7 +67,8 @@ class LRUMap {
   }
 
   assign(entries) {
-    let entry, limit = this.limit || Number.MAX_VALUE;
+    let entry,
+      limit = this.limit || Number.MAX_VALUE;
     this._keymap.clear();
     let it = entries[Symbol.iterator]();
     for (let itv = it.next(); !itv.done; itv = it.next()) {
@@ -91,7 +82,7 @@ class LRUMap {
       }
       entry = e;
       if (limit-- == 0) {
-        throw new Error('overflow');
+        throw new Error("overflow");
       }
     }
     this.newest = entry;
@@ -193,7 +184,8 @@ class LRUMap {
       entry[OLDER][NEWER] = undefined;
       // link the newer entry to head
       this.newest = entry[OLDER];
-    } else {// if(entry[OLDER] === undefined && entry.newer === undefined) {
+    } else {
+      // if(entry[OLDER] === undefined && entry.newer === undefined) {
       this.oldest = this.newest = undefined;
     }
 
@@ -225,7 +217,7 @@ class LRUMap {
   }
 
   forEach(fun, thisObj) {
-    if (typeof thisObj !== 'object') {
+    if (typeof thisObj !== "object") {
       thisObj = this;
     }
     let entry = this.oldest;
@@ -237,7 +229,9 @@ class LRUMap {
 
   /** Returns a JSON (array) representation */
   toJSON() {
-    var s = new Array(this.size), i = 0, entry = this.oldest;
+    var s = new Array(this.size),
+      i = 0,
+      entry = this.oldest;
     while (entry) {
       s[i++] = { key: entry.key, value: entry.value };
       entry = entry[NEWER];
@@ -247,19 +241,18 @@ class LRUMap {
 
   /** Returns a String representation */
   toString() {
-    var s = '', entry = this.oldest;
+    var s = "",
+      entry = this.oldest;
     while (entry) {
-      s += String(entry.key)+':'+entry.value;
+      s += String(entry.key) + ":" + entry.value;
       entry = entry[NEWER];
       if (entry) {
-        s += ' < ';
+        s += " < ";
       }
     }
     return s;
   }
 }
-
-exports.LRUMap = LRUMap
 
 function Entry(key, value) {
   this.key = key;
@@ -268,10 +261,13 @@ function Entry(key, value) {
   this[OLDER] = undefined;
 }
 
-
-function EntryIterator(oldestEntry) { this.entry = oldestEntry; }
-EntryIterator.prototype[Symbol.iterator] = function() { return this; }
-EntryIterator.prototype.next = function() {
+function EntryIterator(oldestEntry) {
+  this.entry = oldestEntry;
+}
+EntryIterator.prototype[Symbol.iterator] = function () {
+  return this;
+};
+EntryIterator.prototype.next = function () {
   let ent = this.entry;
   if (ent) {
     this.entry = ent[NEWER];
@@ -281,10 +277,13 @@ EntryIterator.prototype.next = function() {
   }
 };
 
-
-function KeyIterator(oldestEntry) { this.entry = oldestEntry; }
-KeyIterator.prototype[Symbol.iterator] = function() { return this; }
-KeyIterator.prototype.next = function() {
+function KeyIterator(oldestEntry) {
+  this.entry = oldestEntry;
+}
+KeyIterator.prototype[Symbol.iterator] = function () {
+  return this;
+};
+KeyIterator.prototype.next = function () {
   let ent = this.entry;
   if (ent) {
     this.entry = ent[NEWER];
@@ -294,9 +293,13 @@ KeyIterator.prototype.next = function() {
   }
 };
 
-function ValueIterator(oldestEntry) { this.entry = oldestEntry; }
-ValueIterator.prototype[Symbol.iterator] = function() { return this; }
-ValueIterator.prototype.next = function() {
+function ValueIterator(oldestEntry) {
+  this.entry = oldestEntry;
+}
+ValueIterator.prototype[Symbol.iterator] = function () {
+  return this;
+};
+ValueIterator.prototype.next = function () {
   let ent = this.entry;
   if (ent) {
     this.entry = ent[NEWER];
@@ -305,5 +308,3 @@ ValueIterator.prototype.next = function() {
     return { done: true, value: undefined };
   }
 };
-
-});

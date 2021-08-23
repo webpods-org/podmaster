@@ -1,6 +1,4 @@
-import * as config from "../../config/index.js";
-import { IRouterContext } from "koa-router";
-import updatePermissions from "../../domain/log/updatePermissions";
+import updatePermissions from "../../domain/log/updatePermissions.js";
 import handleResult from "../handleResult.js";
 import { IKoaAppContext } from "../../types/koa.js";
 import { ACCESS_DENIED } from "../../errors/codes.js";

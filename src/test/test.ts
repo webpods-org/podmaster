@@ -1,9 +1,8 @@
-import "mocha";
-import "should";
-import integrationTests from "./integrationTests";
-import * as path from "path";
-import { AppConfig } from "../types/types.js";
 import { join } from "path";
+import * as path from "path";
+
+import integrationTests from "./integrationTests/index.js";
+import { AppConfig } from "../types/types.js";
 
 async function run() {
   /* Sanity check to make sure we don't accidentally run on the server. */
@@ -32,6 +31,8 @@ async function run() {
   const dbConfig = {
     path: path.join(appConfig.storage.dataDir, "webpodssysdb.sqlite"),
   };
+
+  console.log({ configDir, configFilePath });
 
   describe("webpods", () => {
     integrationTests(configDir, configFilePath);
