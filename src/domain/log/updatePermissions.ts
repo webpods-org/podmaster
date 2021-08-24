@@ -8,6 +8,7 @@ import ensurePod from "../pod/ensurePod.js";
 import { ACCESS_DENIED } from "../../errors/codes.js";
 import { PermissionsRow } from "../../types/db.js";
 import { generateInsertStatement } from "../../lib/sqlite.js";
+import { getPodDataDir } from "../../storage/index.js";
 
 export type UpdatePermissionsResult = {
   added: number;
@@ -34,7 +35,7 @@ export default async function updatePermissions(
 
   return ensurePod(hostname, async (pod) => {
     // Let's see if the log already exists.
-    const podDataDir = join(appConfig.storage.dataDir, pod.dataDir);
+    const podDataDir = getPodDataDir(pod.name);
     const podDb = db.getPodDb(podDataDir);
 
     if (pod.claims.iss === iss && pod.claims.sub === sub) {

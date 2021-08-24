@@ -14,13 +14,13 @@ PUBLIC_KEY=$(basho -i fs fs 'fs.readFileSync("'"$CONFIG_DIR"'/jwtRS256.key.pub.p
 # make a list of strings to replace
 REPLACE_LIST=$(cat <<"EOF"
 [
-  [`WEBPODS_TEST_CONFIG_DIR="/some/path"`, `WEBPODS_TEST_CONFIG_DIR="${k.configDir}"`], 
+  [`PODMASTER_TEST_DATA_DIR="/some/path"`, `PODMASTER_TEST_DATA_DIR="${k.configDir}"`], 
   
-  [`WEBPODS_TEST_HOSTNAME="pod.example.com"`, `WEBPODS_TEST_HOSTNAME="${k.hostname}"`],
+  [`PODMASTER_TEST_HOSTNAME="pod.example.com"`, `PODMASTER_TEST_HOSTNAME="${k.hostname}"`],
 
-  [`WEBPODS_TEST_JWT_ISSUER_HOSTNAME="issuer.example.com"`, `WEBPODS_TEST_JWT_ISSUER_HOSTNAME="${k.jwtIssuer}"`],
+  [`PODMASTER_TEST_JWT_ISSUER_HOSTNAME="issuer.example.com"`, `PODMASTER_TEST_JWT_ISSUER_HOSTNAME="${k.jwtIssuer}"`],
   
-  [`WEBPODS_TEST_JWT_PUBLIC_KEY="abcdef"`, `WEBPODS_TEST_JWT_PUBLIC_KEY="${k.publicKey}"`], 
+  [`PODMASTER_TEST_JWT_PUBLIC_KEY="abcdef"`, `PODMASTER_TEST_JWT_PUBLIC_KEY="${k.publicKey}"`], 
 ]
 EOF
 )

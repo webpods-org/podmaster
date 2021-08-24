@@ -6,6 +6,7 @@ import { LogsRow } from "../../types/db.js";
 import { Result } from "../../types/api.js";
 import ensurePod from "../pod/ensurePod.js";
 import { ACCESS_DENIED } from "../../errors/codes.js";
+import { getPodDataDir } from "../../storage/index.js";
 
 export type GetLogsResult = {
   logs: {
@@ -25,7 +26,7 @@ export default async function getLogs(
     const tagsList = tags ? tags.split(",") : [];
 
     if (pod.claims.iss === iss && pod.claims.sub === sub) {
-      const podDataDir = join(appConfig.storage.dataDir, pod.dataDir);
+      const podDataDir = getPodDataDir(pod.name);
       const podDb = db.getPodDb(podDataDir);
 
       const getLogsStmt = podDb.prepare(`SELECT * FROM "logs"`);

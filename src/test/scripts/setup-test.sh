@@ -5,8 +5,8 @@ fi
 
 if [ ! -d "$1" ]; then
   mkdir -p $1
-  mkdir -p "$1/data"
   mkdir -p "$1/logs"
+  mkdir -p "$1/pods"
 fi
 
 # replace trailing slash.

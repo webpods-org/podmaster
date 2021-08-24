@@ -9,6 +9,7 @@ import ensurePod from "../pod/ensurePod.js";
 import { ACCESS_DENIED } from "../../errors/codes.js";
 import { LogsRow } from "../../types/db.js";
 import { generateInsertStatement } from "../../lib/sqlite.js";
+import { getPodDataDir } from "../../storage/index.js";
 export type CreateLogResult = {
   log: string;
 };
@@ -26,7 +27,7 @@ export default async function createLog(
     // Is it own pod?
     if (pod.claims.iss === iss && pod.claims.sub === sub) {
       // Let's see if the log already exists.
-      const podDataDir = join(appConfig.storage.dataDir, pod.dataDir);
+      const podDataDir = getPodDataDir(pod.name);
 
       const log = generateLogId();
       const logDir = join(podDataDir, log);

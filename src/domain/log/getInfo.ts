@@ -7,6 +7,7 @@ import ensurePod from "../pod/ensurePod.js";
 import { EntriesRow } from "../../types/db.js";
 import { ACCESS_DENIED } from "../../errors/codes.js";
 import { getPermissionsForLog } from "./checkPermissionsForLog.js";
+import { getPodDataDir } from "../../storage/index.js";
 
 export type GetInfoResult = {
   count: number;
@@ -23,7 +24,7 @@ export default async function getInfo(
 
   return ensurePod(hostname, async (pod) => {
     // Let's see if the log already exists.
-    const podDataDir = join(appConfig.storage.dataDir, pod.dataDir);
+    const podDataDir = getPodDataDir(pod.name);
     const podDb = db.getPodDb(podDataDir);
 
     const permissions = await getPermissionsForLog(pod, iss, sub, log, podDb);

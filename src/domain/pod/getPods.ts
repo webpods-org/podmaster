@@ -4,6 +4,7 @@ import * as db from "../../db/index.js";
 import * as config from "../../config/index.js";
 import mapper from "../../mappers/pod.js";
 import { Result } from "../../types/api.js";
+import { getPodDataDir } from "../../storage/index.js";
 
 export type GetPodsResult = {
   pods: {
@@ -45,7 +46,7 @@ export async function getPods(
     .map((x) => ({
       hostname: x.hostname,
       hostnameAlias: x.hostnameAlias,
-      dataDir: `${path.join(appConfig.storage.dataDir, x.dataDir)}`,
+      dataDir: getPodDataDir(x.name),
     }));
 
   return { ok: true, value: { pods } };

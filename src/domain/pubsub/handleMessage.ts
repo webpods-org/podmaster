@@ -26,6 +26,7 @@ import {
   MISSING_POD,
   UNKNOWN_ERROR,
 } from "../../errors/codes.js";
+import { getPodDataDir } from "../../storage/index.js";
 
 export function handleMessage(
   hostname: string,
@@ -95,7 +96,7 @@ export function handleMessage(
 
           const pod = await getPodByHostname(hostname);
           if (pod) {
-            const podDataDir = join(appConfig.storage.dataDir, pod.dataDir);
+            const podDataDir = getPodDataDir(pod.name);
             const podDb = db.getPodDb(podDataDir);
             const permissions = await getPermissionsForLog(
               pod,
@@ -164,7 +165,7 @@ export function handleMessage(
           const [log, channelId] = channel.split("/");
           const pod = await getPodByHostname(hostname);
           if (pod) {
-            const podDataDir = join(appConfig.storage.dataDir, pod.dataDir);
+            const podDataDir = getPodDataDir(pod.name);
             const podDb = db.getPodDb(podDataDir);
             const permissions = await getPermissionsForLog(
               pod,

@@ -7,6 +7,7 @@ import ensurePod from "../pod/ensurePod.js";
 import { ACCESS_DENIED, NOT_FOUND } from "../../errors/codes.js";
 import { getPermissionsForLog } from "./checkPermissionsForLog.js";
 import isFilenameValid from "../../lib/validation/checkFilename.js";
+import { getPodDataDir } from "../../storage/index.js";
 
 export type GetFileResult = {
   root: string;
@@ -24,7 +25,7 @@ export default async function getFile(
 
   return ensurePod(hostname, async (pod) => {
     // Let's see if the log already exists.
-    const podDataDir = join(appConfig.storage.dataDir, pod.dataDir);
+    const podDataDir = getPodDataDir(pod.name);
     const podDb = db.getPodDb(podDataDir);
 
     const permissions = await getPermissionsForLog(pod, iss, sub, log, podDb);
@@ -39,7 +40,7 @@ export default async function getFile(
         filesLiteral.toLowerCase() === "files" &&
         isFilenameValid(fileName)
       ) {
-        const filePath = join(pod.dataDir, log, fileName);
+        const filePath = join(pod.name, log, fileName);
         return {
           ok: true,
           value: { root: appConfig.storage.dataDir, filePath },

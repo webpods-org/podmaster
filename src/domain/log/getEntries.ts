@@ -9,6 +9,7 @@ import mapper from "../../mappers/entry.js";
 import { LogEntry } from "../../types/types.js";
 import { ACCESS_DENIED } from "../../errors/codes.js";
 import { getPermissionsForLog } from "./checkPermissionsForLog.js";
+import { getPodDataDir } from "../../storage/index.js";
 
 export type GetEntriesResult = {
   entries: LogEntry[];
@@ -82,7 +83,7 @@ export default async function getEntries(
     }
 
     // Let's see if the log already exists.
-    const podDataDir = join(appConfig.storage.dataDir, pod.dataDir);
+    const podDataDir = getPodDataDir(pod.name);
     const podDb = db.getPodDb(podDataDir);
 
     const permissions = await getPermissionsForLog(pod, iss, sub, log, podDb);

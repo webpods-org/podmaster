@@ -10,6 +10,7 @@ import * as db from "../../db/index.js";
 import { Result } from "../../types/api.js";
 import { PodsRow } from "../../types/db.js";
 import { generateInsertStatement } from "../../lib/sqlite.js";
+import { getPodDataDir } from "../../storage/index.js";
 
 export type CreatePodResult = { hostname: string; pod: string };
 
@@ -40,17 +41,16 @@ export default async function createPod(
       // Gotta make a directory.
       const hostname = `${pod}.${appConfig.hostname}`;
 
-      const podDataDir = join(appConfig.storage.dataDir, pod);
+      const podDataDir = getPodDataDir(pod);
 
       const podsRow: PodsRow = {
         iss: userClaims.iss,
         sub: userClaims.sub,
-        pod: pod,
+        name: pod,
         hostname,
         hostname_alias: null,
         created_at: Date.now(),
         tier: "free",
-        data_dir: pod,
       };
 
       const insertPodStmt = systemDb.prepare(
@@ -88,17 +88,4 @@ export default async function createPod(
 
 function generatePodId() {
   return random(8);
-}
-
-export function getNesting(hostname: string) {
-  const appConfig = config.get();
-  const baseDir =
-    appConfig.storage.dirNesting.length === 0
-      ? appConfig.storage.dataDir
-      : (function loop() {
-          const totalDirs = appConfig.storage.dirNesting.reduce(
-            (acc, n) => acc * n,
-            1
-          );
-        })();
 }

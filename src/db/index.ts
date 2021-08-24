@@ -17,7 +17,7 @@ let systemDb: Sqlite3.Database;
 export async function init() {
   const appConfig = config.get();
   systemDb = new Sqlite3(
-    path.join(appConfig.storage.dataDir, "webpodssysdb.sqlite")
+    path.join(appConfig.storage.dataDir, "podmaster.sqlite")
   );
   await ensureTablesExist();
   podDbCache = new LRUMap(appConfig.podDbCacheSize || 100);

@@ -121,12 +121,11 @@ const config: AppConfig = {
     dataDir: "/path/to/data/dir",
 
     /*
-      Number of directory levels to use for storage.
-      [n1, n2] means first level has n1, second has n2
-      [100, 100] means 100 dirs in dataDir, and 100 in each of them.
-      Number goes n1, n2 etc.
+      Max numbered directories to use for pod storage.
+      A count of 100 means that the pods directory will have:
+      pods/1/..., pods/2/... up to pods/100/...      
     */
-    dirNesting: [100, 100],
+    podsDirCount: 100,
 
     // Only sqlite is supported now.
     db: {

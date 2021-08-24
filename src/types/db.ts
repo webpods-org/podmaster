@@ -3,11 +3,10 @@ export type SqliteBoolean = 1 | 0;
 export type PodsRow = {
   iss: string;
   sub: string;
-  pod: string;
+  name: string;
   hostname: string;
   hostname_alias: string | null;
   created_at: number;
-  data_dir: string;
   tier: string;
 };
 

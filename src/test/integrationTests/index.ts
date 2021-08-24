@@ -33,7 +33,7 @@ export default function run(configDir: string, configFilePath: string) {
   describe("integration tests", async () => {
     let app: any;
     let port: number;
-    let mainHostname: string = process.env.WEBPODS_TEST_HOSTNAME as string;
+    let mainHostname: string = process.env.PODMASTER_TEST_HOSTNAME as string;
 
     let hostname: string;
     let hostnameAndPort: string;
@@ -70,7 +70,7 @@ export default function run(configDir: string, configFilePath: string) {
     it("gets all pods", async () => {
       const response = await request(app)
         .get("/pods")
-        .set("Host", process.env.WEBPODS_TEST_HOSTNAME as string)
+        .set("Host", process.env.PODMASTER_TEST_HOSTNAME as string)
         .set("Authorization", `Bearer ${jwt}`);
 
       response.status.should.equal(200);

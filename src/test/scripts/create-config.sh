@@ -9,15 +9,15 @@ cp "$SCRIPT_PATH/../../../dist/example-config/config.js" "$CONFIG_DIR/config-sou
 # make a list of strings to replace
 REPLACE_LIST=$(cat <<"EOF"
 [
-  [`"pods.example.com"`, `process.env.WEBPODS_TEST_HOSTNAME`],
+  [`"pods.example.com"`, `process.env.PODMASTER_TEST_HOSTNAME`],
 
-  [`"https://auth.example.com/"`, `"https://" + process.env.WEBPODS_TEST_JWT_ISSUER_HOSTNAME + "/"`],
+  [`"https://auth.example.com/"`, `"https://" + process.env.PODMASTER_TEST_JWT_ISSUER_HOSTNAME + "/"`],
   
-  [`"/path/to/data/dir"`, `path.join(process.env.WEBPODS_TEST_CONFIG_DIR, "data")`],
+  [`"/path/to/data/dir"`, `path.join(process.env.PODMASTER_TEST_DATA_DIR)`],
   
-  [`iss: "https://issuer.example.com"`, `iss: "https://" + process.env.WEBPODS_TEST_JWT_ISSUER_HOSTNAME + "/"`], 
+  [`iss: "https://issuer.example.com"`, `iss: "https://" + process.env.PODMASTER_TEST_JWT_ISSUER_HOSTNAME + "/"`], 
   
-  [`publicKey: "mysecretkey"`, `publicKey: process.env.WEBPODS_TEST_JWT_PUBLIC_KEY`]
+  [`publicKey: "mysecretkey"`, `publicKey: process.env.PODMASTER_TEST_JWT_PUBLIC_KEY`]
 ]
 EOF
 )

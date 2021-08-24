@@ -43,7 +43,7 @@ export type JWK = {
 
 export type StorageConfig = {
   dataDir: string;
-  dirNesting: number[];
+  podsDirCount: 100,
   db: {
     type: "sqlite"
   }
@@ -69,11 +69,10 @@ export type PodInfo = {
     iss: string;
     sub: string;
   };
-  pod: string;
+  name: string;
   hostname: string;
   hostnameAlias: string | null;
   createdAt: number;
-  dataDir: string;
   tier: string;
   permissions?: PermissionGrant[];
 };

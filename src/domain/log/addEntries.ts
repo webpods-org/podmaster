@@ -15,6 +15,7 @@ import { getPermissionsForLog } from "./checkPermissionsForLog.js";
 import { ACCESS_DENIED, INVALID_FILENAME } from "../../errors/codes.js";
 import isFilenameValid from "../../lib/validation/checkFilename.js";
 import { generateInsertStatement } from "../../lib/sqlite.js";
+import { getPodDataDir } from "../../storage/index.js";
 
 const moveFile = promisify(mv);
 
@@ -48,7 +49,7 @@ export default async function addEntries(
     }[] = [];
 
     // Let's see if the log already exists.
-    const podDataDir = join(appConfig.storage.dataDir, pod.dataDir);
+    const podDataDir = getPodDataDir(pod.name);
     const podDb = db.getPodDb(podDataDir);
 
     const permissions = await getPermissionsForLog(pod, iss, sub, log, podDb);
@@ -92,21 +93,13 @@ export default async function addEntries(
               ? `${randomFilename}${extension}`
               : randomFilename;
 
-            return join(
-              appConfig.storage.dataDir,
-              pod.dataDir,
-              log,
-              newFilename
-            );
+            const podDataDir = getPodDataDir(pod.name);
+            return join(podDataDir, log, newFilename);
           }
 
           function getFilePathBasedOnOriginalName(filename: string) {
-            const preferredFilePath = join(
-              appConfig.storage.dataDir,
-              pod.dataDir,
-              log,
-              filename
-            );
+            const podDataDir = getPodDataDir(pod.name);
+            const preferredFilePath = join(podDataDir, log, filename);
 
             return !existsSync(preferredFilePath)
               ? preferredFilePath
