@@ -41,13 +41,13 @@ export type JWK = {
   x5c?: string[];
 };
 
-export type SqliteStorageConfig = {
-  type: "sqlite";
+export type StorageConfig = {
   dataDir: string;
   dirNesting: number[];
+  db: {
+    type: "sqlite"
+  }
 };
-
-export type StorageConfig = SqliteStorageConfig;
 
 export type Tier = {
   type: string;
@@ -93,7 +93,7 @@ export type HttpsConfig = {
 
 export type PubSubConfig = {
   maxConnections?: number;
-}
+};
 
 export type AppConfig = {
   hostname: string;
@@ -110,7 +110,7 @@ export type AppConfig = {
   podDbCacheSize?: number;
   maxFileSize?: number;
   useHttps?: HttpsConfig;
-  pubsub?: PubSubConfig
+  pubsub?: PubSubConfig;
 };
 
 export type Permission = {

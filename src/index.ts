@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import * as path from "path";
 import * as fs from "fs";
-import * as yargs from "yargs";
+import yargs from "yargs";
 import startApp from "./startApp.js";
 import { dirname } from "path";
 import { fileURLToPath } from "url";

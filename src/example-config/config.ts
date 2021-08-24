@@ -112,9 +112,7 @@ const config: AppConfig = {
     },
   ],
 
-  // Only sqlite is supported now.
   storage: {
-    type: "sqlite",
     /*
       This is the base directory which stores all data
       Each user will get a directory under this.
@@ -129,6 +127,11 @@ const config: AppConfig = {
       Number goes n1, n2 etc.
     */
     dirNesting: [100, 100],
+
+    // Only sqlite is supported now.
+    db: {
+      type: "sqlite",
+    },
   },
 
   pubsub: {

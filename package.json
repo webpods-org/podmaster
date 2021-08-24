@@ -1,6 +1,6 @@
 {
-  "name": "@webpods/webpods-server",
-  "version": "0.0.2",
+  "name": "podmaster",
+  "version": "0.0.1",
   "private": false,
   "type": "module",
   "main": "dist/index.js",
@@ -15,7 +15,7 @@
     "test": "npx mocha --exit dist/test/test.js"
   },
   "bin": {
-    "pod-server": "dist/index.js"
+    "podmaster": "dist/index.js"
   },
   "dependencies": {
     "@types/better-sqlite3": "^7.4.0",

@@ -1,8 +1,17 @@
 import winston from "winston";
+import * as path from "path";
+
+import * as config from "../../config/index.js";
 
 let logger: winston.Logger;
 
 export async function init() {
+  const appConfig = config.get();
+  const errorsFile = path.join(appConfig.storage.dataDir, "logs/errors.log");
+  const combinedLogsFile = path.join(
+    appConfig.storage.dataDir,
+    "logs/combined.log"
+  );
   const transports =
     process.env.NODE_ENV === "development"
       ? [
@@ -12,10 +21,12 @@ export async function init() {
         ]
       : [
           new winston.transports.File({
-            filename: "error.log",
+            filename: errorsFile,
             level: "error",
           }),
-          new winston.transports.File({ filename: "combined.log" }),
+          new winston.transports.File({
+            filename: combinedLogsFile,
+          }),
         ];
   logger = winston.createLogger({
     level: "info",

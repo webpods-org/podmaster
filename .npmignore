@@ -3,3 +3,4 @@ dist/test/*
 build.sh
 .gitignore
 tsconfig.json
+.eslintrc
