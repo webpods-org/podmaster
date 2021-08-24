@@ -2,12 +2,14 @@ import { IncomingMessage, Server as HttpServer } from "http";
 import { Server as HttpsServer } from "https";
 import { Socket } from "net";
 import WebSocket from "ws";
-
 import { AppConfig } from "../../types/types.js";
 import { TrackedWebSocket } from "../../types/webSocket.js";
 import { handleMessage } from "../../domain/pubsub/handleMessage.js";
 import { handleClose } from "../../domain/pubsub/handleClose.js";
 import { INACTIVE, SERVER_BUSY } from "../../errors/codes.js";
+
+const { WebSocketServer }: { WebSocketServer: typeof WebSocket.Server } =
+  (await import("ws")) as any;
 
 // Check WS client connection status every 30s.
 const TRACKING_INTERVAL_MS = 30000;
@@ -16,7 +18,7 @@ export function attachWebSocketServer(
   httpServer: HttpServer | HttpsServer,
   appConfig: AppConfig
 ) {
-  const wss = new WebSocket.Server({ noServer: true });
+  const wss = new WebSocketServer({ noServer: true });
   const interval = setInterval(function ping() {
     wss.clients.forEach(checkConnectionValidity);
   }, TRACKING_INTERVAL_MS);

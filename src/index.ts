@@ -3,6 +3,11 @@ import * as path from "path";
 import * as fs from "fs";
 import * as yargs from "yargs";
 import startApp from "./startApp.js";
+import { dirname } from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const argv = yargs(process.argv.slice(2))
   .options({

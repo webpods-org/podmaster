@@ -4,12 +4,6 @@ import * as path from "path";
 import integrationTests from "./integrationTests/index.js";
 import { AppConfig } from "../types/types.js";
 
-const port = parseInt(process.env.WEBPODS_TEST_PORT as string);
-const configDir = process.env.WEBPODS_TEST_CONFIG_DIR as string;
-const configFilePath = join(configDir, "config.mjs");
-
-const appConfig: AppConfig = (await import(configFilePath)).default;
-
 if (process.env.NODE_ENV !== "development") {
   throw new Error("Tests can only be run with NODE_ENV=development.");
 }
@@ -25,11 +19,16 @@ for (const envVar of [
     throw new Error(`The process.env.${envVar} should be defined.`);
   }
 }
+
+const port = parseInt(process.env.WEBPODS_TEST_PORT as string);
+const configDir = process.env.WEBPODS_TEST_CONFIG_DIR as string;
+const configFilePath = join(configDir, "config.mjs");
+
+const appConfig: AppConfig = (await import(configFilePath)).default;
+
 const dbConfig = {
   path: path.join(appConfig.storage.dataDir, "webpodssysdb.sqlite"),
 };
-
-console.log({ configDir, configFilePath });
 
 describe("webpods", () => {
   integrationTests(configDir, configFilePath);

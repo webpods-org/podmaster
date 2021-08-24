@@ -2,12 +2,16 @@ import * as path from "path";
 import { readFileSync } from "fs";
 import { join } from "path";
 import Sqlite3 from "better-sqlite3";
+import { dirname } from "path";
+import { fileURLToPath } from "url";
 
 import * as config from "../config/index.js";
 import { LRUMap } from "../lib/lruCache/lru.js";
 
-let podDbCache: LRUMap<string, Sqlite3.Database>;
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
+let podDbCache: LRUMap<string, Sqlite3.Database>;
 let systemDb: Sqlite3.Database;
 
 export async function init() {

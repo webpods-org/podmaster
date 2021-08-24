@@ -3,6 +3,8 @@ import { join } from "path";
 import { readFileSync } from "fs";
 import WebSocket from "ws";
 import should from "should";
+import { dirname } from "path";
+import { fileURLToPath } from "url";
 
 import startApp from "../../startApp.js";
 import { GetPodsAPIResult } from "../../api/pods/getPods.js";
@@ -19,6 +21,9 @@ import promiseSignal from "../../lib/promiseSignal.js";
 
 let app: any;
 let port: number;
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 export default function run(configDir: string, configFilePath: string) {
   const jwt = readFileSync(join(configDir, "jwt"))

@@ -1,5 +1,5 @@
 import { join } from "path";
-import * as jsonwebtoken from "jsonwebtoken";
+import jsonwebtoken from "jsonwebtoken";
 import { IncomingMessage } from "http";
 
 import getJwtParams from "../../lib/jwt/getJwtParams.js";
