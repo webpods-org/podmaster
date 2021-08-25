@@ -2,6 +2,12 @@ CONFIG_DIR=$1
 HOSTNAME=$2
 JWT_ISSUER_HOSTNAME=$3
 
+# Create keys
+ssh-keygen -t rsa -b 4096 -m PEM -f "$CONFIG_DIR/jwtRS256.key" -q -N ""
+
+# Convert it to a PEM file format.
+ssh-keygen -f "$CONFIG_DIR/jwtRS256.key.pub" -e -m pem > "$CONFIG_DIR/jwtRS256.key.pub.pem"
+
 basho \
 --import fs fs \
 --import crypto crypto \
@@ -16,4 +22,5 @@ basho \
 -d sig \
 'k.signFunc.update(`${k.base64Header}.${k.base64Payload}`),k.signFunc.end(),k.toBase64Url(k.signFunc.sign(k.privateKey, "base64"))' \
 -d jwt '`${k.base64Header}.${k.base64Payload}.${k.sig}`' \
-k.jwt
+-j k.jwt \
+> "$CONFIG_DIR/jwt"

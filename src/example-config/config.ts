@@ -79,9 +79,9 @@ const config: AppConfig = {
   jwtKeys: [
     {
       alg: "RS256",
-      iss: "https://issuer.example.com",
+      iss: "https://issuer.example.com/",
       kid: "007",
-      publicKey: "mysecretkey",
+      publicKey: `issuerpubkey`,
     },
   ],
 

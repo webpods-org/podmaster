@@ -1,5 +1,0 @@
-export PODMASTER_TEST_PORT="11666"
-export PODMASTER_TEST_DATA_DIR="/some/path"
-export PODMASTER_TEST_HOSTNAME="pod.example.com"
-export PODMASTER_TEST_JWT_ISSUER_HOSTNAME="issuer.example.com"
-export PODMASTER_TEST_JWT_PUBLIC_KEY="abcdef"

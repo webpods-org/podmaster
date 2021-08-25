@@ -15,7 +15,7 @@ import { CreateLogAPIResult } from "../../api/logs/createLog.js";
 import { AddEntriesAPIResult } from "../../api/logs/addEntries.js";
 import { GetPermissionsAPIResult } from "../../api/logs/getPermissions.js";
 import { GetEntriesAPIResult } from "../../api/logs/getEntries.js";
-import { LogEntry } from "../../types/types.js";
+import { AppConfig, LogEntry } from "../../types/types.js";
 import { GetInfoAPIResult } from "../../api/logs/getInfo.js";
 import promiseSignal from "../../lib/promiseSignal.js";
 
@@ -31,9 +31,11 @@ export default function run(configDir: string, configFilePath: string) {
     .replace(/\r?\n|\r/g, "");
 
   describe("integration tests", async () => {
+    const appConfig: AppConfig = ((await import(configFilePath)) as any)
+      .default;
     let app: any;
     let port: number;
-    let mainHostname: string = process.env.PODMASTER_TEST_HOSTNAME as string;
+    let mainHostname: string = appConfig.hostname;
 
     let hostname: string;
     let hostnameAndPort: string;
@@ -71,7 +73,7 @@ export default function run(configDir: string, configFilePath: string) {
     it("gets all pods", async () => {
       const response = await request(app)
         .get("/pods")
-        .set("Host", process.env.PODMASTER_TEST_HOSTNAME as string)
+        .set("Host", mainHostname)
         .set("Authorization", `Bearer ${jwt}`);
 
       response.status.should.equal(200);

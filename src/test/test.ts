@@ -8,19 +8,12 @@ if (process.env.NODE_ENV !== "development") {
   throw new Error("Tests can only be run with NODE_ENV=development.");
 }
 
-for (const envVar of [
-  "PODMASTER_TEST_PORT",
-  "PODMASTER_TEST_DATA_DIR",
-  "PODMASTER_TEST_HOSTNAME",
-  "PODMASTER_TEST_JWT_ISSUER_HOSTNAME",
-  "PODMASTER_TEST_JWT_PUBLIC_KEY",
-]) {
+for (const envVar of ["PODMASTER_TEST_DATA_DIR"]) {
   if (!process.env[envVar]) {
     throw new Error(`The process.env.${envVar} should be defined.`);
   }
 }
 
-const port = parseInt(process.env.PODMASTER_TEST_PORT as string);
 const configDir = process.env.PODMASTER_TEST_DATA_DIR as string;
 const configFilePath = join(configDir, "config.mjs");
 
