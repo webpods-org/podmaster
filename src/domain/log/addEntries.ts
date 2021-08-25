@@ -202,7 +202,7 @@ export default async function addEntries(
               commit: newCommit,
               content_hash: movedFile.hash,
               log,
-              data: movedFile.newPath,
+              data: movedFile.filename,
               type: "file",
               previous_commit: lastCommit,
               created_at: Date.now(),

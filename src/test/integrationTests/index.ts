@@ -39,6 +39,7 @@ export default function run(configDir: string, configFilePath: string) {
     let hostnameAndPort: string;
     let pod: string;
     let log: string;
+    let uploadedPath: string;
     const entries: LogEntry[] = [];
 
     before(async () => {
@@ -202,7 +203,18 @@ export default function run(configDir: string, configFilePath: string) {
 
       response.status.should.equal(200);
       const apiResult: GetEntriesAPIResult = JSON.parse(response.text);
+      uploadedPath = (
+        apiResult.entries.find((x) => x.type === "file") as LogEntry
+      ).data;
       apiResult.entries.length.should.equal(4);
+    });
+
+    it("downloads files", async () => {
+      const response = await request(app)
+        .get(uploadedPath)
+        .set("Host", hostnameAndPort)
+        .set("Authorization", `Bearer ${jwt}`);
+      response.status.should.equal(200);
     });
 
     it("limit results by count", async () => {

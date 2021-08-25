@@ -98,7 +98,13 @@ export default async function getEntries(
         : getEntriesAfterId(0);
 
       if (dbEntries) {
-        const entries = dbEntries.map(mapper);
+        const entries = dbEntries.map(mapper).map((entry) => ({
+          ...entry,
+          data:
+            entry.type === "file"
+              ? `/logs/${log}/files/${entry.data}`
+              : entry.data,
+        }));
         return { ok: true, value: { entries } };
       } else {
         return { ok: true, value: { entries: [] } };

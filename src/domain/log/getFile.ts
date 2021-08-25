@@ -7,11 +7,10 @@ import ensurePod from "../pod/ensurePod.js";
 import { ACCESS_DENIED, NOT_FOUND } from "../../errors/codes.js";
 import { getPermissionsForLog } from "./checkPermissionsForLog.js";
 import isFilenameValid from "../../lib/validation/checkFilename.js";
-import { getPodDataDir } from "../../storage/index.js";
+import { getDirNumber, getPodDataDir } from "../../storage/index.js";
 
 export type GetFileResult = {
-  root: string;
-  filePath: string;
+  relativeFilePath: string;
 };
 
 export default async function getFile(
@@ -21,8 +20,6 @@ export default async function getFile(
   log: string,
   urlPath: string
 ): Promise<Result<GetFileResult>> {
-  const appConfig = config.get();
-
   return ensurePod(hostname, async (pod) => {
     // Let's see if the log already exists.
     const podDataDir = getPodDataDir(pod.name);
@@ -40,10 +37,10 @@ export default async function getFile(
         filesLiteral.toLowerCase() === "files" &&
         isFilenameValid(fileName)
       ) {
-        const filePath = join(pod.name, log, fileName);
+        const relativeFilePath = join(getDirNumber(pod.name), pod.name, log, fileName);
         return {
           ok: true,
-          value: { root: appConfig.storage.dataDir, filePath },
+          value: { relativeFilePath },
         };
       } else {
         return {

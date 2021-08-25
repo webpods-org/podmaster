@@ -43,10 +43,10 @@ export type JWK = {
 
 export type StorageConfig = {
   dataDir: string;
-  podsDirCount: 100,
+  podsDirCount: 100;
   db: {
-    type: "sqlite"
-  }
+    type: "sqlite";
+  };
 };
 
 export type Tier = {
@@ -133,6 +133,7 @@ export type LogEntry = {
   commit: string;
   previousCommit: string;
   data: string;
+  type: "data" | "file";
   iss: string;
   sub: string;
 };
