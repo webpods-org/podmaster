@@ -6,7 +6,7 @@ JWT_ISSUER_HOSTNAME=$3
 SCRIPT_PATH=$(dirname "$0")
 
 # copy the source config file
-cp "$SCRIPT_PATH/../dist/example-config/config.js" "$CONFIG_DIR/config-source.js"
+cp "$SCRIPT_PATH/config.mjs" "$CONFIG_DIR/config-source.js"
 
 # Replace all the newlines with \r\n
 PUBLIC_KEY=$(basho -i fs fs 'fs.readFileSync("'"$CONFIG_DIR"'/jwtRS256.key.pub.pem").toString().replace(/\r?\n|\r/g, "\\r\\n")')

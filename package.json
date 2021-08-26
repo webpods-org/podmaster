@@ -11,7 +11,9 @@
   ],
   "scripts": {
     "clean": "rimraf ./dist",
-    "build": "npm run clean && cp -r src dist && npx tsc && npx tsc src/example-config/config.ts --outDir dist/ --esModuleInterop --module esnext --target es2018 --moduleResolution node",
+    "build-config": "npx tsc src/example-config/config.ts --outDir dist/ --esModuleInterop --module esnext --target es2018 --moduleResolution node && cp dist/example-config/config.js scripts/config.mjs && rimraf ./dist/example-config",
+    "build-source": "cp -r src dist && npx tsc",
+    "build": "npm run clean && npm run build-source && npm run build-config",
     "test": "npx mocha --exit dist/test/test.js"
   },
   "bin": {
