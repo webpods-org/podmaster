@@ -9,5 +9,6 @@ export default function map(row: PodsRow): PodInfo {
     hostnameAlias: row.hostname_alias,
     createdAt: row.created_at,
     tier: row.tier,
+    description: row.description,
   };
 }

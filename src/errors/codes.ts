@@ -11,3 +11,4 @@ export const INVALID_FILENAME = "INVALID_FILENAME";
 export const SERVER_BUSY = "SERVER_BUSY";
 export const INACTIVE = "INACTIVE";
 export const QUOTA_EXCEEDED = "QUOTA_EXCEEDED";
+export const POD_EXISTS = "POD_EXISTS";

@@ -1,7 +1,7 @@
 import { IRouterContext } from "koa-router";
 import createPod from "../../domain/pod/createPod.js";
 import * as config from "../../config/index.js";
-import { NOT_FOUND } from "../../errors/codes.js";
+import { NOT_FOUND, POD_EXISTS } from "../../errors/codes.js";
 import handleResult from "../handleResult.js";
 
 export type CreatePodAPIResult = {
@@ -15,13 +15,30 @@ export default async function createPodAPI(ctx: IRouterContext) {
   if (hostname === appConfig.hostname) {
     await handleResult(
       ctx,
-      () => createPod(ctx.state.jwt?.claims),
+      () =>
+        createPod(
+          ctx.request.body.name || "",
+          ctx.request.body.description || "",
+          ctx.state.jwt?.claims
+        ),
       (result) => {
         const body: CreatePodAPIResult = {
           pod: result.value.pod,
           hostname: result.value.hostname,
         };
         ctx.body = body;
+      },
+      (errorResult) => {
+        if (errorResult.code === POD_EXISTS) {
+          ctx.status = 403;
+          ctx.body = {
+            error: errorResult.error,
+            code: errorResult.code,
+          };
+          return { handled: true };
+        } else {
+          return { handled: false };
+        }
       }
     );
   } else {

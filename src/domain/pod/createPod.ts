@@ -6,6 +6,7 @@ import * as config from "../../config/index.js";
 import {
   ACCESS_DENIED,
   INVALID_CLAIM,
+  POD_EXISTS,
   QUOTA_EXCEEDED,
 } from "../../errors/codes.js";
 import matchObject from "../../utils/matchObject.js";
@@ -16,10 +17,13 @@ import { PodsRow } from "../../types/db.js";
 import { generateInsertStatement } from "../../lib/sqlite.js";
 import { getPodDataDir } from "../../storage/index.js";
 import { getPods } from "./getPods.js";
+import { getPodByHostname } from "./getPodByHostname.js";
 
 export type CreatePodResult = { hostname: string; pod: string };
 
 export default async function createPod(
+  name: string,
+  description: string,
   userClaims: JwtClaims
 ): Promise<Result<CreatePodResult>> {
   const appConfig = config.get();
@@ -48,39 +52,50 @@ export default async function createPod(
         (existingPods.ok &&
           matchingTier.maxPodsPerUser > existingPods.value.pods.length)
       ) {
-        const pod = generatePodId();
-
-        // Gotta make a directory.
+        const pod = name || generatePodId();
         const hostname = `${pod}.${appConfig.hostname}`;
 
-        const podDataDir = getPodDataDir(pod);
+        // Check if the pod name is available.
 
-        const podsRow: PodsRow = {
-          iss: userClaims.iss,
-          sub: userClaims.sub,
-          name: pod,
-          hostname,
-          hostname_alias: null,
-          created_at: Date.now(),
-          tier: "free",
-        };
+        const existingPod = await getPodByHostname(hostname);
+        if (!existingPod) {
+          // Gotta make a directory.
+          const podDataDir = getPodDataDir(pod);
 
-        const insertPodStmt = systemDb.prepare(
-          generateInsertStatement("pods", podsRow)
-        );
+          const podsRow: PodsRow = {
+            iss: userClaims.iss,
+            sub: userClaims.sub,
+            name: pod,
+            hostname,
+            hostname_alias: null,
+            created_at: Date.now(),
+            tier: "free",
+            description,
+          };
 
-        insertPodStmt.run(podsRow);
+          const insertPodStmt = systemDb.prepare(
+            generateInsertStatement("pods", podsRow)
+          );
 
-        await mkdirp(podDataDir);
+          insertPodStmt.run(podsRow);
 
-        // Create the Pod DB
-        const podDb = db.getPodDb(podDataDir);
-        await db.initPodDb(podDb);
+          await mkdirp(podDataDir);
 
-        return {
-          ok: true,
-          value: { pod, hostname },
-        };
+          // Create the Pod DB
+          const podDb = db.getPodDb(podDataDir);
+          await db.initPodDb(podDb);
+
+          return {
+            ok: true,
+            value: { pod, hostname },
+          };
+        } else {
+          return {
+            ok: false,
+            code: POD_EXISTS,
+            error: `A pod named ${hostname} already exists.`,
+          };
+        }
       } else {
         return {
           ok: false,

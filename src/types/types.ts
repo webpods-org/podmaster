@@ -76,6 +76,7 @@ export type PodInfo = {
   createdAt: number;
   tier: string;
   permissions?: PermissionGrant[];
+  description: string;
 };
 
 export type LogInfo = {

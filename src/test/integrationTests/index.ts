@@ -18,6 +18,7 @@ import { GetEntriesAPIResult } from "../../api/logs/getEntries.js";
 import { AppConfig, LogEntry } from "../../types/types.js";
 import { GetInfoAPIResult } from "../../api/logs/getInfo.js";
 import promiseSignal from "../../lib/promiseSignal.js";
+import { ErrResult } from "../../types/api.js";
 
 let app: any;
 let port: number;
@@ -68,6 +69,37 @@ export default function run(configDir: string, configFilePath: string) {
       hostnameAndPort =
         port === 80 || port === 443 ? hostname : `${hostname}:${port}`;
       pod = apiResult.pod;
+    });
+
+    it("creates a pod with name and description", async () => {
+      const response = await request(app)
+        .post("/pods")
+        .send({
+          name: "mypod",
+          description: "This is my very own pod.",
+        })
+        .set("Host", mainHostname)
+        .set("Authorization", `Bearer ${jwt}`);
+
+      response.status.should.equal(200);
+      const apiResult: CreatePodAPIResult = JSON.parse(response.text);
+      should.exist(apiResult.pod);
+      should.exist(apiResult.hostname);
+    });
+
+    it("cannot create pod with existing name", async () => {
+      const response = await request(app)
+        .post("/pods")
+        .send({
+          name: "mypod",
+          description: "This is my very own pod.",
+        })
+        .set("Host", mainHostname)
+        .set("Authorization", `Bearer ${jwt}`);
+
+      response.status.should.equal(403);
+      const apiResult: ErrResult = JSON.parse(response.text);
+      apiResult.code.should.equal("POD_EXISTS");
     });
 
     it("gets all pods", async () => {

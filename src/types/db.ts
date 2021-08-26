@@ -8,6 +8,7 @@ export type PodsRow = {
   hostname_alias: string | null;
   created_at: number;
   tier: string;
+  description: string;
 };
 
 export type LogsRow = {

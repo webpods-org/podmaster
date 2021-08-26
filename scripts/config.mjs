@@ -61,8 +61,7 @@ const config = {
     /*
       Locally defined JWT keys.
       These do not require a JWKS lookup.
-      Supports symmetric and asymmetric algos.
-      Asymmetric is strongly recommended.
+      Only RS256 is supported now.
     */
     jwtKeys: [
         {
