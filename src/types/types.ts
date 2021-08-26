@@ -52,6 +52,7 @@ export type StorageConfig = {
 export type Tier = {
   type: string;
   maxSpaceMB: number;
+  maxPodsPerUser?: number;
   claims: {
     [key: string]: unknown;
   };

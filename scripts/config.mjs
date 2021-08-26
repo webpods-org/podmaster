@@ -93,6 +93,7 @@ const config = {
         {
             type: "free",
             maxSpaceMB: 64,
+            maxPodsPerUser: 5,
             claims: {
                 iss: "https://auth.example.com/",
             },
