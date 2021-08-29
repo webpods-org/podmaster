@@ -1,6 +1,5 @@
 import Sqlite3 from "better-sqlite3";
 
-import { PodInfo } from "../../types/types.js";
 import permissionMapper from "../../mappers/logPermission.js";
 import logMapper from "../../mappers/log.js";
 

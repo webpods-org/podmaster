@@ -1,5 +1,4 @@
 import { join } from "path";
-import * as path from "path";
 
 import integrationTests from "./integrationTests/index.js";
 import { AppConfig } from "../types/types.js";

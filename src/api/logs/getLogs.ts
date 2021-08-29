@@ -1,4 +1,3 @@
-import * as config from "../../config/index.js";
 import getLogs from "../../domain/log/getLogs.js";
 import handleResult from "../handleResult.js";
 import { IKoaAppContext } from "../../types/koa.js";

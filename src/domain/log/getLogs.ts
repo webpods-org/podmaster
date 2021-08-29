@@ -1,6 +1,3 @@
-import { join } from "path";
-
-import * as config from "../../config/index.js";
 import * as db from "../../db/index.js";
 import { LogsRow } from "../../types/db.js";
 import { Result } from "../../types/api.js";
@@ -20,8 +17,6 @@ export default async function getLogs(
   hostname: string,
   tags: string | undefined
 ): Promise<Result<GetLogsResult>> {
-  const appConfig = config.get();
-
   return ensurePod(hostname, async (pod) => {
     const tagsList = tags ? tags.split(",") : [];
 

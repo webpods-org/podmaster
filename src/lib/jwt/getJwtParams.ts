@@ -26,7 +26,7 @@ export type JwtParamsForAsymmetricAlgorithm = {
   signature: string;
 };
 
-export async function init() {
+export async function init(): Promise<void> {
   const appConfig = config.get();
   cache = new LRUMap(appConfig.jwksCacheSize || 1000);
 }

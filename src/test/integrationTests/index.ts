@@ -30,6 +30,9 @@ export default function run(configDir: string, configFilePath: string) {
     .replace(/\r?\n|\r/g, "");
 
   describe("integration tests", async () => {
+    const podName = "myweblog";
+    const logName = "myposts";
+    
     const appConfig: AppConfig = ((await import(configFilePath)) as any)
       .default;
     let app: any;
@@ -38,8 +41,6 @@ export default function run(configDir: string, configFilePath: string) {
 
     let hostname: string;
     let hostnameAndPort: string;
-    let podName: string = "myweblog";
-    let logName: string = "myposts";
     let uploadedPath: string;
     const entries: LogEntry[] = [];
 

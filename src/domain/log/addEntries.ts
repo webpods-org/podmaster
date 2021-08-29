@@ -6,7 +6,6 @@ import random from "../../utils/random.js";
 import { promisify } from "util";
 import { existsSync, readFileSync } from "fs";
 
-import * as config from "../../config/index.js";
 import * as db from "../../db/index.js";
 import { ErrResult, Result } from "../../types/api.js";
 import { EntriesRow } from "../../types/db.js";
@@ -40,8 +39,6 @@ export default async function addEntries(
   entries: LogEntry[] | undefined,
   files: Files | undefined
 ): Promise<Result<AddEntriesResult>> {
-  const appConfig = config.get();
-
   return ensurePod(hostname, async (pod) => {
     function getFilePathBasedOnOriginalName(filename: string) {
       const podDataDir = getPodDataDir(pod.name);

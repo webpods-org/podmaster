@@ -1,6 +1,3 @@
-import { join } from "path";
-
-import * as config from "../../config/index.js";
 import * as db from "../../db/index.js";
 import { LogPermission } from "../../types/types.js";
 import { Result } from "../../types/api.js";
@@ -19,8 +16,6 @@ export default async function getPermissions(
   hostname: string,
   logName: string
 ): Promise<Result<GetPermissionsResult>> {
-  const appConfig = config.get();
-
   return ensurePod(hostname, async (pod) => {
     const podDataDir = getPodDataDir(pod.name);
     const podDb = db.getPodDb(podDataDir);
@@ -32,7 +27,9 @@ export default async function getPermissions(
         `SELECT * FROM "log_permissions" WHERE "log_name"=@log_name`
       );
 
-      const permissions = existingPermStmt.all({ log_name: logName }).map(mapper);
+      const permissions = existingPermStmt
+        .all({ log_name: logName })
+        .map(mapper);
 
       return {
         ok: true,

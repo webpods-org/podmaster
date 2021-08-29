@@ -1,6 +1,3 @@
-import { join } from "path";
-
-import * as config from "../../config/index.js";
 import * as db from "../../db/index.js";
 import { Result } from "../../types/api.js";
 import ensurePod from "../pod/ensurePod.js";
@@ -20,8 +17,6 @@ export default async function getInfo(
   hostname: string,
   logName: string
 ): Promise<Result<GetInfoResult>> {
-  const appConfig = config.get();
-
   return ensurePod(hostname, async (pod) => {
     // Let's see if the log already exists.
     const podDataDir = getPodDataDir(pod.name);

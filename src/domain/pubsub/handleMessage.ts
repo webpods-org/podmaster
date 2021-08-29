@@ -1,4 +1,3 @@
-import { join } from "path";
 import jsonwebtoken from "jsonwebtoken";
 import { IncomingMessage } from "http";
 
@@ -17,7 +16,6 @@ import {
 } from "./subscriptions.js";
 import validateClaims from "../../lib/jwt/validateClaims.js";
 import { getPodByHostname } from "../pod/getPodByHostname.js";
-import * as config from "../../config/index.js";
 import * as db from "../../db/index.js";
 import { getPermissionsForLog } from "../log/checkPermissionsForLog.js";
 import {
@@ -34,8 +32,6 @@ export function handleMessage(
   request: IncomingMessage
 ) {
   return async function messageHandler(message: string) {
-    const appConfig = config.get();
-
     // If this is the first message, it needs to be a JWT
     if (!ws.webpodsTracking) {
       try {

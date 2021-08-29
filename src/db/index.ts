@@ -26,7 +26,7 @@ export async function init(): Promise<void> {
     const entry: [string, Sqlite3.Database] | undefined =
       LRUMap.prototype.shift.call(this);
     if (entry) {
-      const [key, value] = entry;
+      const [, value] = entry;
       value.close();
       return entry;
     }

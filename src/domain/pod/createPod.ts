@@ -1,4 +1,3 @@
-import { join } from "path";
 import mkdirp from "mkdirp";
 
 import { JwtClaims } from "../../types/types.js";
@@ -11,7 +10,6 @@ import {
   QUOTA_EXCEEDED,
 } from "../../errors/codes.js";
 import matchObject from "../../utils/matchObject.js";
-import random from "../../utils/random.js";
 import * as db from "../../db/index.js";
 import { ErrResult, Result } from "../../types/api.js";
 import { PodsRow } from "../../types/db.js";

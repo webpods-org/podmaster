@@ -1,6 +1,3 @@
-import { join } from "path";
-
-import * as config from "../../config/index.js";
 import * as db from "../../db/index.js";
 import { Result } from "../../types/api.js";
 import ensurePod from "../pod/ensurePod.js";
@@ -26,7 +23,6 @@ export default async function getEntries(
   maxResults?: number
 ): Promise<Result<GetEntriesResult>> {
   const limit = maxResults || 100;
-  const appConfig = config.get();
 
   return ensurePod(hostname, async (pod) => {
     function getEntriesAfterId(id: number) {

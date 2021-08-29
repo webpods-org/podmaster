@@ -1,5 +1,3 @@
-import * as path from "path";
-
 import * as db from "../../db/index.js";
 import * as config from "../../config/index.js";
 import mapper from "../../mappers/pod.js";
@@ -20,10 +18,6 @@ export async function getPods(
 ): Promise<Result<GetPodsResult>> {
   const appConfig = config.get();
   const systemDb = db.getSystemDb();
-  const podInfoStmt = systemDb.prepare(
-    `SELECT * FROM "pods" WHERE "iss"=@iss AND "sub"=@sub`
-  );
-
   // See if it's already in predefined.
   function getPodsFromConfig() {
     return appConfig.pods

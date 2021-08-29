@@ -1,6 +1,3 @@
-import { join } from "path";
-
-import * as config from "../../config/index.js";
 import * as db from "../../db/index.js";
 import { PodPermission } from "../../types/types.js";
 import { Result } from "../../types/api.js";
@@ -33,8 +30,6 @@ export default async function updatePermissions(
     remove: { claims: { iss: string; sub: string } }[];
   }
 ): Promise<Result<UpdatePermissionsResult>> {
-  const appConfig = config.get();
-
   return ensurePod(hostname, async (pod) => {
     // Let's see if the log already exists.
     const podDataDir = getPodDataDir(pod.name);
