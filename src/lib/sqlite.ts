@@ -1,7 +1,7 @@
 export function generateInsertStatement(
   table: string,
   row: Record<string, unknown>
-) {
+): string {
   const keys = Object.getOwnPropertyNames(row);
   const columns = keys.map((x) => `"${x}"`).join(", ");
   const values = keys.map((x) => `@${x}`).join(", ");
@@ -12,7 +12,7 @@ export function generateUpdateStatement(
   table: string,
   row: Record<string, unknown>,
   clauses?: string
-) {
+): string {
   const keys = Object.getOwnPropertyNames(row);
   const setters = keys.map((key) => `"${key}"=${`@${key}`}`).join(", ");
   return clauses

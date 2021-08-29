@@ -10,7 +10,7 @@ import startApp from "../../startApp.js";
 import { GetPodsAPIResult } from "../../api/pods/getPods.js";
 import { CreatePodAPIResult } from "../../api/pods/createPod.js";
 import { GetLogsAPIResult } from "../../api/logs/getLogs.js";
-import { UpdatePermissionsAPIResult } from "../../api/logs/updatePermissions.js";
+import { UpdatePermissionsAPIResult as UpdateLogPermissionsAPIResult } from "../../api/logs/updatePermissions.js";
 import { CreateLogAPIResult } from "../../api/logs/createLog.js";
 import { AddEntriesAPIResult } from "../../api/logs/addEntries.js";
 import { GetPermissionsAPIResult } from "../../api/logs/getPermissions.js";
@@ -19,9 +19,7 @@ import { AppConfig, LogEntry } from "../../types/types.js";
 import { GetInfoAPIResult } from "../../api/logs/getInfo.js";
 import promiseSignal from "../../lib/promiseSignal.js";
 import { ErrResult } from "../../types/api.js";
-
-let app: any;
-let port: number;
+import { UpdatePermissionsAPIResult as UpdatePodPermissionsAPIResult } from "../../api/pods/updatePermissions.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -40,8 +38,8 @@ export default function run(configDir: string, configFilePath: string) {
 
     let hostname: string;
     let hostnameAndPort: string;
-    let pod: string;
-    let log: string;
+    let podName: string = "myweblog";
+    let logName: string = "myposts";
     let uploadedPath: string;
     const entries: LogEntry[] = [];
 
@@ -58,40 +56,23 @@ export default function run(configDir: string, configFilePath: string) {
     it("creates a pod", async () => {
       const response = await request(app)
         .post("/pods")
+        .send({ name: podName })
         .set("Host", mainHostname)
         .set("Authorization", `Bearer ${jwt}`);
 
       response.status.should.equal(200);
       const apiResult: CreatePodAPIResult = JSON.parse(response.text);
-      should.exist(apiResult.pod);
       should.exist(apiResult.hostname);
       hostname = apiResult.hostname;
       hostnameAndPort =
         port === 80 || port === 443 ? hostname : `${hostname}:${port}`;
-      pod = apiResult.pod;
-    });
-
-    it("creates a pod with name and description", async () => {
-      const response = await request(app)
-        .post("/pods")
-        .send({
-          name: "mypod",
-          description: "This is my very own pod.",
-        })
-        .set("Host", mainHostname)
-        .set("Authorization", `Bearer ${jwt}`);
-
-      response.status.should.equal(200);
-      const apiResult: CreatePodAPIResult = JSON.parse(response.text);
-      should.exist(apiResult.pod);
-      should.exist(apiResult.hostname);
     });
 
     it("cannot create pod with existing name", async () => {
       const response = await request(app)
         .post("/pods")
         .send({
-          name: "mypod",
+          name: "myweblog",
           description: "This is my very own pod.",
         })
         .set("Host", mainHostname)
@@ -100,6 +81,32 @@ export default function run(configDir: string, configFilePath: string) {
       response.status.should.equal(403);
       const apiResult: ErrResult = JSON.parse(response.text);
       apiResult.code.should.equal("POD_EXISTS");
+    });
+
+    it("adds permissions for a pod", async () => {
+      const response = await request(app)
+        .post("/permissions/updates")
+        .send({
+          add: [
+            {
+              claims: {
+                iss: appConfig.tiers[0].claims.iss,
+                sub: "alice",
+              },
+              access: {
+                write: true,
+              },
+            },
+          ],
+        })
+        .set("Host", hostnameAndPort)
+        .set("Authorization", `Bearer ${jwt}`);
+
+      response.status.should.equal(200);
+      const apiResult: UpdatePodPermissionsAPIResult = JSON.parse(
+        response.text
+      );
+      apiResult.added.should.equal(1);
     });
 
     it("gets all pods", async () => {
@@ -117,13 +124,44 @@ export default function run(configDir: string, configFilePath: string) {
     it("creates a log", async () => {
       const response = await request(app)
         .post("/logs")
+        .send({
+          name: logName,
+        })
         .set("Host", hostnameAndPort)
         .set("Authorization", `Bearer ${jwt}`);
 
       response.status.should.equal(200);
       const apiResult: CreateLogAPIResult = JSON.parse(response.text);
-      should.exist(apiResult.log);
-      log = apiResult.log;
+      should.exist(apiResult.name);
+    });
+
+    it("adds a permission to a log", async () => {
+      const response = await request(app)
+        .post(`/logs/${logName}/permissions/updates`)
+        .send({
+          add: [
+            {
+              claims: {
+                iss: appConfig.tiers[0].claims.iss,
+                sub: "alice",
+              },
+              access: {
+                write: true,
+                read: true,
+                publish: true,
+                subscribe: true,
+              },
+            },
+          ],
+        })
+        .set("Host", hostnameAndPort)
+        .set("Authorization", `Bearer ${jwt}`);
+
+      response.status.should.equal(200);
+      const apiResult: UpdateLogPermissionsAPIResult = JSON.parse(
+        response.text
+      );
+      apiResult.added.should.equal(1);
     });
 
     it("gets all logs", async () => {
@@ -139,7 +177,7 @@ export default function run(configDir: string, configFilePath: string) {
 
     it("writes log entries", async () => {
       const response = await request(app)
-        .post(`/logs/${log}/entries`)
+        .post(`/logs/${logName}/entries`)
         .send({
           entries: [
             {
@@ -167,7 +205,7 @@ export default function run(configDir: string, configFilePath: string) {
       const file2 = join(__dirname, "fixtures/world.txt");
 
       const response = await request(app)
-        .post(`/logs/${log}/entries`)
+        .post(`/logs/${logName}/entries`)
         .set("Host", hostnameAndPort)
         .set("Authorization", `Bearer ${jwt}`)
         .attach("hello.txt", file1)
@@ -181,7 +219,7 @@ export default function run(configDir: string, configFilePath: string) {
 
     it("gets info about a log", async () => {
       const response = await request(app)
-        .get(`/logs/${log}/info`)
+        .get(`/logs/${logName}/info`)
         .set("Host", hostnameAndPort)
         .set("Authorization", `Bearer ${jwt}`);
 
@@ -193,7 +231,7 @@ export default function run(configDir: string, configFilePath: string) {
 
     it("gets entries from a log", async () => {
       const response = await request(app)
-        .get(`/logs/${log}/entries`)
+        .get(`/logs/${logName}/entries`)
         .set("Host", hostnameAndPort)
         .set("Authorization", `Bearer ${jwt}`);
 
@@ -205,7 +243,7 @@ export default function run(configDir: string, configFilePath: string) {
 
     it("gets entries from a log after id", async () => {
       const response = await request(app)
-        .get(`/logs/${log}/entries?sinceId=1`)
+        .get(`/logs/${logName}/entries?sinceId=1`)
         .set("Host", hostnameAndPort)
         .set("Authorization", `Bearer ${jwt}`);
 
@@ -216,7 +254,7 @@ export default function run(configDir: string, configFilePath: string) {
 
     it("gets entries from a log after commit", async () => {
       const response = await request(app)
-        .get(`/logs/${log}/entries?sinceCommit=${entries[1].commit}`)
+        .get(`/logs/${logName}/entries?sinceCommit=${entries[1].commit}`)
         .set("Host", hostnameAndPort)
         .set("Authorization", `Bearer ${jwt}`);
 
@@ -231,7 +269,7 @@ export default function run(configDir: string, configFilePath: string) {
         .map((x) => x.commit)
         .join(",");
       const response = await request(app)
-        .get(`/logs/${log}/entries?commits=${commits}`)
+        .get(`/logs/${logName}/entries?commits=${commits}`)
         .set("Host", hostnameAndPort)
         .set("Authorization", `Bearer ${jwt}`);
 
@@ -253,7 +291,7 @@ export default function run(configDir: string, configFilePath: string) {
 
     it("limit results by count", async () => {
       const response = await request(app)
-        .get(`/logs/${log}/entries?limit=2`)
+        .get(`/logs/${logName}/entries?limit=2`)
         .set("Host", hostnameAndPort)
         .set("Authorization", `Bearer ${jwt}`);
 
@@ -263,36 +301,9 @@ export default function run(configDir: string, configFilePath: string) {
       entries.push(...apiResult.entries);
     });
 
-    it("adds a permission to a log", async () => {
-      const response = await request(app)
-        .post(`/logs/${log}/permissions/updates`)
-        .send({
-          add: [
-            {
-              claims: {
-                iss: "https://example.com",
-                sub: "alice",
-              },
-              access: {
-                read: true,
-                write: false,
-                admin: false,
-                metadata: false,
-              },
-            },
-          ],
-        })
-        .set("Host", hostnameAndPort)
-        .set("Authorization", `Bearer ${jwt}`);
-
-      response.status.should.equal(200);
-      const apiResult: UpdatePermissionsAPIResult = JSON.parse(response.text);
-      apiResult.added.should.equal(1);
-    });
-
     it("gets all permissions for a log", async () => {
       const response = await request(app)
-        .get(`/logs/${log}/permissions`)
+        .get(`/logs/${logName}/permissions`)
         .set("Host", hostnameAndPort)
         .set("Authorization", `Bearer ${jwt}`);
 
@@ -330,7 +341,7 @@ export default function run(configDir: string, configFilePath: string) {
               wsSender.send(
                 JSON.stringify({
                   type: "message",
-                  channels: ["test-channel"],
+                  channels: [`${logName}/test-channel`],
                   message: "hello world 2021",
                 })
               );
@@ -345,7 +356,7 @@ export default function run(configDir: string, configFilePath: string) {
               wsReceiver.send(
                 JSON.stringify({
                   type: "subscribe",
-                  channels: ["test-channel"],
+                  channels: [`${logName}/test-channel`],
                 })
               );
             } else if (data.event === "subscribe") {

@@ -16,8 +16,7 @@ export type JwtClaims = {
   iss: string;
   sub: string;
   webpods?: {
-    hostname: string;
-    pod: string;
+    domain: string;
   };
   [key: string]: unknown;
 };
@@ -80,7 +79,7 @@ export type PodInfo = {
 };
 
 export type LogInfo = {
-  log: string;
+  name: string;
   public: boolean;
   createdAt: number;
   tags: string | null;
@@ -114,7 +113,19 @@ export type AppConfig = {
   pubsub?: PubSubConfig;
 };
 
-export type Permission = {
+export type PodPermission = {
+  claims: {
+    iss: string;
+    sub: string;
+  };
+  access: {
+    admin: boolean;
+    read: boolean;
+    write: boolean;
+  };
+};
+
+export type LogPermission = {
   claims: {
     iss: string;
     sub: string;
@@ -122,8 +133,6 @@ export type Permission = {
   access: {
     read: boolean;
     write: boolean;
-    admin: boolean;
-    metadata: boolean;
     publish: boolean;
     subscribe: boolean;
   };

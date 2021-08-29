@@ -92,14 +92,13 @@ export function handleMessage(
           data.channels
         );
         for (const channel of data.channels) {
-          const [log, channelId] = channel.split("/");
+          const [log] = channel.split("/");
 
           const pod = await getPodByHostname(hostname);
           if (pod) {
             const podDataDir = getPodDataDir(pod.name);
             const podDb = db.getPodDb(podDataDir);
             const permissions = await getPermissionsForLog(
-              pod,
               ws.webpodsTracking.jwtClaims.iss,
               ws.webpodsTracking.jwtClaims.sub,
               log,
@@ -168,7 +167,6 @@ export function handleMessage(
             const podDataDir = getPodDataDir(pod.name);
             const podDb = db.getPodDb(podDataDir);
             const permissions = await getPermissionsForLog(
-              pod,
               ws.webpodsTracking.jwtClaims.iss,
               ws.webpodsTracking.jwtClaims.sub,
               log,

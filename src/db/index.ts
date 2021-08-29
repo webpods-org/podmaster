@@ -14,7 +14,7 @@ const __dirname = dirname(__filename);
 let podDbCache: LRUMap<string, Sqlite3.Database>;
 let systemDb: Sqlite3.Database;
 
-export async function init() {
+export async function init(): Promise<void> {
   const appConfig = config.get();
   systemDb = new Sqlite3(
     path.join(appConfig.storage.dataDir, "podmaster.sqlite")
@@ -33,7 +33,7 @@ export async function init() {
   };
 }
 
-async function ensureTablesExist() {
+async function ensureTablesExist(): Promise<void> {
   const createTablesSql = readFileSync(
     join(__dirname, "createSystemDbTables.sql"),
     "utf8"
@@ -42,7 +42,7 @@ async function ensureTablesExist() {
   systemDb.exec(createTablesSql);
 }
 
-export async function initPodDb(db: Sqlite3.Database) {
+export async function initPodDb(db: Sqlite3.Database): Promise<void> {
   const createTablesSql = readFileSync(
     join(__dirname, "createPodDbTables.sql"),
     "utf8"

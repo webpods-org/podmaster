@@ -1,4 +1,6 @@
-export function getFieldValue(value: string | string[] | undefined) {
+export function getFieldValue(
+  value: string | string[] | undefined
+): string | undefined {
   return value !== undefined
     ? Array.isArray(value)
       ? value[0]

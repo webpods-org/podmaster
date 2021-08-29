@@ -1,4 +1,7 @@
-export default function getObjectWithProps(source: any, props: string[]): any {
+export default function getObjectWithProps(
+  source: Record<string, any>,
+  props: string[]
+): Record<string, any> {
   return props.reduce((result, prop) => {
     return prop
       .split(".")

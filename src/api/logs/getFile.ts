@@ -5,7 +5,7 @@ import getFile from "../../domain/log/getFile.js";
 import * as config from "../../config/index.js";
 import path from "path/posix";
 
-export default async function getFileAPI(ctx: IKoaAppContext) {
+export default async function getFileAPI(ctx: IKoaAppContext): Promise<void> {
   const appConfig = config.get();
   const hostname = ctx.URL.hostname;
 

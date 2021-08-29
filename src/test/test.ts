@@ -19,11 +19,6 @@ const configFilePath = join(configDir, "config.mjs");
 
 const appConfig: AppConfig = (await import(configFilePath)).default;
 
-const dbConfig = {
-  path: path.join(appConfig.storage.dataDir, "podmaster.sqlite"),
-};
-
 describe("webpods", () => {
   integrationTests(configDir, configFilePath);
-  // unitTests(configDir, dbConfig);
 });

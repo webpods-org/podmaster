@@ -10,7 +10,9 @@ export type AddEntriesAPIResult = {
   }[];
 };
 
-export default async function addEntriesAPI(ctx: IKoaAppContext) {
+export default async function addEntriesAPI(
+  ctx: IKoaAppContext
+): Promise<void> {
   const hostname = ctx.URL.hostname;
 
   await handleResult(

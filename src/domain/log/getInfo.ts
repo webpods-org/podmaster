@@ -18,7 +18,7 @@ export default async function getInfo(
   iss: string | undefined,
   sub: string | undefined,
   hostname: string,
-  log: string
+  logName: string
 ): Promise<Result<GetInfoResult>> {
   const appConfig = config.get();
 
@@ -27,7 +27,7 @@ export default async function getInfo(
     const podDataDir = getPodDataDir(pod.name);
     const podDb = db.getPodDb(podDataDir);
 
-    const permissions = await getPermissionsForLog(pod, iss, sub, log, podDb);
+    const permissions = await getPermissionsForLog(iss, sub, logName, podDb);
 
     if (permissions.read) {
       // Get the last item

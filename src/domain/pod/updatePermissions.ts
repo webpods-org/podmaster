@@ -2,11 +2,11 @@ import { join } from "path";
 
 import * as config from "../../config/index.js";
 import * as db from "../../db/index.js";
-import { LogPermission } from "../../types/types.js";
+import { PodPermission } from "../../types/types.js";
 import { Result } from "../../types/api.js";
-import ensurePod from "../pod/ensurePod.js";
+import ensurePod from "./ensurePod.js";
 import { ACCESS_DENIED } from "../../errors/codes.js";
-import { LogPermissionsRow } from "../../types/db.js";
+import { PodPermissionsRow } from "../../types/db.js";
 import { generateInsertStatement } from "../../lib/sqlite.js";
 import { getPodDataDir } from "../../storage/index.js";
 
@@ -25,11 +25,13 @@ export default async function updatePermissions(
   iss: string,
   sub: string,
   hostname: string,
-  logName: string,
   {
     add,
     remove,
-  }: { add: LogPermission[]; remove: { claims: { iss: string; sub: string } }[] }
+  }: {
+    add: PodPermission[];
+    remove: { claims: { iss: string; sub: string } }[];
+  }
 ): Promise<Result<UpdatePermissionsResult>> {
   const appConfig = config.get();
 
@@ -43,30 +45,27 @@ export default async function updatePermissions(
         for (const permission of add) {
           // See if the permission already exists.
           const existingPermStmt = podDb.prepare(
-            `SELECT * FROM "log_permissions" WHERE "log_name"=@log_name AND "iss"=@iss AND "sub"=@sub`
+            `SELECT * FROM "pod_permissions" WHERE "iss"=@iss AND "sub"=@sub`
           );
 
           const existingItem = existingPermStmt.get({
-            log_name: logName,
             iss: permission.claims.iss,
             sub: permission.claims.sub,
           });
 
           // Don't insert if it already exists.
           if (!existingItem) {
-            const permissionsRow: LogPermissionsRow = {
-              log_name: logName,
+            const permissionsRow: PodPermissionsRow = {
               iss: permission.claims.iss,
               sub: permission.claims.sub,
+              admin: permission.access.admin ? 1 : 0,
               read: permission.access.read ? 1 : 0,
               write: permission.access.write ? 1 : 0,
-              publish: permission.access.publish ? 1 : 0,
-              subscribe: permission.access.subscribe ? 1 : 0,
               created_at: Date.now(),
             };
 
             const insertPermStmt = podDb.prepare(
-              generateInsertStatement("log_permissions", permissionsRow)
+              generateInsertStatement("pod_permissions", permissionsRow)
             );
 
             insertPermStmt.run(permissionsRow);
@@ -78,11 +77,10 @@ export default async function updatePermissions(
         for (const item of remove) {
           // See if the permission already exists.
           const deletePermStmt = podDb.prepare(
-            `DELETE FROM "log_permissions" WHERE "log_name"=@log_name AND "iss"=@iss AND "sub"=@sub`
+            `DELETE FROM "pod_permissions" WHERE "iss"=@iss AND "sub"=@sub`
           );
 
           deletePermStmt.get({
-            log_name: logName,
             iss: item.claims.iss,
             sub: item.claims.sub,
           });

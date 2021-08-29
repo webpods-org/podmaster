@@ -1,14 +1,14 @@
-import updatePermissions from "../../domain/log/updatePermissions.js";
 import handleResult from "../handleResult.js";
+import getPermissions from "../../domain/pod/getPermissions.js";
+import { PodPermission } from "../../types/types.js";
 import { IKoaAppContext } from "../../types/koa.js";
 import { ACCESS_DENIED } from "../../errors/codes.js";
 
-export type UpdatePermissionsAPIResult = {
-  added: number;
-  removed: number;
+export type GetPermissionsAPIResult = {
+  permissions: PodPermission[];
 };
 
-export default async function updatePermissionsAPI(
+export default async function getPermissionsAPI(
   ctx: IKoaAppContext
 ): Promise<void> {
   const hostname = ctx.URL.hostname;
@@ -17,12 +17,10 @@ export default async function updatePermissionsAPI(
     ctx,
     () =>
       ctx.state.jwt?.claims.iss && ctx.state.jwt?.claims.sub
-        ? updatePermissions(
+        ? getPermissions(
             ctx.state.jwt?.claims.iss,
             ctx.state.jwt?.claims.sub,
-            hostname,
-            ctx.params.log,
-            ctx.request.body
+            hostname
           )
         : Promise.resolve({
             ok: false,
@@ -30,9 +28,8 @@ export default async function updatePermissionsAPI(
             code: ACCESS_DENIED,
           }),
     (result) => {
-      const body: UpdatePermissionsAPIResult = {
-        added: result.value.added,
-        removed: result.value.removed,
+      const body: GetPermissionsAPIResult = {
+        permissions: result.value.permissions,
       };
       ctx.body = body;
     }

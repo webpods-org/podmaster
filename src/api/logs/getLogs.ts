@@ -6,12 +6,11 @@ import { ACCESS_DENIED } from "../../errors/codes.js";
 
 export type GetLogsAPIResult = {
   logs: {
-    log: string;
+    name: string;
   }[];
 };
 
-export default async function getLogsAPI(ctx: IKoaAppContext) {
-  const appConfig = config.get();
+export default async function getLogsAPI(ctx: IKoaAppContext): Promise<void> {
   const hostname = ctx.URL.hostname;
 
   await handleResult(

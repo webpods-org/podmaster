@@ -1,4 +1,4 @@
-import updatePermissions from "../../domain/log/updatePermissions.js";
+import updatePermissions from "../../domain/pod/updatePermissions.js";
 import handleResult from "../handleResult.js";
 import { IKoaAppContext } from "../../types/koa.js";
 import { ACCESS_DENIED } from "../../errors/codes.js";
@@ -21,7 +21,6 @@ export default async function updatePermissionsAPI(
             ctx.state.jwt?.claims.iss,
             ctx.state.jwt?.claims.sub,
             hostname,
-            ctx.params.log,
             ctx.request.body
           )
         : Promise.resolve({

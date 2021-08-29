@@ -2,7 +2,7 @@ import WebSocket from "ws";
 
 const subscriptions = new Map<string, Map<string, WebSocket[]>>();
 
-export function getSubscriptions() {
+export function getSubscriptions(): Map<string, Map<string, WebSocket[]>> {
   return subscriptions;
 }
 
@@ -11,7 +11,7 @@ export function addSubscription(
   iss: string,
   sub: string,
   ws: WebSocket
-) {
+): void {
   const channelSubscriptions = subscriptions.get(channel);
   if (!channelSubscriptions) {
     const newChannelSubscriptions = new Map<string, WebSocket[]>();
@@ -35,7 +35,7 @@ export function removeSubscription(
   iss: string,
   sub: string,
   ws: WebSocket
-) {
+): void {
   const channelSubscriptions = subscriptions.get(channel);
   if (channelSubscriptions) {
     const webSockets = channelSubscriptions.get(`${iss}:${sub}`);
@@ -59,7 +59,7 @@ export function publish(
   sub: string,
   ws: WebSocket,
   message: string
-) {
+): void {
   const payload = JSON.stringify({
     event: "message",
     data: {

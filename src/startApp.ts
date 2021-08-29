@@ -1,8 +1,6 @@
 import Koa from "koa";
 import Router from "koa-router";
 import bodyParser from "koa-body";
-import yargs from "yargs";
-
 import jwtMiddleware from "./lib/jwt/middleware.js";
 import { init as libJwtInit } from "./lib/jwt/getJwtParams.js";
 import * as db from "./db/index.js";
@@ -26,9 +24,13 @@ export default async function startApp(configFile: string) {
   // Set up routes
   const router = new Router();
 
-  // pods
+  // podmaster
   router.post("/pods", podsApi.createPodAPI);
   router.get("/pods", podsApi.getPodsAPI);
+
+  // pods
+  router.get("/permissions", podsApi.getPermissionsAPI);
+  router.post("/permissions/updates", podsApi.updatePermissions);
 
   // logs
   router.get("/logs", logsApi.getLogsAPI);

@@ -11,7 +11,7 @@ export type GetPodsAPIResult = {
   }[];
 };
 
-export default async function getPodsAPI(ctx: IRouterContext) {
+export default async function getPodsAPI(ctx: IRouterContext): Promise<void> {
   const appConfig = config.get();
   const hostname = ctx.URL.hostname;
 

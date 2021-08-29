@@ -7,5 +7,5 @@ CREATE TABLE IF NOT EXISTS pods (
 	"created_at" INTEGER NOT NULL,
   "tier" TEXT NOT NULL,
   "description" TEXT NOT NULL,
-	PRIMARY KEY (iss, sub, name)
+	PRIMARY KEY ("iss", "sub", "name")
 );

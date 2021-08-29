@@ -12,3 +12,5 @@ export const SERVER_BUSY = "SERVER_BUSY";
 export const INACTIVE = "INACTIVE";
 export const QUOTA_EXCEEDED = "QUOTA_EXCEEDED";
 export const POD_EXISTS = "POD_EXISTS";
+export const LOG_EXISTS = "LOG_EXISTS";
+export const MISSING_FIELD = "MISSING_FIELD";

@@ -43,6 +43,26 @@ export default async function addEntries(
   const appConfig = config.get();
 
   return ensurePod(hostname, async (pod) => {
+    function getFilePathBasedOnOriginalName(filename: string) {
+      const podDataDir = getPodDataDir(pod.name);
+      const preferredFilePath = join(podDataDir, log, filename);
+
+      return !existsSync(preferredFilePath)
+        ? preferredFilePath
+        : getRandomFilePath(filename);
+    }
+
+    function getRandomFilePath(filename: string | null) {
+      const extension = filename ? extname(filename) : undefined;
+      const randomFilename = random(12);
+      const newFilename = extension
+        ? `${randomFilename}${extension}`
+        : randomFilename;
+
+      const podDataDir = getPodDataDir(pod.name);
+      return join(podDataDir, log, newFilename);
+    }
+
     const savedEntryIds: {
       id: number;
       commit: string;
@@ -52,9 +72,9 @@ export default async function addEntries(
     const podDataDir = getPodDataDir(pod.name);
     const podDb = db.getPodDb(podDataDir);
 
-    const permissions = await getPermissionsForLog(pod, iss, sub, log, podDb);
+    const permissions = await getPermissionsForLog(iss, sub, log, podDb);
 
-    if (permissions.admin || permissions.write) {
+    if (permissions.write) {
       // First move the files into the the log directory.
       const movedFiles: {
         [key: string]: {
@@ -86,29 +106,9 @@ export default async function addEntries(
             return fileError;
           }
 
-          function getRandomFilePath() {
-            const extension = file.name ? extname(file.name) : undefined;
-            const randomFilename = random(12);
-            const newFilename = extension
-              ? `${randomFilename}${extension}`
-              : randomFilename;
-
-            const podDataDir = getPodDataDir(pod.name);
-            return join(podDataDir, log, newFilename);
-          }
-
-          function getFilePathBasedOnOriginalName(filename: string) {
-            const podDataDir = getPodDataDir(pod.name);
-            const preferredFilePath = join(podDataDir, log, filename);
-
-            return !existsSync(preferredFilePath)
-              ? preferredFilePath
-              : getRandomFilePath();
-          }
-
           const newPath = file.name
             ? getFilePathBasedOnOriginalName(file.name)
-            : getRandomFilePath();
+            : getRandomFilePath(file.name);
 
           await moveFile(file.path, newPath);
 
@@ -157,7 +157,7 @@ export default async function addEntries(
               content_hash: contentHash,
               commit: newCommit,
               previous_commit: lastCommit,
-              log,
+              log_name: log,
               data: entry.data,
               type: "data",
               created_at: Date.now(),
@@ -201,7 +201,7 @@ export default async function addEntries(
             const entryRow: Omit<EntriesRow, "id"> = {
               commit: newCommit,
               content_hash: movedFile.hash,
-              log,
+              log_name: log,
               data: movedFile.filename,
               type: "file",
               previous_commit: lastCommit,

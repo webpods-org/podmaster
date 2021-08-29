@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 export class LRUMap<K,V> {
   // Construct a new cache object which will hold up to limit entries.
   // When the size == limit, a `put` operation will evict the oldest entry.

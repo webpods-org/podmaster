@@ -5,7 +5,7 @@ import * as config from "../../config/index.js";
 
 let logger: winston.Logger;
 
-export async function init() {
+export async function init(): Promise<void> {
   const appConfig = config.get();
   const errorsFile = path.join(appConfig.storage.dataDir, "logs/errors.log");
   const combinedLogsFile = path.join(
@@ -46,10 +46,10 @@ export type LogLevel =
   | "info"
   | "debug ";
 
-export function log(level: LogLevel, message: string) {
+export function log(level: LogLevel, message: string): void {
   logger.log(level, message);
 }
 
-export function logException(ex: any) {
+export function logException(ex: any): void {
   logger.log("error", ex.toString() + ex.message ? "::" + ex.message : "");
 }

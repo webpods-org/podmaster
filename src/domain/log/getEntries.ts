@@ -19,7 +19,7 @@ export default async function getEntries(
   iss: string | undefined,
   sub: string | undefined,
   hostname: string,
-  log: string,
+  logName: string,
   fromId?: number,
   fromCommit?: string,
   commaSeperatedCommits?: string,
@@ -31,23 +31,23 @@ export default async function getEntries(
   return ensurePod(hostname, async (pod) => {
     function getEntriesAfterId(id: number) {
       const getEntriesStmt = podDb.prepare(
-        `SELECT * FROM "entries" WHERE "log" = @log AND "id" > @id LIMIT @count`
+        `SELECT * FROM "entries" WHERE "log_name" = @log_name AND "id" > @id LIMIT @count`
       );
 
       return getEntriesStmt.all({
         id,
-        log,
+        log_name: logName,
         count: limit,
       }) as EntriesRow[];
     }
 
     function getEntriesAfterCommit(commit: string) {
       const getCommitStmt = podDb.prepare(
-        `SELECT "id" FROM "entries" WHERE "log" = @log AND "commit" = @commit`
+        `SELECT "id" FROM "entries" WHERE "log_name" = @log_name AND "commit" = @commit`
       );
 
       const commitRow: EntriesRow = getCommitStmt.get({
-        log,
+        log_name: logName,
         commit,
       });
 
@@ -65,10 +65,13 @@ export default async function getEntries(
 
       for (const commit of commitList) {
         const getSingleCommitStmt = podDb.prepare(
-          `SELECT * FROM "entries" WHERE "log" = @log AND "commit" = @commit`
+          `SELECT * FROM "entries" WHERE "log_name" = @log_name AND "commit" = @commit`
         );
 
-        const commitRow = getSingleCommitStmt.get({ log, commit: commit });
+        const commitRow = getSingleCommitStmt.get({
+          log_name: logName,
+          commit: commit,
+        });
 
         if (commitRow) {
           commitRows.push(commitRow);
@@ -86,7 +89,7 @@ export default async function getEntries(
     const podDataDir = getPodDataDir(pod.name);
     const podDb = db.getPodDb(podDataDir);
 
-    const permissions = await getPermissionsForLog(pod, iss, sub, log, podDb);
+    const permissions = await getPermissionsForLog(iss, sub, logName, podDb);
 
     if (permissions.read) {
       const dbEntries = fromId
@@ -102,7 +105,7 @@ export default async function getEntries(
           ...entry,
           data:
             entry.type === "file"
-              ? `/logs/${log}/files/${entry.data}`
+              ? `/logs/${logName}/files/${entry.data}`
               : entry.data,
         }));
         return { ok: true, value: { entries } };

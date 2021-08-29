@@ -6,10 +6,9 @@ import handleResult from "../handleResult.js";
 
 export type CreatePodAPIResult = {
   hostname: string;
-  pod: string;
 };
 
-export default async function createPodAPI(ctx: IRouterContext) {
+export default async function createPodAPI(ctx: IRouterContext): Promise<void> {
   const appConfig = config.get();
   const hostname = ctx.URL.hostname;
   if (hostname === appConfig.hostname) {
@@ -23,7 +22,6 @@ export default async function createPodAPI(ctx: IRouterContext) {
         ),
       (result) => {
         const body: CreatePodAPIResult = {
-          pod: result.value.pod,
           hostname: result.value.hostname,
         };
         ctx.body = body;

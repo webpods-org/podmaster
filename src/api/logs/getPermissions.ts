@@ -1,14 +1,16 @@
 import handleResult from "../handleResult.js";
 import getPermissions from "../../domain/log/getPermissions.js";
-import { Permission } from "../../types/types.js";
+import { LogPermission } from "../../types/types.js";
 import { IKoaAppContext } from "../../types/koa.js";
 import { ACCESS_DENIED } from "../../errors/codes.js";
 
 export type GetPermissionsAPIResult = {
-  permissions: Permission[];
+  permissions: LogPermission[];
 };
 
-export default async function addPermissionAPI(ctx: IKoaAppContext) {
+export default async function getPermissionsAPI(
+  ctx: IKoaAppContext
+): Promise<void> {
   const hostname = ctx.URL.hostname;
 
   await handleResult(
