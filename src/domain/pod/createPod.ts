@@ -50,63 +50,68 @@ export default async function createPod(
           If not:
             Create a randomly named pod.
         */
-        const existingPods = await getPods(userClaims.iss, userClaims.sub);
-        if (
-          !matchingTier.maxPodsPerUser ||
-          (existingPods.ok &&
-            matchingTier.maxPodsPerUser > existingPods.value.pods.length)
-        ) {
-          const hostname = userClaims.webpods?.domain
-            ? `${podName}.${userClaims.webpods.domain}.${appConfig.hostname}`
-            : `${podName}.${appConfig.hostname}`;
+        const existingPodsResult = await getPods(userClaims.iss, userClaims.sub);
 
-          // Check if the pod name is available.
+        if (existingPodsResult.ok) {
+          if (
+            !matchingTier.maxPodsPerUser ||
+            (existingPodsResult.ok &&
+              matchingTier.maxPodsPerUser > existingPodsResult.value.pods.length)
+          ) {
+            const hostname = userClaims.webpods?.domain
+              ? `${podName}.${userClaims.webpods.domain}.${appConfig.hostname}`
+              : `${podName}.${appConfig.hostname}`;
 
-          const existingPod = await getPodByHostname(hostname);
-          if (!existingPod) {
-            // Gotta make a directory.
-            const podDataDir = getPodDataDir(podName);
+            // Check if the pod name is available.
 
-            const podsRow: PodsRow = {
-              iss: userClaims.iss,
-              sub: userClaims.sub,
-              name: podName,
-              hostname,
-              hostname_alias: null,
-              created_at: Date.now(),
-              tier: "free",
-              description,
-            };
+            const existingPod = await getPodByHostname(hostname);
+            if (!existingPod) {
+              // Gotta make a directory.
+              const podDataDir = getPodDataDir(podName);
 
-            const insertPodStmt = systemDb.prepare(
-              generateInsertStatement("pods", podsRow)
-            );
+              const podsRow: PodsRow = {
+                iss: userClaims.iss,
+                sub: userClaims.sub,
+                name: podName,
+                hostname,
+                hostname_alias: null,
+                created_at: Date.now(),
+                tier: "free",
+                description,
+              };
 
-            insertPodStmt.run(podsRow);
+              const insertPodStmt = systemDb.prepare(
+                generateInsertStatement("pods", podsRow)
+              );
 
-            await mkdirp(podDataDir);
+              insertPodStmt.run(podsRow);
 
-            // Create the Pod DB
-            const podDb = db.getPodDb(podDataDir);
-            await db.initPodDb(podDb);
+              await mkdirp(podDataDir);
 
-            return {
-              ok: true,
-              value: { hostname },
-            };
+              // Create the Pod DB
+              const podDb = db.getPodDb(podDataDir);
+              await db.initPodDb(podDb);
+
+              return {
+                ok: true,
+                value: { hostname },
+              };
+            } else {
+              return {
+                ok: false,
+                code: POD_EXISTS,
+                error: `A pod named ${hostname} already exists.`,
+              };
+            }
           } else {
             return {
               ok: false,
-              code: POD_EXISTS,
-              error: `A pod named ${hostname} already exists.`,
+              code: QUOTA_EXCEEDED,
+              error: "Quota exceeded.",
             };
           }
         } else {
-          return {
-            ok: false,
-            code: QUOTA_EXCEEDED,
-            error: "Quota exceeded.",
-          };
+          return existingPodsResult;
         }
       } else {
         return {
