@@ -22,10 +22,14 @@ export default async function getEntriesAPI(
         ctx.state.jwt?.claims.sub,
         hostname,
         ctx.params.log,
-        transformQuery(ctx.request.query.sinceId, parseInt),
-        getQuery(ctx.request.query.sinceCommit),
-        getQuery(ctx.request.query.commits),
-        transformQuery(ctx.request.query.limit, parseInt)
+        {
+          sinceId: transformQuery(ctx.request.query.sinceId, parseInt),
+          sinceCommit: getQuery(ctx.request.query.sinceCommit),
+          commits: getQuery(ctx.request.query.commits),
+          limit: transformQuery(ctx.request.query.limit, parseInt),
+          from: transformQuery(ctx.request.query.from, parseInt),
+          last: transformQuery(ctx.request.query.last, parseInt),
+        }
       ),
     (result) => {
       const body: GetEntriesAPIResult = {

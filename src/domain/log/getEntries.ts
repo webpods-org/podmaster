@@ -12,28 +12,48 @@ export type GetEntriesResult = {
   entries: LogEntry[];
 };
 
+export type GetEntriesOptions = {
+  from?: number;
+  last?: number;
+  sinceId?: number;
+  sinceCommit?: string;
+  commits?: string;
+  limit?: number;
+};
+
 export default async function getEntries(
   iss: string | undefined,
   sub: string | undefined,
   hostname: string,
   logName: string,
-  fromId?: number,
-  fromCommit?: string,
-  commaSeperatedCommits?: string,
-  maxResults?: number
+  { from, last, sinceId, sinceCommit, commits: commitIds, limit: maxResults }: GetEntriesOptions
 ): Promise<Result<GetEntriesResult>> {
   const limit = maxResults || 100;
 
   return ensurePod(hostname, async (pod) => {
-    function getEntriesAfterId(id: number) {
+    function getEntriesFrom(offset: number, ascending: boolean) {
       const getEntriesStmt = podDb.prepare(
-        `SELECT * FROM "entries" WHERE "log_name" = @log_name AND "id" > @id LIMIT @count`
+        ascending
+          ? `SELECT * FROM "entries" WHERE "log_name" = @log_name LIMIT @limit OFFSET @offset`
+          : `SELECT * FROM "entries" WHERE "log_name" = @log_name ORDER BY ROWID DESC LIMIT @limit OFFSET @offset`
+      );
+
+      return getEntriesStmt.all({
+        log_name: logName,
+        limit,
+        offset,
+      }) as EntriesRow[];
+    }
+
+    function getEntriesFromId(id: number) {
+      const getEntriesStmt = podDb.prepare(
+        `SELECT * FROM "entries" WHERE "log_name" = @log_name AND "id" > @id LIMIT @limit`
       );
 
       return getEntriesStmt.all({
         id,
         log_name: logName,
-        count: limit,
+        limit,
       }) as EntriesRow[];
     }
 
@@ -48,7 +68,7 @@ export default async function getEntries(
       });
 
       if (commitRow) {
-        return getEntriesAfterId(commitRow.id);
+        return getEntriesFromId(commitRow.id);
       } else {
         return [] as EntriesRow[];
       }
@@ -88,13 +108,17 @@ export default async function getEntries(
     const permissions = await getPermissionsForLog(iss, sub, logName, podDb);
 
     if (permissions.read) {
-      const dbEntries = fromId
-        ? getEntriesAfterId(fromId)
-        : fromCommit
-        ? getEntriesAfterCommit(fromCommit)
-        : commaSeperatedCommits
-        ? getEntriesByCommits(commaSeperatedCommits)
-        : getEntriesAfterId(0);
+      const dbEntries = sinceId
+        ? getEntriesFromId(sinceId)
+        : sinceCommit
+        ? getEntriesAfterCommit(sinceCommit)
+        : commitIds
+        ? getEntriesByCommits(commitIds)
+        : from
+        ? getEntriesFrom(from, true)
+        : last
+        ? getEntriesFrom(last, false)
+        : getEntriesFromId(0);
 
       if (dbEntries) {
         const entries = dbEntries.map(mapper).map((entry) => ({
