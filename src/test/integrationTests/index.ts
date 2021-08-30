@@ -31,8 +31,10 @@ export default function run(configDir: string, configFilePath: string) {
   describe("integration tests", async () => {
     const podId = "myweblog";
     const podName = "My Blog Db";
+    const podDescription = "This is a test pod.";
     const logId = "myposts";
     const logName = "Table of Posts";
+    const logDescription = "This is where all the posts go.";
 
     const appConfig: AppConfig = ((await import(configFilePath)) as any)
       .default;
@@ -58,7 +60,7 @@ export default function run(configDir: string, configFilePath: string) {
     it("creates a pod", async () => {
       const response = await request(app)
         .post("/pods")
-        .send({ id: podId, name: podName })
+        .send({ id: podId, name: podName, description: podDescription })
         .set("Host", mainHostname)
         .set("Authorization", `Bearer ${jwt}`);
 
@@ -121,6 +123,8 @@ export default function run(configDir: string, configFilePath: string) {
       const apiResult: GetPodsAPIResult = JSON.parse(response.text);
       should.exist(apiResult.pods);
       apiResult.pods.length.should.be.greaterThan(0);
+      apiResult.pods[0].name.should.equal(podName);
+      apiResult.pods[0].description.should.equal(podDescription);
     });
 
     it("creates a log", async () => {
@@ -129,6 +133,7 @@ export default function run(configDir: string, configFilePath: string) {
         .send({
           id: logId,
           name: logName,
+          description: logDescription,
         })
         .set("Host", hostnameAndPort)
         .set("Authorization", `Bearer ${jwt}`);
@@ -174,6 +179,8 @@ export default function run(configDir: string, configFilePath: string) {
       response.status.should.equal(200);
       const apiResult: GetLogsAPIResult = JSON.parse(response.text);
       should.exist(apiResult.logs);
+      apiResult.logs[0].name.should.equal(logName);
+      apiResult.logs[0].description.should.equal(logDescription);
     });
 
     it("writes log entries", async () => {

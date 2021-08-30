@@ -8,6 +8,8 @@ export type GetPodsAPIResult = {
   pods: {
     hostname: string;
     hostnameAlias: string | null;
+    name: string;
+    description: string;
   }[];
 };
 
@@ -24,6 +26,8 @@ export default async function getPodsAPI(ctx: IRouterContext): Promise<void> {
           pods: result.value.pods.map((x) => ({
             hostname: x.hostname,
             hostnameAlias: x.hostnameAlias,
+            name: x.name,
+            description: x.description,
           })),
         };
         ctx.body = body;

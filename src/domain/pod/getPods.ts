@@ -7,6 +7,8 @@ import { getPodDataDir } from "../../storage/index.js";
 export type GetPodsResult = {
   pods: {
     hostname: string;
+    name: string;
+    description: string;
     dataDir: string;
     hostnameAlias: string | null;
   }[];
@@ -40,6 +42,8 @@ export async function getPods(
     .map((x) => ({
       hostname: x.hostname,
       hostnameAlias: x.hostnameAlias,
+      name: x.name,
+      description: x.description,
       dataDir: getPodDataDir(x.id),
     }));
 

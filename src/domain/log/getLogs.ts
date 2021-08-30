@@ -8,6 +8,8 @@ import { getPodDataDir } from "../../storage/index.js";
 export type GetLogsResult = {
   logs: {
     id: string;
+    name: string;
+    description: string;
   }[];
 };
 
@@ -25,6 +27,8 @@ export default async function getLogs(
 
       const logs = getLogsStmt.all().map((x: LogsRow) => ({
         id: x.id,
+        name: x.name,
+        description: x.description,
       }));
       return { ok: true, value: { logs } };
     } else {

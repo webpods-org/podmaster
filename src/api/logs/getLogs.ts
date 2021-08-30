@@ -6,6 +6,8 @@ import { ACCESS_DENIED } from "../../errors/codes.js";
 export type GetLogsAPIResult = {
   logs: {
     id: string;
+    name: string;
+    description: string;
   }[];
 };
 

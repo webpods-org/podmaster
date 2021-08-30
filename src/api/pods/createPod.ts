@@ -23,7 +23,7 @@ export default async function createPodAPI(ctx: IRouterContext): Promise<void> {
         ),
       (result) => {
         const body: CreatePodAPIResult = {
-          hostname: result.value.hostname,
+          hostname: result.value.hostname
         };
         ctx.body = body;
       },
