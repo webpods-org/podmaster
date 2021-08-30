@@ -20,7 +20,7 @@ export default async function getFile(
 ): Promise<Result<GetFileResult>> {
   return ensurePod(hostname, async (pod) => {
     // Let's see if the log already exists.
-    const podDataDir = getPodDataDir(pod.name);
+    const podDataDir = getPodDataDir(pod.id);
     const podDb = db.getPodDb(podDataDir);
 
     const permissions = await getPermissionsForLog(iss, sub, logName, podDb);
@@ -36,8 +36,8 @@ export default async function getFile(
         isFilenameValid(fileName)
       ) {
         const relativeFilePath = join(
-          getDirNumber(pod.name),
-          pod.name,
+          getDirNumber(pod.id),
+          pod.id,
           logName,
           fileName
         );

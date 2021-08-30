@@ -16,7 +16,7 @@ export default async function getPermissions(
   hostname: string
 ): Promise<Result<GetPermissionsResult>> {
   return ensurePod(hostname, async (pod) => {
-    const podDataDir = getPodDataDir(pod.name);
+    const podDataDir = getPodDataDir(pod.id);
     const podDb = db.getPodDb(podDataDir);
 
     // Is own pod?

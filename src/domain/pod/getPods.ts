@@ -40,7 +40,7 @@ export async function getPods(
     .map((x) => ({
       hostname: x.hostname,
       hostnameAlias: x.hostnameAlias,
-      dataDir: getPodDataDir(x.name),
+      dataDir: getPodDataDir(x.id),
     }));
 
   return { ok: true, value: { pods } };

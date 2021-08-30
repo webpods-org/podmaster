@@ -102,7 +102,7 @@ export default async function getEntries(
     }
 
     // Let's see if the log already exists.
-    const podDataDir = getPodDataDir(pod.name);
+    const podDataDir = getPodDataDir(pod.id);
     const podDb = db.getPodDb(podDataDir);
 
     const permissions = await getPermissionsForLog(iss, sub, logName, podDb);

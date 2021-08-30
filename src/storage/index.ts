@@ -11,6 +11,6 @@ export function getPodDataDir(pod: string): string {
 
 export function getDirNumber(pod: string): string {
   const appConfig = config.get();
-  const hashOfPodName = getHashCode(pod);
-  return (hashOfPodName % appConfig.storage.podsDirCount).toString();
+  const hashOfPodId = getHashCode(pod);
+  return (hashOfPodId % appConfig.storage.podsDirCount).toString();
 }

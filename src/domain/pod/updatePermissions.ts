@@ -32,7 +32,7 @@ export default async function updatePermissions(
 ): Promise<Result<UpdatePermissionsResult>> {
   return ensurePod(hostname, async (pod) => {
     // Let's see if the log already exists.
-    const podDataDir = getPodDataDir(pod.name);
+    const podDataDir = getPodDataDir(pod.id);
     const podDb = db.getPodDb(podDataDir);
 
     if (pod.claims.iss === iss && pod.claims.sub === sub) {

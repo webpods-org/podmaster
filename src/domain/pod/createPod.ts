@@ -21,12 +21,13 @@ import { getPodByHostname } from "./getPodByHostname.js";
 export type CreatePodResult = { hostname: string };
 
 export default async function createPod(
-  podName: string,
+  podId: string,
+  podTitle: string,
   description: string,
   userClaims: JwtClaims
 ): Promise<Result<CreatePodResult>> {
   // Check fields
-  const validationErrors = isInvalid({ podName });
+  const validationErrors = isInvalid({ podId });
 
   if (!validationErrors) {
     const appConfig = config.get();
@@ -48,29 +49,34 @@ export default async function createPod(
           If not:
             Create a randomly named pod.
         */
-        const existingPodsResult = await getPods(userClaims.iss, userClaims.sub);
+        const existingPodsResult = await getPods(
+          userClaims.iss,
+          userClaims.sub
+        );
 
         if (existingPodsResult.ok) {
           if (
             !matchingTier.maxPodsPerUser ||
             (existingPodsResult.ok &&
-              matchingTier.maxPodsPerUser > existingPodsResult.value.pods.length)
+              matchingTier.maxPodsPerUser >
+                existingPodsResult.value.pods.length)
           ) {
             const hostname = userClaims.webpods?.domain
-              ? `${podName}.${userClaims.webpods.domain}.${appConfig.hostname}`
-              : `${podName}.${appConfig.hostname}`;
+              ? `${podId}.${userClaims.webpods.domain}.${appConfig.hostname}`
+              : `${podId}.${appConfig.hostname}`;
 
             // Check if the pod name is available.
 
             const existingPod = await getPodByHostname(hostname);
             if (!existingPod) {
               // Gotta make a directory.
-              const podDataDir = getPodDataDir(podName);
+              const podDataDir = getPodDataDir(podId);
 
               const podsRow: PodsRow = {
                 iss: userClaims.iss,
                 sub: userClaims.sub,
-                name: podName,
+                id: podId,
+                name: podTitle,
                 hostname,
                 hostname_alias: null,
                 created_at: Date.now(),
@@ -131,14 +137,14 @@ export default async function createPod(
   }
 }
 
-function isInvalid(input: { podName: string }): ErrResult | undefined {
-  if (!input.podName) {
+function isInvalid(input: { podId: string }): ErrResult | undefined {
+  if (!input.podId) {
     return {
       ok: false,
       error: "Missing fields in input.",
       code: MISSING_FIELD,
       data: {
-        fields: ["name"],
+        fields: ["id"],
       },
     };
   }

@@ -16,7 +16,8 @@ export default async function createPodAPI(ctx: IRouterContext): Promise<void> {
       ctx,
       () =>
         createPod(
-          ctx.request.body.name || "",
+          ctx.request.body.id,
+          ctx.request.body.name,
           ctx.request.body.description || "",
           ctx.state.jwt?.claims
         ),

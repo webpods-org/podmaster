@@ -21,7 +21,7 @@ export default async function getLogs(
     const tagsList = tags ? tags.split(",") : [];
 
     if (pod.claims.iss === iss && pod.claims.sub === sub) {
-      const podDataDir = getPodDataDir(pod.name);
+      const podDataDir = getPodDataDir(pod.id);
       const podDb = db.getPodDb(podDataDir);
 
       const getLogsStmt = podDb.prepare(`SELECT * FROM "logs"`);

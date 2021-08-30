@@ -69,6 +69,7 @@ export type PodInfo = {
     iss: string;
     sub: string;
   };
+  id: string;
   name: string;
   hostname: string;
   hostnameAlias: string | null;

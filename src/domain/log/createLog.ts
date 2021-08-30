@@ -34,7 +34,7 @@ export default async function createLog(
       );
 
       if (canCreate) {
-        const podDataDir = getPodDataDir(pod.name);
+        const podDataDir = getPodDataDir(pod.id);
         const logDir = join(podDataDir, logName);
         const podDb = db.getPodDb(podDataDir);
         

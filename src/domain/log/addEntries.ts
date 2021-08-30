@@ -41,7 +41,7 @@ export default async function addEntries(
 ): Promise<Result<AddEntriesResult>> {
   return ensurePod(hostname, async (pod) => {
     function getFilePathBasedOnOriginalName(filename: string) {
-      const podDataDir = getPodDataDir(pod.name);
+      const podDataDir = getPodDataDir(pod.id);
       const preferredFilePath = join(podDataDir, log, filename);
 
       return !existsSync(preferredFilePath)
@@ -56,7 +56,7 @@ export default async function addEntries(
         ? `${randomFilename}${extension}`
         : randomFilename;
 
-      const podDataDir = getPodDataDir(pod.name);
+      const podDataDir = getPodDataDir(pod.id);
       return join(podDataDir, log, newFilename);
     }
 
@@ -66,7 +66,7 @@ export default async function addEntries(
     }[] = [];
 
     // Let's see if the log already exists.
-    const podDataDir = getPodDataDir(pod.name);
+    const podDataDir = getPodDataDir(pod.id);
     const podDb = db.getPodDb(podDataDir);
 
     const permissions = await getPermissionsForLog(iss, sub, log, podDb);

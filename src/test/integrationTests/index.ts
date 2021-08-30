@@ -30,9 +30,10 @@ export default function run(configDir: string, configFilePath: string) {
     .replace(/\r?\n|\r/g, "");
 
   describe("integration tests", async () => {
-    const podName = "myweblog";
+    const podId = "myweblog";
+    const podName = "My Blog Db";
     const logName = "myposts";
-    
+
     const appConfig: AppConfig = ((await import(configFilePath)) as any)
       .default;
     let app: any;
@@ -57,7 +58,7 @@ export default function run(configDir: string, configFilePath: string) {
     it("creates a pod", async () => {
       const response = await request(app)
         .post("/pods")
-        .send({ name: podName })
+        .send({ id: podId, name: podName })
         .set("Host", mainHostname)
         .set("Authorization", `Bearer ${jwt}`);
 
@@ -69,11 +70,11 @@ export default function run(configDir: string, configFilePath: string) {
         port === 80 || port === 443 ? hostname : `${hostname}:${port}`;
     });
 
-    it("cannot create pod with existing name", async () => {
+    it("cannot create pod with existing id", async () => {
       const response = await request(app)
         .post("/pods")
         .send({
-          name: "myweblog",
+          id: "myweblog",
           description: "This is my very own pod.",
         })
         .set("Host", mainHostname)

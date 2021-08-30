@@ -3,6 +3,7 @@ export type SqliteBoolean = 1 | 0;
 export type PodsRow = {
   iss: string;
   sub: string;
+  id: string;
   name: string;
   hostname: string;
   hostname_alias: string | null;
