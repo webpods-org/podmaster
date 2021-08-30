@@ -15,7 +15,7 @@ export default async function getFile(
   iss: string | undefined,
   sub: string | undefined,
   hostname: string,
-  logName: string,
+  logId: string,
   urlPath: string
 ): Promise<Result<GetFileResult>> {
   return ensurePod(hostname, async (pod) => {
@@ -23,14 +23,14 @@ export default async function getFile(
     const podDataDir = getPodDataDir(pod.id);
     const podDb = db.getPodDb(podDataDir);
 
-    const permissions = await getPermissionsForLog(iss, sub, logName, podDb);
+    const permissions = await getPermissionsForLog(iss, sub, logId, podDb);
 
     if (permissions.read) {
-      const [, logsLiteral, logName, filesLiteral, fileName] =
+      const [, logsLiteral, logId, filesLiteral, fileName] =
         urlPath.split("/");
       // Some basic checks.
       if (
-        logName === logName &&
+        logId === logId &&
         logsLiteral.toLowerCase() === "logs" &&
         filesLiteral.toLowerCase() === "files" &&
         isFilenameValid(fileName)
@@ -38,7 +38,7 @@ export default async function getFile(
         const relativeFilePath = join(
           getDirNumber(pod.id),
           pod.id,
-          logName,
+          logId,
           fileName
         );
         return {

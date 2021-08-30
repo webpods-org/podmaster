@@ -1,4 +1,3 @@
-import { PodInfo } from "../types/types.js";
 import * as config from "../config/index.js";
 import { join } from "path";
 import { getHashCode } from "../utils/getHashCode.js";

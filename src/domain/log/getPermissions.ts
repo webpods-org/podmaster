@@ -14,7 +14,7 @@ export default async function getPermissions(
   iss: string,
   sub: string,
   hostname: string,
-  logName: string
+  logId: string
 ): Promise<Result<GetPermissionsResult>> {
   return ensurePod(hostname, async (pod) => {
     const podDataDir = getPodDataDir(pod.id);
@@ -24,11 +24,11 @@ export default async function getPermissions(
     if (pod.claims.iss === iss && pod.claims.sub === sub) {
       // See if the permission already exists.
       const existingPermStmt = podDb.prepare(
-        `SELECT * FROM "log_permissions" WHERE "log_name"=@log_name`
+        `SELECT * FROM "log_permissions" WHERE "log_id"=@log_id`
       );
 
       const permissions = existingPermStmt
-        .all({ log_name: logName })
+        .all({ log_id: logId })
         .map(mapper);
 
       return {

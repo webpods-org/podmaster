@@ -7,40 +7,25 @@ import { getPodDataDir } from "../../storage/index.js";
 
 export type GetLogsResult = {
   logs: {
-    name: string;
+    id: string;
   }[];
 };
 
 export default async function getLogs(
   iss: string,
   sub: string,
-  hostname: string,
-  tags: string | undefined
+  hostname: string
 ): Promise<Result<GetLogsResult>> {
   return ensurePod(hostname, async (pod) => {
-    const tagsList = tags ? tags.split(",") : [];
-
     if (pod.claims.iss === iss && pod.claims.sub === sub) {
       const podDataDir = getPodDataDir(pod.id);
       const podDb = db.getPodDb(podDataDir);
 
       const getLogsStmt = podDb.prepare(`SELECT * FROM "logs"`);
 
-      const logs = getLogsStmt
-        .all()
-        .map((x: LogsRow) => ({
-          name: x.name,
-          tags: x.tags,
-        }))
-        .filter((x) => {
-          if (!tags) {
-            return true;
-          } else {
-            const logTags = x.tags?.split(",");
-            return logTags && tagsList.every((tag) => logTags.includes(tag));
-          }
-        });
-
+      const logs = getLogsStmt.all().map((x: LogsRow) => ({
+        id: x.id,
+      }));
       return { ok: true, value: { logs } };
     } else {
       return {

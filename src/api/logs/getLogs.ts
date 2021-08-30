@@ -5,7 +5,7 @@ import { ACCESS_DENIED } from "../../errors/codes.js";
 
 export type GetLogsAPIResult = {
   logs: {
-    name: string;
+    id: string;
   }[];
 };
 
@@ -19,8 +19,7 @@ export default async function getLogsAPI(ctx: IKoaAppContext): Promise<void> {
         ? getLogs(
             ctx.state.jwt?.claims.iss,
             ctx.state.jwt?.claims.sub,
-            hostname,
-            ctx.request.body.tags
+            hostname
           )
         : Promise.resolve({
             ok: false,

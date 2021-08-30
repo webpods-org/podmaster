@@ -13,10 +13,11 @@ export type PodsRow = {
 };
 
 export type LogsRow = {
+  id: string;
   name: string;
+  description: string;
   public: SqliteBoolean;
   created_at: number;
-  tags: string | null;
 };
 
 export type EntriesRow = {
@@ -24,7 +25,7 @@ export type EntriesRow = {
   content_hash: string;
   commit: string;
   previous_commit: string;
-  log_name: string;
+  log_id: string;
   type: "data" | "file";
   data: string;
   created_at: number;
@@ -42,7 +43,7 @@ export type PodPermissionsRow = {
 };
 
 export type LogPermissionsRow = {
-  log_name: string;
+  log_id: string;
   iss: string;
   sub: string;
   read: SqliteBoolean;

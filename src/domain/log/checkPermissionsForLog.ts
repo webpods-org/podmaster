@@ -21,18 +21,18 @@ export async function getPermissionsForLog(
   publish: boolean;
   subscribe: boolean;
 }> {
-  const getLogStmt = podDb.prepare(`SELECT * from "logs" WHERE "name"=@name`);
+  const getLogStmt = podDb.prepare(`SELECT * from "logs" WHERE "id"=@name`);
   const logInfoRow = getLogStmt.get({ name });
   const logInfo = logInfoRow ? logMapper(logInfoRow) : undefined;
 
   if (logInfo) {
     // See if the permission already exists.
     const existingPermStmt = podDb.prepare(
-      `SELECT * FROM "log_permissions" WHERE "log_name"=@log_name`
+      `SELECT * FROM "log_permissions" WHERE "log_id"=@log_id`
     );
 
     const permissions = existingPermStmt
-      .all({ log_name: name })
+      .all({ log_id: name })
       .map(permissionMapper);
 
     const matchingPerm = permissions.find(

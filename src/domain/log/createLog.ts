@@ -11,17 +11,16 @@ import { getPodDataDir } from "../../storage/index.js";
 import getPermissions from "../pod/getPermissions.js";
 import getLogs from "./getLogs.js";
 
-export type CreateLogResult = {
-  name: string;
-};
+export type CreateLogResult = {};
 
 export default async function createLog(
   iss: string,
   sub: string,
   hostname: string,
+  logId: string,
   logName: string,
-  publik?: boolean,
-  tags?: string
+  logDescription: string,
+  publik?: boolean
 ): Promise<Result<CreateLogResult>> {
   return ensurePod(hostname, async (pod) => {
     const podPermissionsResult = await getPermissions(iss, sub, hostname);
@@ -35,19 +34,20 @@ export default async function createLog(
 
       if (canCreate) {
         const podDataDir = getPodDataDir(pod.id);
-        const logDir = join(podDataDir, logName);
+        const logDir = join(podDataDir, logId);
         const podDb = db.getPodDb(podDataDir);
-        
+
         // Let's see if the log already exists.
-        const existingLogsResult = await getLogs(iss, sub, hostname, undefined);
-        
+        const existingLogsResult = await getLogs(iss, sub, hostname);
+
         if (existingLogsResult.ok) {
-          if (!existingLogsResult.value.logs.some((x) => x.name === logName)) {
+          if (!existingLogsResult.value.logs.some((x) => x.id === logId)) {
             const logsRow: LogsRow = {
+              id: logId,
               name: logName,
+              description: logDescription || "",
               created_at: Date.now(),
-              public: publik ? 1 : 0,
-              tags: tags || "",
+              public: publik ? 1 : 0
             };
 
             const insertLogStmt = podDb.prepare(
@@ -60,13 +60,13 @@ export default async function createLog(
 
             return {
               ok: true,
-              value: { name: logName },
+              value: {},
             };
           } else {
             return {
               ok: false,
               code: LOG_EXISTS,
-              error: `The log ${logName} already exists.`,
+              error: `The log ${logId} already exists.`,
             };
           }
         } else {

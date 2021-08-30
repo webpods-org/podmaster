@@ -154,7 +154,7 @@ export default async function addEntries(
               content_hash: contentHash,
               commit: newCommit,
               previous_commit: lastCommit,
-              log_name: log,
+              log_id: log,
               data: entry.data,
               type: "data",
               created_at: Date.now(),
@@ -198,7 +198,7 @@ export default async function addEntries(
             const entryRow: Omit<EntriesRow, "id"> = {
               commit: newCommit,
               content_hash: movedFile.hash,
-              log_name: log,
+              log_id: log,
               data: movedFile.filename,
               type: "file",
               previous_commit: lastCommit,

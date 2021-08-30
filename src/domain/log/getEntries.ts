@@ -25,7 +25,7 @@ export default async function getEntries(
   iss: string | undefined,
   sub: string | undefined,
   hostname: string,
-  logName: string,
+  logId: string,
   { from, last, sinceId, sinceCommit, commits: commitIds, limit: maxResults }: GetEntriesOptions
 ): Promise<Result<GetEntriesResult>> {
   const limit = maxResults || 100;
@@ -34,12 +34,12 @@ export default async function getEntries(
     function getEntriesFrom(offset: number, ascending: boolean) {
       const getEntriesStmt = podDb.prepare(
         ascending
-          ? `SELECT * FROM "entries" WHERE "log_name" = @log_name LIMIT @limit OFFSET @offset`
-          : `SELECT * FROM "entries" WHERE "log_name" = @log_name ORDER BY ROWID DESC LIMIT @limit OFFSET @offset`
+          ? `SELECT * FROM "entries" WHERE "log_id" = @log_id LIMIT @limit OFFSET @offset`
+          : `SELECT * FROM "entries" WHERE "log_id" = @log_id ORDER BY ROWID DESC LIMIT @limit OFFSET @offset`
       );
 
       return getEntriesStmt.all({
-        log_name: logName,
+        log_id: logId,
         limit,
         offset,
       }) as EntriesRow[];
@@ -47,23 +47,23 @@ export default async function getEntries(
 
     function getEntriesFromId(id: number) {
       const getEntriesStmt = podDb.prepare(
-        `SELECT * FROM "entries" WHERE "log_name" = @log_name AND "id" > @id LIMIT @limit`
+        `SELECT * FROM "entries" WHERE "log_id" = @log_id AND "id" > @id LIMIT @limit`
       );
 
       return getEntriesStmt.all({
         id,
-        log_name: logName,
+        log_id: logId,
         limit,
       }) as EntriesRow[];
     }
 
     function getEntriesAfterCommit(commit: string) {
       const getCommitStmt = podDb.prepare(
-        `SELECT "id" FROM "entries" WHERE "log_name" = @log_name AND "commit" = @commit`
+        `SELECT "id" FROM "entries" WHERE "log_id" = @log_id AND "commit" = @commit`
       );
 
       const commitRow: EntriesRow = getCommitStmt.get({
-        log_name: logName,
+        log_id: logId,
         commit,
       });
 
@@ -81,11 +81,11 @@ export default async function getEntries(
 
       for (const commit of commitList) {
         const getSingleCommitStmt = podDb.prepare(
-          `SELECT * FROM "entries" WHERE "log_name" = @log_name AND "commit" = @commit`
+          `SELECT * FROM "entries" WHERE "log_id" = @log_id AND "commit" = @commit`
         );
 
         const commitRow = getSingleCommitStmt.get({
-          log_name: logName,
+          log_id: logId,
           commit: commit,
         });
 
@@ -105,7 +105,7 @@ export default async function getEntries(
     const podDataDir = getPodDataDir(pod.id);
     const podDb = db.getPodDb(podDataDir);
 
-    const permissions = await getPermissionsForLog(iss, sub, logName, podDb);
+    const permissions = await getPermissionsForLog(iss, sub, logId, podDb);
 
     if (permissions.read) {
       const dbEntries = sinceId
@@ -125,7 +125,7 @@ export default async function getEntries(
           ...entry,
           data:
             entry.type === "file"
-              ? `/logs/${logName}/files/${entry.data}`
+              ? `/logs/${logId}/files/${entry.data}`
               : entry.data,
         }));
         return { ok: true, value: { entries } };

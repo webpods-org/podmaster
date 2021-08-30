@@ -22,7 +22,7 @@ export default async function updatePermissions(
   iss: string,
   sub: string,
   hostname: string,
-  logName: string,
+  logId: string,
   {
     add,
     remove,
@@ -38,11 +38,11 @@ export default async function updatePermissions(
         for (const permission of add) {
           // See if the permission already exists.
           const existingPermStmt = podDb.prepare(
-            `SELECT * FROM "log_permissions" WHERE "log_name"=@log_name AND "iss"=@iss AND "sub"=@sub`
+            `SELECT * FROM "log_permissions" WHERE "log_id"=@log_id AND "iss"=@iss AND "sub"=@sub`
           );
 
           const existingItem = existingPermStmt.get({
-            log_name: logName,
+            log_id: logId,
             iss: permission.claims.iss,
             sub: permission.claims.sub,
           });
@@ -50,7 +50,7 @@ export default async function updatePermissions(
           // Don't insert if it already exists.
           if (!existingItem) {
             const permissionsRow: LogPermissionsRow = {
-              log_name: logName,
+              log_id: logId,
               iss: permission.claims.iss,
               sub: permission.claims.sub,
               read: permission.access.read ? 1 : 0,
@@ -73,11 +73,11 @@ export default async function updatePermissions(
         for (const item of remove) {
           // See if the permission already exists.
           const deletePermStmt = podDb.prepare(
-            `DELETE FROM "log_permissions" WHERE "log_name"=@log_name AND "iss"=@iss AND "sub"=@sub`
+            `DELETE FROM "log_permissions" WHERE "log_id"=@log_id AND "iss"=@iss AND "sub"=@sub`
           );
 
           deletePermStmt.get({
-            log_name: logName,
+            log_id: logId,
             iss: item.claims.iss,
             sub: item.claims.sub,
           });

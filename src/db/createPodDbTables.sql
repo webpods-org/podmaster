@@ -9,11 +9,12 @@ CREATE TABLE IF NOT EXISTS pod_permissions (
 );
 
 CREATE TABLE IF NOT EXISTS logs (
-	"name" TEXT NOT NULL UNIQUE,
+	"id" TEXT NOT NULL UNIQUE,
+  "name" TEXT NOT NULL UNIQUE,
+  "description" TEXT NOT NULL,
   "public" INTEGER NOT NULL,
   "created_at" INTEGER NOT NULL,
-  "tags" TEXT NOT NULL,
-  PRIMARY KEY ("name")
+  PRIMARY KEY ("id")
 );
 
 CREATE TABLE IF NOT EXISTS entries (
@@ -22,17 +23,17 @@ CREATE TABLE IF NOT EXISTS entries (
   "content_hash" TEXT NOT NULL,
   "commit" TEXT NOT NULL UNIQUE,
   "previous_commit" TEXT NOT NULL UNIQUE,
-	"log_name" TEXT NOT NULL,
+	"log_id" TEXT NOT NULL,
   "data" TEXT NOT NULL,
   "created_at" INTEGER NOT NULL,
   "iss" TEXT NOT NULL,
   "sub" TEXT NOT NULL,
   PRIMARY KEY ("id")
-  FOREIGN KEY ("log_name") REFERENCES logs("name")
+  FOREIGN KEY ("log_id") REFERENCES logs("id")
 );
 
 CREATE TABLE IF NOT EXISTS log_permissions (
-	"log_name" TEXT NOT NULL,
+	"log_id" TEXT NOT NULL,
   "iss" INTEGER,
   "sub" TEXT NOT NULL UNIQUE,
   "read" INTEGER NOT NULL,
@@ -40,6 +41,6 @@ CREATE TABLE IF NOT EXISTS log_permissions (
   "publish" INTEGER NOT NULL,
   "subscribe" INTEGER NOT NULL,
   "created_at" INTEGER NOT NULL,
-  PRIMARY KEY ("iss", "sub", "log_name")
-  FOREIGN KEY ("log_name") REFERENCES logs("name")
+  PRIMARY KEY ("iss", "sub", "log_id")
+  FOREIGN KEY ("log_id") REFERENCES logs("id")
 );

@@ -80,10 +80,11 @@ export type PodInfo = {
 };
 
 export type LogInfo = {
+  id: string;
   name: string;
+  description: string;
   public: boolean;
   createdAt: number;
-  tags: string | null;
 };
 
 export type HttpsConfig = {

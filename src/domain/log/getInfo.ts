@@ -15,14 +15,14 @@ export default async function getInfo(
   iss: string | undefined,
   sub: string | undefined,
   hostname: string,
-  logName: string
+  logId: string
 ): Promise<Result<GetInfoResult>> {
   return ensurePod(hostname, async (pod) => {
     // Let's see if the log already exists.
     const podDataDir = getPodDataDir(pod.id);
     const podDb = db.getPodDb(podDataDir);
 
-    const permissions = await getPermissionsForLog(iss, sub, logName, podDb);
+    const permissions = await getPermissionsForLog(iss, sub, logId, podDb);
 
     if (permissions.read) {
       // Get the last item
