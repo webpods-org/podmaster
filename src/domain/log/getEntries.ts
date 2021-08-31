@@ -7,14 +7,15 @@ import { JwtClaims, LogEntry } from "../../types/types.js";
 import { ACCESS_DENIED } from "../../errors/codes.js";
 import { getLogPermissionsForJwt } from "./getLogPermissionsForJwt.js";
 import { getPodDataDir } from "../../storage/index.js";
+import * as config from "../../config/index.js";
 
 export type GetEntriesResult = {
   entries: LogEntry[];
 };
 
 export type GetEntriesOptions = {
-  from?: number;
-  last?: number;
+  offset?: number;
+  order?: string;
   sinceId?: number;
   sinceCommit?: string;
   commits?: string;
@@ -25,8 +26,8 @@ export default async function getEntries(
   hostname: string,
   logId: string,
   {
-    from,
-    last,
+    offset,
+    order,
     sinceId,
     sinceCommit,
     commits: commitIds,
@@ -34,7 +35,9 @@ export default async function getEntries(
   }: GetEntriesOptions,
   userClaims: JwtClaims | undefined
 ): Promise<Result<GetEntriesResult>> {
-  const limit = maxResults || 100;
+  const appConfig = config.get();
+
+  const limit = maxResults || appConfig.queries?.maxResults || 100;
 
   return ensurePod(hostname, async (pod) => {
     function getEntriesFrom(offset: number, ascending: boolean) {
@@ -125,10 +128,8 @@ export default async function getEntries(
         ? getEntriesAfterCommit(sinceCommit)
         : commitIds
         ? getEntriesByCommits(commitIds)
-        : from
-        ? getEntriesFrom(from, true)
-        : last
-        ? getEntriesFrom(last, false)
+        : offset !== undefined
+        ? getEntriesFrom(offset, order?.toLowerCase() !== "desc")
         : getEntriesFromId(0);
 
       if (dbEntries) {

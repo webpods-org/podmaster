@@ -25,8 +25,8 @@ export default async function getEntriesAPI(
           sinceCommit: getQuery(ctx.request.query.sinceCommit),
           commits: getQuery(ctx.request.query.commits),
           limit: transformQuery(ctx.request.query.limit, parseInt),
-          from: transformQuery(ctx.request.query.from, parseInt),
-          last: transformQuery(ctx.request.query.last, parseInt),
+          offset: transformQuery(ctx.request.query.offset, parseInt),
+          order: getQuery(ctx.request.query.order),
         },
         ctx.state.jwt?.claims
       ),

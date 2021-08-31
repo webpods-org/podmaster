@@ -35,9 +35,9 @@ export default async function updatePermissions(
     const podDataDir = getPodDataDir(pod.id);
     const podDb = db.getPodDb(podDataDir);
 
-    const permissionsResult = await getPodPermissionsForJwt(podDb, userClaims);
+    const podPermissions = await getPodPermissionsForJwt(podDb, userClaims);
 
-    if (permissionsResult.write) {
+    if (podPermissions.write) {
       if (remove) {
         for (const item of remove) {
           // See if the permission already exists.

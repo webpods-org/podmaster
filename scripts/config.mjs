@@ -119,6 +119,9 @@ const config = {
     pubsub: {
         maxConnections: 10000,
     },
+    queries: {
+        maxResults: 200,
+    },
     /*
       Optional HTTPS config
     */

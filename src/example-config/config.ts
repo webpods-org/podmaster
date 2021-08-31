@@ -1,4 +1,3 @@
-
 import pathModule from "path";
 import fsModule from "fs";
 
@@ -136,6 +135,10 @@ const config: AppConfig = {
 
   pubsub: {
     maxConnections: 10000,
+  },
+
+  queries: {
+    maxResults: 200,
   },
 
   /*

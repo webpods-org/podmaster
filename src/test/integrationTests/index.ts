@@ -285,6 +285,30 @@ export default function run(configDir: string, configFilePath: string) {
       apiResult.entries.length.should.equal(3);
     });
 
+    it("gets entries with offset", async () => {
+      const response = await request(app)
+        .get(`/logs/${logId}/entries?offset=1&limit=1`)
+        .set("Host", hostnameAndPort)
+        .set("Authorization", `Bearer ${podJwt}`);
+
+      response.status.should.equal(200);
+      const apiResult: GetEntriesAPIResult = JSON.parse(response.text);
+      apiResult.entries.length.should.equal(1);
+      apiResult.entries[0].id.should.equal(2);
+    });
+
+    it("gets last entries with offset", async () => {
+      const response = await request(app)
+        .get(`/logs/${logId}/entries?offset=1&order=desc&limit=1`)
+        .set("Host", hostnameAndPort)
+        .set("Authorization", `Bearer ${podJwt}`);
+
+      response.status.should.equal(200);
+      const apiResult: GetEntriesAPIResult = JSON.parse(response.text);
+      apiResult.entries.length.should.equal(1);
+      apiResult.entries[0].id.should.equal(4);
+    });
+
     it("gets entries by commits", async () => {
       const commits = entries
         .slice(1)

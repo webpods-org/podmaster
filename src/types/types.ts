@@ -20,7 +20,7 @@ export type UncheckedJwtClaims = {
   nbf?: number;
   iat?: number;
   [key: string]: unknown;
-}
+};
 
 export type JwtClaims = {
   iss: string;
@@ -108,6 +108,10 @@ export type PubSubConfig = {
   maxConnections?: number;
 };
 
+export type QueryConfig = {
+  maxResults?: number;
+};
+
 export type AppConfig = {
   hostname: string;
   externalAuthServers: ExternalAuthServers;
@@ -124,6 +128,7 @@ export type AppConfig = {
   maxFileSize?: number;
   useHttps?: HttpsConfig;
   pubsub?: PubSubConfig;
+  queries?: QueryConfig;
 };
 
 export type PodPermission = {
