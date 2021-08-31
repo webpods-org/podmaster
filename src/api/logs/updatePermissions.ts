@@ -18,11 +18,10 @@ export default async function updatePermissionsAPI(
     () =>
       ctx.state.jwt?.claims.iss && ctx.state.jwt?.claims.sub
         ? updatePermissions(
-            ctx.state.jwt?.claims.iss,
-            ctx.state.jwt?.claims.sub,
             hostname,
             ctx.params.log,
-            ctx.request.body
+            ctx.request.body,
+            ctx.state.jwt?.claims
           )
         : Promise.resolve({
             ok: false,

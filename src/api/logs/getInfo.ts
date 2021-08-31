@@ -3,7 +3,8 @@ import getInfo from "../../domain/log/getInfo.js";
 import { IKoaAppContext } from "../../types/koa.js";
 
 export type GetInfoAPIResult = {
-  count: number;
+  id: number;
+  commit: string;
 };
 
 export default async function getEntriesAPI(
@@ -13,16 +14,11 @@ export default async function getEntriesAPI(
 
   await handleResult(
     ctx,
-    () =>
-      getInfo(
-        ctx.state.jwt?.claims.iss,
-        ctx.state.jwt?.claims.sub,
-        hostname,
-        ctx.params.log
-      ),
+    () => getInfo(hostname, ctx.params.log, ctx.state.jwt?.claims),
     (result) => {
       const body: GetInfoAPIResult = {
-        count: result.value.count,
+        id: result.value.id,
+        commit: result.value.commit,
       };
       ctx.body = body;
     }

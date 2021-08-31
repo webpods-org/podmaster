@@ -18,8 +18,6 @@ export default async function getEntriesAPI(
     ctx,
     () =>
       getEntries(
-        ctx.state.jwt?.claims.iss,
-        ctx.state.jwt?.claims.sub,
         hostname,
         ctx.params.log,
         {
@@ -29,7 +27,8 @@ export default async function getEntriesAPI(
           limit: transformQuery(ctx.request.query.limit, parseInt),
           from: transformQuery(ctx.request.query.from, parseInt),
           last: transformQuery(ctx.request.query.last, parseInt),
-        }
+        },
+        ctx.state.jwt?.claims
       ),
     (result) => {
       const body: GetEntriesAPIResult = {

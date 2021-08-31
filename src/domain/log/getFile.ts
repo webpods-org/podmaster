@@ -3,31 +3,35 @@ import * as db from "../../db/index.js";
 import { Result } from "../../types/api.js";
 import ensurePod from "../pod/ensurePod.js";
 import { ACCESS_DENIED, NOT_FOUND } from "../../errors/codes.js";
-import { getPermissionsForLog } from "./checkPermissionsForLog.js";
+import { getPermissionsForLog } from "./getPermissionsForLog.js";
 import isFilenameValid from "../../lib/validation/checkFilename.js";
 import { getDirNumber, getPodDataDir } from "../../storage/index.js";
+import { JwtClaims } from "../../types/types.js";
 
 export type GetFileResult = {
   relativeFilePath: string;
 };
 
 export default async function getFile(
-  iss: string | undefined,
-  sub: string | undefined,
   hostname: string,
   logId: string,
-  urlPath: string
+  urlPath: string,
+  userClaims: JwtClaims | undefined
 ): Promise<Result<GetFileResult>> {
   return ensurePod(hostname, async (pod) => {
     // Let's see if the log already exists.
     const podDataDir = getPodDataDir(pod.id);
     const podDb = db.getPodDb(podDataDir);
 
-    const permissions = await getPermissionsForLog(iss, sub, logId, podDb);
+    const permissions = await getPermissionsForLog(
+      hostname,
+      logId,
+      podDb,
+      userClaims
+    );
 
     if (permissions.read) {
-      const [, logsLiteral, logId, filesLiteral, fileName] =
-        urlPath.split("/");
+      const [, logsLiteral, logId, filesLiteral, fileName] = urlPath.split("/");
       // Some basic checks.
       if (
         logId === logId &&

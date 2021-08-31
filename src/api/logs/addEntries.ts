@@ -20,12 +20,11 @@ export default async function addEntriesAPI(
     () =>
       ctx.state.jwt?.claims.iss && ctx.state.jwt?.claims.sub
         ? addEntries(
-            ctx.state.jwt?.claims.iss,
-            ctx.state.jwt?.claims.sub,
             hostname,
             ctx.params.log,
             ctx.request.body.entries,
-            ctx.request.files
+            ctx.request.files,
+            ctx.state.jwt?.claims
           )
         : Promise.resolve({
             ok: false,

@@ -3,9 +3,9 @@ import { Result } from "../../types/api.js";
 import ensurePod from "../pod/ensurePod.js";
 import { EntriesRow } from "../../types/db.js";
 import mapper from "../../mappers/entry.js";
-import { LogEntry } from "../../types/types.js";
+import { JwtClaims, LogEntry } from "../../types/types.js";
 import { ACCESS_DENIED } from "../../errors/codes.js";
-import { getPermissionsForLog } from "./checkPermissionsForLog.js";
+import { getPermissionsForLog } from "./getPermissionsForLog.js";
 import { getPodDataDir } from "../../storage/index.js";
 
 export type GetEntriesResult = {
@@ -22,11 +22,17 @@ export type GetEntriesOptions = {
 };
 
 export default async function getEntries(
-  iss: string | undefined,
-  sub: string | undefined,
   hostname: string,
   logId: string,
-  { from, last, sinceId, sinceCommit, commits: commitIds, limit: maxResults }: GetEntriesOptions
+  {
+    from,
+    last,
+    sinceId,
+    sinceCommit,
+    commits: commitIds,
+    limit: maxResults,
+  }: GetEntriesOptions,
+  userClaims: JwtClaims | undefined
 ): Promise<Result<GetEntriesResult>> {
   const limit = maxResults || 100;
 
@@ -105,7 +111,12 @@ export default async function getEntries(
     const podDataDir = getPodDataDir(pod.id);
     const podDb = db.getPodDb(podDataDir);
 
-    const permissions = await getPermissionsForLog(iss, sub, logId, podDb);
+    const permissions = await getPermissionsForLog(
+      hostname,
+      logId,
+      podDb,
+      userClaims
+    );
 
     if (permissions.read) {
       const dbEntries = sinceId

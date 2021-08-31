@@ -2,6 +2,8 @@ import Sqlite3 from "better-sqlite3";
 
 import permissionMapper from "../../mappers/logPermission.js";
 import logMapper from "../../mappers/log.js";
+import { JwtClaims } from "../../types/types.js";
+import verifyAudClaim from "../../api/utils/verifyAudClaim.js";
 
 const noPermissions = {
   read: false,
@@ -11,10 +13,10 @@ const noPermissions = {
 };
 
 export async function getPermissionsForLog(
-  iss: string | undefined,
-  sub: string | undefined,
+  hostname: string,
   name: string,
-  podDb: Sqlite3.Database
+  podDb: Sqlite3.Database,
+  userClaims: JwtClaims | undefined
 ): Promise<{
   read: boolean;
   write: boolean;
@@ -25,7 +27,7 @@ export async function getPermissionsForLog(
   const logInfoRow = getLogStmt.get({ name });
   const logInfo = logInfoRow ? logMapper(logInfoRow) : undefined;
 
-  if (logInfo) {
+  if (userClaims && logInfo) {
     // See if the permission already exists.
     const existingPermStmt = podDb.prepare(
       `SELECT * FROM "log_permissions" WHERE "log_id"=@log_id`
@@ -37,7 +39,9 @@ export async function getPermissionsForLog(
 
     const matchingPerm = permissions.find(
       (x) =>
-        x.claims.iss === iss && (x.claims.sub === sub || x.claims.sub === "*")
+        x.claims.iss === userClaims.iss &&
+        (x.claims.sub === userClaims.sub || x.claims.sub === "*") &&
+        verifyAudClaim(userClaims.aud, hostname)
     );
 
     if (matchingPerm) {

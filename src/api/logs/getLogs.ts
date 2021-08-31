@@ -19,9 +19,8 @@ export default async function getLogsAPI(ctx: IKoaAppContext): Promise<void> {
     () =>
       ctx.state.jwt?.claims.iss && ctx.state.jwt?.claims.sub
         ? getLogs(
-            ctx.state.jwt?.claims.iss,
-            ctx.state.jwt?.claims.sub,
-            hostname
+            hostname,
+            ctx.state.jwt?.claims
           )
         : Promise.resolve({
             ok: false,

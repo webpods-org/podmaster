@@ -3,26 +3,31 @@ import { Result } from "../../types/api.js";
 import ensurePod from "../pod/ensurePod.js";
 import { EntriesRow } from "../../types/db.js";
 import { ACCESS_DENIED } from "../../errors/codes.js";
-import { getPermissionsForLog } from "./checkPermissionsForLog.js";
+import { getPermissionsForLog } from "./getPermissionsForLog.js";
 import { getPodDataDir } from "../../storage/index.js";
+import { JwtClaims } from "../../types/types.js";
 
 export type GetInfoResult = {
-  count: number;
+  id: number;
   commit: string;
 };
 
 export default async function getInfo(
-  iss: string | undefined,
-  sub: string | undefined,
   hostname: string,
-  logId: string
+  logId: string,
+  userClaims: JwtClaims | undefined
 ): Promise<Result<GetInfoResult>> {
   return ensurePod(hostname, async (pod) => {
     // Let's see if the log already exists.
     const podDataDir = getPodDataDir(pod.id);
     const podDb = db.getPodDb(podDataDir);
 
-    const permissions = await getPermissionsForLog(iss, sub, logId, podDb);
+    const permissions = await getPermissionsForLog(
+      hostname,
+      logId,
+      podDb,
+      userClaims
+    );
 
     if (permissions.read) {
       // Get the last item
@@ -37,7 +42,7 @@ export default async function getInfo(
 
       return {
         ok: true,
-        value: { count: id, commit },
+        value: { id, commit },
       };
     } else {
       return {

@@ -233,8 +233,8 @@ export default function run(configDir: string, configFilePath: string) {
 
       response.status.should.equal(200);
       const apiResult: GetInfoAPIResult = JSON.parse(response.text);
-      should.exist(apiResult.count);
-      apiResult.count.should.equal(5);
+      should.exist(apiResult.id);
+      apiResult.id.should.equal(5);
     });
 
     it("gets entries from a log", async () => {

@@ -15,6 +15,7 @@ export type JwksEndpoint = {
 export type JwtClaims = {
   iss: string;
   sub: string;
+  aud: string | string[];
   webpods?: {
     domain: string;
   };
@@ -53,6 +54,7 @@ export type Tier = {
   maxSpaceMB: number;
   maxPodsPerUser?: number;
   claims: {
+    iss: string;
     [key: string]: unknown;
   };
 };

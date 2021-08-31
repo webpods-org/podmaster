@@ -17,7 +17,7 @@ import {
 import validateClaims from "../../lib/jwt/validateClaims.js";
 import { getPodByHostname } from "../pod/getPodByHostname.js";
 import * as db from "../../db/index.js";
-import { getPermissionsForLog } from "../log/checkPermissionsForLog.js";
+import { getPermissionsForLog } from "../log/getPermissionsForLog.js";
 import {
   ACCESS_DENIED,
   INVALID_JWT,
@@ -95,10 +95,10 @@ export function handleMessage(
             const podDataDir = getPodDataDir(pod.id);
             const podDb = db.getPodDb(podDataDir);
             const permissions = await getPermissionsForLog(
-              ws.webpodsTracking.jwtClaims.iss,
-              ws.webpodsTracking.jwtClaims.sub,
+              hostname,
               log,
-              podDb
+              podDb,
+              ws.webpodsTracking.jwtClaims
             );
 
             if (permissions.subscribe) {
@@ -157,16 +157,16 @@ export function handleMessage(
         }
       } else if (data.type === "message") {
         for (const channel of data.channels) {
-          const [log, channelId] = channel.split("/");
+          const [log] = channel.split("/");
           const pod = await getPodByHostname(hostname);
           if (pod) {
             const podDataDir = getPodDataDir(pod.id);
             const podDb = db.getPodDb(podDataDir);
             const permissions = await getPermissionsForLog(
-              ws.webpodsTracking.jwtClaims.iss,
-              ws.webpodsTracking.jwtClaims.sub,
+              hostname,
               log,
-              podDb
+              podDb,
+              ws.webpodsTracking.jwtClaims
             );
             if (permissions.publish) {
               publish(

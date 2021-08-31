@@ -14,13 +14,12 @@ export default async function createLogAPI(ctx: IKoaAppContext): Promise<void> {
     () =>
       ctx.state.jwt?.claims.iss && ctx.state.jwt?.claims.sub
         ? createLog(
-            ctx.state.jwt?.claims.iss,
-            ctx.state.jwt?.claims.sub,
             hostname,
             ctx.request.body.id,
             ctx.request.body.name,
             ctx.request.body.description,
-            transformQuery(ctx.request.body.public, (x) => !!x)
+            transformQuery(ctx.request.body.public, (x) => !!x),
+            ctx.state.jwt?.claims
           )
         : Promise.resolve({
             ok: false,

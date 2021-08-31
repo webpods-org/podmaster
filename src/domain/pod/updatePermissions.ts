@@ -1,11 +1,12 @@
 import * as db from "../../db/index.js";
-import { PodPermission } from "../../types/types.js";
+import { JwtClaims, PodPermission } from "../../types/types.js";
 import { Result } from "../../types/api.js";
 import ensurePod from "./ensurePod.js";
 import { ACCESS_DENIED } from "../../errors/codes.js";
 import { PodPermissionsRow } from "../../types/db.js";
 import { generateInsertStatement } from "../../lib/sqlite.js";
 import { getPodDataDir } from "../../storage/index.js";
+import verifyAudClaim from "../../api/utils/verifyAudClaim.js";
 
 export type UpdatePermissionsResult = {
   added: number;
@@ -19,8 +20,6 @@ export type LogEntry = {
 };
 
 export default async function updatePermissions(
-  iss: string,
-  sub: string,
   hostname: string,
   {
     add,
@@ -28,14 +27,20 @@ export default async function updatePermissions(
   }: {
     add: PodPermission[];
     remove: { claims: { iss: string; sub: string } }[];
-  }
+  },
+  userClaims: JwtClaims | undefined
 ): Promise<Result<UpdatePermissionsResult>> {
   return ensurePod(hostname, async (pod) => {
     // Let's see if the log already exists.
     const podDataDir = getPodDataDir(pod.id);
     const podDb = db.getPodDb(podDataDir);
 
-    if (pod.claims.iss === iss && pod.claims.sub === sub) {
+    if (
+      userClaims &&
+      pod.claims.iss === userClaims.iss &&
+      pod.claims.sub === userClaims.sub &&
+      verifyAudClaim(userClaims.aud, hostname)
+    ) {
       if (add) {
         for (const permission of add) {
           // See if the permission already exists.

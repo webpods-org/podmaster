@@ -17,12 +17,7 @@ export default async function updatePermissionsAPI(
     ctx,
     () =>
       ctx.state.jwt?.claims.iss && ctx.state.jwt?.claims.sub
-        ? updatePermissions(
-            ctx.state.jwt?.claims.iss,
-            ctx.state.jwt?.claims.sub,
-            hostname,
-            ctx.request.body
-          )
+        ? updatePermissions(hostname, ctx.request.body, ctx.state.jwt?.claims)
         : Promise.resolve({
             ok: false,
             error: "Access Denied.",

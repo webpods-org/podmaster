@@ -13,11 +13,10 @@ export default async function getFileAPI(ctx: IKoaAppContext): Promise<void> {
     ctx,
     () =>
       getFile(
-        ctx.state.jwt?.claims.iss,
-        ctx.state.jwt?.claims.sub,
         hostname,
         ctx.params.log,
-        ctx.url
+        ctx.url,
+        ctx.state.jwt?.claims
       ),
     async (result) => {
       await send(ctx, result.value.relativeFilePath, {

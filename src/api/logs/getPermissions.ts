@@ -18,10 +18,9 @@ export default async function getPermissionsAPI(
     () =>
       ctx.state.jwt?.claims.iss && ctx.state.jwt?.claims.sub
         ? getPermissions(
-            ctx.state.jwt?.claims.iss,
-            ctx.state.jwt?.claims.sub,
             hostname,
-            ctx.params.log
+            ctx.params.log,
+            ctx.state.jwt?.claims
           )
         : Promise.resolve({
             ok: false,

@@ -17,11 +17,7 @@ export default async function getPermissionsAPI(
     ctx,
     () =>
       ctx.state.jwt?.claims.iss && ctx.state.jwt?.claims.sub
-        ? getPermissions(
-            ctx.state.jwt?.claims.iss,
-            ctx.state.jwt?.claims.sub,
-            hostname
-          )
+        ? getPermissions(hostname, ctx.state.jwt?.claims)
         : Promise.resolve({
             ok: false,
             error: "Access Denied.",

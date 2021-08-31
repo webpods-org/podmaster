@@ -1,0 +1,42 @@
+import Sqlite3 from "better-sqlite3";
+
+import { JwtClaims, PodInfo } from "../../types/types.js";
+import permissionMapper from "../../mappers/podPermission.js";
+
+const noPermissions = {
+  admin: false,
+  read: false,
+  write: false,
+};
+
+export async function getPermissionsForPod(
+  pod: PodInfo,
+  podDb: Sqlite3.Database,
+  userClaims: JwtClaims | undefined
+): Promise<{
+  admin: boolean;
+  read: boolean;
+  write: boolean;
+}> {
+  if (userClaims) {
+    // See if the permission already exists.
+    const existingPermStmt = podDb.prepare(`SELECT * FROM "pod_permissions"`);
+    const permissions = existingPermStmt.all().map(permissionMapper);
+
+    const matchingPerm = permissions.find(
+      (x) => x.claims.iss === userClaims.iss && x.claims.sub === userClaims.sub
+    );
+
+    if (matchingPerm) {
+      return {
+        ...matchingPerm.access,
+        write: matchingPerm.access.admin || matchingPerm.access.write,
+        read: matchingPerm.access.admin || matchingPerm.access.read,
+      };
+    } else {
+      return noPermissions;
+    }
+  } else {
+    return noPermissions;
+  }
+}
