@@ -3,6 +3,7 @@ import handleResult from "../handleResult.js";
 import transformQuery from "../utils/transformQuery.js";
 import { IKoaAppContext } from "../../types/koa.js";
 import { ACCESS_DENIED } from "../../errors/codes.js";
+import { ensureJwt } from "../utils/ensureJwt.js";
 
 export type CreateLogAPIResult = {};
 
@@ -12,14 +13,14 @@ export default async function createLogAPI(ctx: IKoaAppContext): Promise<void> {
   await handleResult(
     ctx,
     () =>
-      ctx.state.jwt?.claims.iss && ctx.state.jwt?.claims.sub
+      ensureJwt(ctx.state.jwt)
         ? createLog(
             hostname,
             ctx.request.body.id,
             ctx.request.body.name,
             ctx.request.body.description,
             transformQuery(ctx.request.body.public, (x) => !!x),
-            ctx.state.jwt?.claims
+            ctx.state.jwt.claims
           )
         : Promise.resolve({
             ok: false,

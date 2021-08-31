@@ -17,7 +17,7 @@ import {
 import validateClaims from "../../lib/jwt/validateClaims.js";
 import { getPodByHostname } from "../pod/getPodByHostname.js";
 import * as db from "../../db/index.js";
-import { getPermissionsForLog } from "../log/getPermissionsForLog.js";
+import { getLogPermissionsForJwt } from "../log/getLogPermissionsForJwt.js";
 import {
   ACCESS_DENIED,
   INVALID_JWT,
@@ -94,7 +94,7 @@ export function handleMessage(
           if (pod) {
             const podDataDir = getPodDataDir(pod.id);
             const podDb = db.getPodDb(podDataDir);
-            const permissions = await getPermissionsForLog(
+            const permissions = await getLogPermissionsForJwt(
               hostname,
               log,
               podDb,
@@ -162,7 +162,7 @@ export function handleMessage(
           if (pod) {
             const podDataDir = getPodDataDir(pod.id);
             const podDb = db.getPodDb(podDataDir);
-            const permissions = await getPermissionsForLog(
+            const permissions = await getLogPermissionsForJwt(
               hostname,
               log,
               podDb,

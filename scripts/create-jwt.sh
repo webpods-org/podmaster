@@ -12,7 +12,7 @@ basho \
 --import fs fs \
 --import crypto crypto \
 -d header '{ "alg": "RS256", "type": "JWT" }' \
--d payload '{ "sub": "alice", "iss": "https://'$JWT_ISSUER_HOSTNAME'/", kid: "007", "iat": Date.now() }' \
+-d payload '{ "sub": "alice", "iss": "https://'$JWT_ISSUER_HOSTNAME'/", kid: "007", "aud": "'$HOSTNAME'", "exp": Math.floor(Date.now()/1000)  + 3600, "iat": Math.floor(Date.now()/1000) }' \
 -d toBase64 'x => Buffer.from(JSON.stringify(x)).toString("base64")' \
 -d toBase64Url 'x => x.replace(/=/g, "").replace(/\+/g, "-").replace(/\//g, "_")' \
 -d base64Header 'k.toBase64Url(k.toBase64(k.header))' \
@@ -23,4 +23,21 @@ basho \
 'k.signFunc.update(`${k.base64Header}.${k.base64Payload}`),k.signFunc.end(),k.toBase64Url(k.signFunc.sign(k.privateKey, "base64"))' \
 -d jwt '`${k.base64Header}.${k.base64Payload}.${k.sig}`' \
 -j k.jwt \
-> "$CONFIG_DIR/jwt"
+> "$CONFIG_DIR/podmaster_jwt"
+
+basho \
+--import fs fs \
+--import crypto crypto \
+-d header '{ "alg": "RS256", "type": "JWT" }' \
+-d payload '{ "sub": "alice", "iss": "https://'$JWT_ISSUER_HOSTNAME'/", kid: "007", "aud": "myweblog.'$HOSTNAME'", "exp": Math.floor(Date.now()/1000)  + 3600, "iat": Math.floor(Date.now()/1000) }' \
+-d toBase64 'x => Buffer.from(JSON.stringify(x)).toString("base64")' \
+-d toBase64Url 'x => x.replace(/=/g, "").replace(/\+/g, "-").replace(/\//g, "_")' \
+-d base64Header 'k.toBase64Url(k.toBase64(k.header))' \
+-d base64Payload 'k.toBase64Url(k.toBase64(k.payload))' \
+-d privateKey 'fs.readFileSync("'"$CONFIG_DIR"'/jwtRS256.key", "utf8")' \
+-d signFunc 'crypto.createSign("RSA-SHA256")' \
+-d sig \
+'k.signFunc.update(`${k.base64Header}.${k.base64Payload}`),k.signFunc.end(),k.toBase64Url(k.signFunc.sign(k.privateKey, "base64"))' \
+-d jwt '`${k.base64Header}.${k.base64Payload}.${k.sig}`' \
+-j k.jwt \
+> "$CONFIG_DIR/pod_jwt"

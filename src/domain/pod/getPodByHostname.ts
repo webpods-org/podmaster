@@ -11,9 +11,7 @@ export async function getPodByHostname(
 
   function getPodFromConfig() {
     return appConfig.pods
-      ? appConfig.pods.find(
-          (x) => x.hostname === hostname || x.hostnameAlias === hostname
-        )
+      ? appConfig.pods.find((x) => x.hostname === hostname)
       : undefined;
   }
 

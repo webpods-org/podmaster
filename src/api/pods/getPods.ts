@@ -1,31 +1,38 @@
 import { IRouterContext } from "koa-router";
 import * as config from "../../config/index.js";
-import { NOT_FOUND } from "../../errors/codes.js";
+import { ACCESS_DENIED, NOT_FOUND } from "../../errors/codes.js";
 import { getPods } from "../../domain/pod/getPods.js";
 import handleResult from "../handleResult.js";
+import { IKoaAppContext } from "../../types/koa.js";
+import { ensureJwt } from "../utils/ensureJwt.js";
 
 export type GetPodsAPIResult = {
   pods: {
     hostname: string;
-    hostnameAlias: string | null;
     name: string;
     description: string;
   }[];
 };
 
-export default async function getPodsAPI(ctx: IRouterContext): Promise<void> {
+export default async function getPodsAPI(ctx: IKoaAppContext): Promise<void> {
   const appConfig = config.get();
   const hostname = ctx.URL.hostname;
 
   if (hostname === appConfig.hostname) {
     await handleResult(
       ctx,
-      () => getPods(ctx.state.jwt?.claims),
+      () =>
+        ensureJwt(ctx.state.jwt)
+          ? getPods(ctx.state.jwt.claims)
+          : Promise.resolve({
+              ok: false,
+              error: "Access Denied.",
+              code: ACCESS_DENIED,
+            }),
       (result) => {
         const body: GetPodsAPIResult = {
           pods: result.value.pods.map((x) => ({
             hostname: x.hostname,
-            hostnameAlias: x.hostnameAlias,
             name: x.name,
             description: x.description,
           })),

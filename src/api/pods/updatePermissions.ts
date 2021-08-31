@@ -1,7 +1,9 @@
 import updatePermissions from "../../domain/pod/updatePermissions.js";
 import handleResult from "../handleResult.js";
 import { IKoaAppContext } from "../../types/koa.js";
-import { ACCESS_DENIED } from "../../errors/codes.js";
+import { ACCESS_DENIED, NOT_FOUND } from "../../errors/codes.js";
+import { ensureJwt } from "../utils/ensureJwt.js";
+import * as config from "../../config/index.js";
 
 export type UpdatePermissionsAPIResult = {
   added: number;
@@ -16,7 +18,7 @@ export default async function updatePermissionsAPI(
   await handleResult(
     ctx,
     () =>
-      ctx.state.jwt?.claims.iss && ctx.state.jwt?.claims.sub
+      ensureJwt(ctx.state.jwt)
         ? updatePermissions(hostname, ctx.request.body, ctx.state.jwt?.claims)
         : Promise.resolve({
             ok: false,

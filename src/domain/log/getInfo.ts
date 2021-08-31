@@ -3,7 +3,7 @@ import { Result } from "../../types/api.js";
 import ensurePod from "../pod/ensurePod.js";
 import { EntriesRow } from "../../types/db.js";
 import { ACCESS_DENIED } from "../../errors/codes.js";
-import { getPermissionsForLog } from "./getPermissionsForLog.js";
+import { getLogPermissionsForJwt } from "./getLogPermissionsForJwt.js";
 import { getPodDataDir } from "../../storage/index.js";
 import { JwtClaims } from "../../types/types.js";
 
@@ -22,7 +22,7 @@ export default async function getInfo(
     const podDataDir = getPodDataDir(pod.id);
     const podDb = db.getPodDb(podDataDir);
 
-    const permissions = await getPermissionsForLog(
+    const permissions = await getLogPermissionsForJwt(
       hostname,
       logId,
       podDb,

@@ -6,7 +6,7 @@ import { ACCESS_DENIED } from "../../errors/codes.js";
 import { LogPermissionsRow } from "../../types/db.js";
 import { generateInsertStatement } from "../../lib/sqlite.js";
 import { getPodDataDir } from "../../storage/index.js";
-import verifyAudClaim from "../../api/utils/verifyAudClaim.js";
+import { getPodPermissionsForJwt } from "../pod/getPodPermissionsForJwt.js";
 
 export type UpdatePermissionsResult = {
   added: number;
@@ -29,18 +29,16 @@ export default async function updatePermissions(
     add: LogPermission[];
     remove: { claims: { iss: string; sub: string } }[];
   },
-  userClaims: JwtClaims | undefined
+  userClaims: JwtClaims
 ): Promise<Result<UpdatePermissionsResult>> {
   return ensurePod(hostname, async (pod) => {
     // Let's see if the log already exists.
     const podDataDir = getPodDataDir(pod.id);
     const podDb = db.getPodDb(podDataDir);
 
-    if (userClaims &&
-      pod.claims.iss === userClaims.iss &&
-      pod.claims.sub === userClaims.sub &&
-      verifyAudClaim(userClaims.aud, hostname)
-    ) {
+    const podPermissions = await getPodPermissionsForJwt(podDb, userClaims);
+
+    if (podPermissions.admin) {
       if (add) {
         for (const permission of add) {
           // See if the permission already exists.

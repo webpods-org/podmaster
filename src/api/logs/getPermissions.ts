@@ -3,6 +3,7 @@ import getPermissions from "../../domain/log/getPermissions.js";
 import { LogPermission } from "../../types/types.js";
 import { IKoaAppContext } from "../../types/koa.js";
 import { ACCESS_DENIED } from "../../errors/codes.js";
+import { ensureJwt } from "../utils/ensureJwt.js";
 
 export type GetPermissionsAPIResult = {
   permissions: LogPermission[];
@@ -16,12 +17,8 @@ export default async function getPermissionsAPI(
   await handleResult(
     ctx,
     () =>
-      ctx.state.jwt?.claims.iss && ctx.state.jwt?.claims.sub
-        ? getPermissions(
-            hostname,
-            ctx.params.log,
-            ctx.state.jwt?.claims
-          )
+      ensureJwt(ctx.state.jwt)
+        ? getPermissions(hostname, ctx.params.log, ctx.state.jwt.claims)
         : Promise.resolve({
             ok: false,
             error: "Access Denied.",

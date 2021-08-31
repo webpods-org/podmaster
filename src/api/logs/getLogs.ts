@@ -2,6 +2,7 @@ import getLogs from "../../domain/log/getLogs.js";
 import handleResult from "../handleResult.js";
 import { IKoaAppContext } from "../../types/koa.js";
 import { ACCESS_DENIED } from "../../errors/codes.js";
+import { ensureJwt } from "../utils/ensureJwt.js";
 
 export type GetLogsAPIResult = {
   logs: {
@@ -17,11 +18,8 @@ export default async function getLogsAPI(ctx: IKoaAppContext): Promise<void> {
   await handleResult(
     ctx,
     () =>
-      ctx.state.jwt?.claims.iss && ctx.state.jwt?.claims.sub
-        ? getLogs(
-            hostname,
-            ctx.state.jwt?.claims
-          )
+      ensureJwt(ctx.state.jwt)
+        ? getLogs(hostname, ctx.state.jwt.claims)
         : Promise.resolve({
             ok: false,
             error: "Access Denied.",

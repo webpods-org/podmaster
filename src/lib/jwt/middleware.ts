@@ -9,6 +9,7 @@ import getJwtParams, {
   JwtParamsForAsymmetricAlgorithm,
 } from "./getJwtParams.js";
 import validateClaims from "./validateClaims.js";
+import { checkAud, checkExp, checkNbf } from "./validations.js";
 
 export class AuthenticationError extends Error {
   code: string;
@@ -43,9 +44,17 @@ export default function jwtMiddleware(options: { exclude: RegExp[] }) {
 
           // We only support claims which are JSON objects.
           if (validateClaims(claims)) {
-            ctx.state.jwt = {
-              claims,
-            };
+            const hostname = ctx.URL.hostname;
+            // Additional checks for exp, nbf and aud
+            if (
+              checkExp(claims) &&
+              checkNbf(claims) &&
+              checkAud(claims, hostname)
+            ) {
+              ctx.state.jwt = {
+                claims,
+              };
+            }
           } else {
             log(
               "info",

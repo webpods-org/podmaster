@@ -2,6 +2,7 @@ import addEntries from "../../domain/log/addEntries.js";
 import { ACCESS_DENIED } from "../../errors/codes.js";
 import { IKoaAppContext } from "../../types/koa.js";
 import handleResult from "../handleResult.js";
+import { ensureJwt } from "../utils/ensureJwt.js";
 
 export type AddEntriesAPIResult = {
   entries: {
@@ -18,13 +19,13 @@ export default async function addEntriesAPI(
   await handleResult(
     ctx,
     () =>
-      ctx.state.jwt?.claims.iss && ctx.state.jwt?.claims.sub
+      ensureJwt(ctx.state.jwt)
         ? addEntries(
             hostname,
             ctx.params.log,
             ctx.request.body.entries,
             ctx.request.files,
-            ctx.state.jwt?.claims
+            ctx.state.jwt.claims
           )
         : Promise.resolve({
             ok: false,

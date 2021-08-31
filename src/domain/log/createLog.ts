@@ -8,9 +8,9 @@ import { ACCESS_DENIED, LOG_EXISTS } from "../../errors/codes.js";
 import { LogsRow } from "../../types/db.js";
 import { generateInsertStatement } from "../../lib/sqlite.js";
 import { getPodDataDir } from "../../storage/index.js";
-import getPermissions from "../pod/getPermissions.js";
 import getLogs from "./getLogs.js";
 import { JwtClaims } from "../../types/types.js";
+import { getPodPermissionsForJwt } from "../pod/getPodPermissionsForJwt.js";
 
 export type CreateLogResult = {};
 
@@ -20,77 +20,57 @@ export default async function createLog(
   logName: string,
   logDescription: string,
   publik: boolean | undefined,
-  userClaims: JwtClaims | undefined
+  userClaims: JwtClaims
 ): Promise<Result<CreateLogResult>> {
   return ensurePod(hostname, async (pod) => {
-    const podPermissionsResult = await getPermissions(hostname, userClaims);
+    const podDataDir = getPodDataDir(pod.id);
+    const logDir = join(podDataDir, logId);
+    const podDb = db.getPodDb(podDataDir);
 
-    if (podPermissionsResult.ok) {
-      if (userClaims) {
-        const canCreate = podPermissionsResult.value.permissions.some(
-          (x) =>
-            (x.claims.iss === userClaims.iss &&
-              x.claims.sub === userClaims.sub &&
-              x.access.admin) ||
-            x.access.write
-        );
+    const podPermissions = await getPodPermissionsForJwt(podDb, userClaims);
 
-        if (canCreate) {
-          const podDataDir = getPodDataDir(pod.id);
-          const logDir = join(podDataDir, logId);
-          const podDb = db.getPodDb(podDataDir);
+    if (podPermissions.write) {
+      // Let's see if the log already exists.
+      const existingLogsResult = await getLogs(hostname, userClaims);
 
-          // Let's see if the log already exists.
-          const existingLogsResult = await getLogs(hostname, userClaims);
+      if (existingLogsResult.ok) {
+        if (!existingLogsResult.value.logs.some((x) => x.id === logId)) {
+          const logsRow: LogsRow = {
+            id: logId,
+            name: logName,
+            description: logDescription || "",
+            created_at: Date.now(),
+            public: publik ? 1 : 0,
+          };
 
-          if (existingLogsResult.ok) {
-            if (!existingLogsResult.value.logs.some((x) => x.id === logId)) {
-              const logsRow: LogsRow = {
-                id: logId,
-                name: logName,
-                description: logDescription || "",
-                created_at: Date.now(),
-                public: publik ? 1 : 0,
-              };
+          const insertLogStmt = podDb.prepare(
+            generateInsertStatement("logs", logsRow)
+          );
 
-              const insertLogStmt = podDb.prepare(
-                generateInsertStatement("logs", logsRow)
-              );
+          insertLogStmt.run(logsRow);
 
-              insertLogStmt.run(logsRow);
+          await mkdirp(logDir);
 
-              await mkdirp(logDir);
-
-              return {
-                ok: true,
-                value: {},
-              };
-            } else {
-              return {
-                ok: false,
-                code: LOG_EXISTS,
-                error: `The log ${logId} already exists.`,
-              };
-            }
-          } else {
-            return existingLogsResult;
-          }
+          return {
+            ok: true,
+            value: {},
+          };
         } else {
           return {
             ok: false,
-            code: ACCESS_DENIED,
-            error: "Access denied.",
+            code: LOG_EXISTS,
+            error: `The log ${logId} already exists.`,
           };
         }
       } else {
-        return {
-          ok: false,
-          code: ACCESS_DENIED,
-          error: "Access denied.",
-        };
+        return existingLogsResult;
       }
     } else {
-      return podPermissionsResult;
+      return {
+        ok: false,
+        code: ACCESS_DENIED,
+        error: "Access denied.",
+      };
     }
   });
 }

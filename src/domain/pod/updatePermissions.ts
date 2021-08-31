@@ -6,7 +6,7 @@ import { ACCESS_DENIED } from "../../errors/codes.js";
 import { PodPermissionsRow } from "../../types/db.js";
 import { generateInsertStatement } from "../../lib/sqlite.js";
 import { getPodDataDir } from "../../storage/index.js";
-import verifyAudClaim from "../../api/utils/verifyAudClaim.js";
+import { getPodPermissionsForJwt } from "./getPodPermissionsForJwt.js";
 
 export type UpdatePermissionsResult = {
   added: number;
@@ -28,19 +28,30 @@ export default async function updatePermissions(
     add: PodPermission[];
     remove: { claims: { iss: string; sub: string } }[];
   },
-  userClaims: JwtClaims | undefined
+  userClaims: JwtClaims
 ): Promise<Result<UpdatePermissionsResult>> {
   return ensurePod(hostname, async (pod) => {
     // Let's see if the log already exists.
     const podDataDir = getPodDataDir(pod.id);
     const podDb = db.getPodDb(podDataDir);
 
-    if (
-      userClaims &&
-      pod.claims.iss === userClaims.iss &&
-      pod.claims.sub === userClaims.sub &&
-      verifyAudClaim(userClaims.aud, hostname)
-    ) {
+    const permissionsResult = await getPodPermissionsForJwt(podDb, userClaims);
+
+    if (permissionsResult.write) {
+      if (remove) {
+        for (const item of remove) {
+          // See if the permission already exists.
+          const deletePermStmt = podDb.prepare(
+            `DELETE FROM "pod_permissions" WHERE "iss"=@iss AND "sub"=@sub`
+          );
+
+          deletePermStmt.get({
+            iss: item.claims.iss,
+            sub: item.claims.sub,
+          });
+        }
+      }
+
       if (add) {
         for (const permission of add) {
           // See if the permission already exists.
@@ -70,20 +81,6 @@ export default async function updatePermissions(
 
             insertPermStmt.run(permissionsRow);
           }
-        }
-      }
-
-      if (remove) {
-        for (const item of remove) {
-          // See if the permission already exists.
-          const deletePermStmt = podDb.prepare(
-            `DELETE FROM "pod_permissions" WHERE "iss"=@iss AND "sub"=@sub`
-          );
-
-          deletePermStmt.get({
-            iss: item.claims.iss,
-            sub: item.claims.sub,
-          });
         }
       }
 

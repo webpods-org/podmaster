@@ -5,7 +5,7 @@ import mapper from "../../mappers/podPermission.js";
 import ensurePod from "./ensurePod.js";
 import { ACCESS_DENIED } from "../../errors/codes.js";
 import { getPodDataDir } from "../../storage/index.js";
-import verifyAudClaim from "../../api/utils/verifyAudClaim.js";
+import { getPodPermissionsForJwt } from "./getPodPermissionsForJwt.js";
 
 export type GetPermissionsResult = {
   permissions: PodPermission[];
@@ -13,29 +13,18 @@ export type GetPermissionsResult = {
 
 export default async function getPermissions(
   hostname: string,
-  userClaims: JwtClaims | undefined
+  userClaims: JwtClaims
 ): Promise<Result<GetPermissionsResult>> {
   return ensurePod(hostname, async (pod) => {
     const podDataDir = getPodDataDir(pod.id);
     const podDb = db.getPodDb(podDataDir);
 
-    if (
-      userClaims &&
-      pod.claims.iss === userClaims.iss &&
-      pod.claims.sub === userClaims.sub &&
-      verifyAudClaim(userClaims.aud, hostname)
-    ) {
-      // See if the permission already exists.
-      const existingPermStmt = podDb.prepare(
-        `SELECT * FROM "pod_permissions" WHERE "iss"=@iss AND "sub"="@sub`
-      );
+    const podPermissions = await getPodPermissionsForJwt(podDb, userClaims);
 
-      const permissions = existingPermStmt
-        .all({
-          iss: userClaims.iss,
-          sub: userClaims.sub,
-        })
-        .map(mapper);
+    if (podPermissions.read) {
+      // See if the permission already exists.
+      const existingPermStmt = podDb.prepare(`SELECT * FROM "pod_permissions"`);
+      const permissions = existingPermStmt.all().map(mapper);
 
       return {
         ok: true,

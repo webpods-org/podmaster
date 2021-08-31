@@ -1,3 +1,3 @@
-import { IRouterContext } from "koa-router";
+import { IKoaAppContext } from "../../types/koa.js";
 
-export default async function getProfile(ctx: IRouterContext) {}
+export default async function getProfile(ctx: IKoaAppContext) {}

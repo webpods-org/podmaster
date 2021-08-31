@@ -1,29 +1,38 @@
 import { IRouterContext } from "koa-router";
 import createPod from "../../domain/pod/createPod.js";
 import * as config from "../../config/index.js";
-import { NOT_FOUND, POD_EXISTS } from "../../errors/codes.js";
+import { ACCESS_DENIED, NOT_FOUND, POD_EXISTS } from "../../errors/codes.js";
 import handleResult from "../handleResult.js";
+import { ensureJwt as ensureJwt } from "../utils/ensureJwt.js";
+import { IKoaAppContext } from "../../types/koa.js";
 
 export type CreatePodAPIResult = {
   hostname: string;
 };
 
-export default async function createPodAPI(ctx: IRouterContext): Promise<void> {
+export default async function createPodAPI(ctx: IKoaAppContext): Promise<void> {
   const appConfig = config.get();
   const hostname = ctx.URL.hostname;
   if (hostname === appConfig.hostname) {
     await handleResult(
       ctx,
       () =>
-        createPod(
-          ctx.request.body.id,
-          ctx.request.body.name,
-          ctx.request.body.description || "",
-          ctx.state.jwt?.claims
-        ),
+        ensureJwt(ctx.state.jwt)
+          ? createPod(
+              ctx.request.body.id,
+              ctx.request.body.name,
+              ctx.request.body.description || "",
+              ctx.request.body.admin,
+              ctx.state.jwt.claims
+            )
+          : Promise.resolve({
+              ok: false,
+              error: "Access Denied.",
+              code: ACCESS_DENIED,
+            }),
       (result) => {
         const body: CreatePodAPIResult = {
-          hostname: result.value.hostname
+          hostname: result.value.hostname,
         };
         ctx.body = body;
       },

@@ -5,7 +5,6 @@ import { Result } from "../../types/api.js";
 import { getPodDataDir } from "../../storage/index.js";
 import { JwtClaims } from "../../types/types.js";
 import { ACCESS_DENIED } from "../../errors/codes.js";
-import verifyAudClaim from "../../api/utils/verifyAudClaim.js";
 
 export type GetPodsResult = {
   pods: {
@@ -13,12 +12,11 @@ export type GetPodsResult = {
     name: string;
     description: string;
     dataDir: string;
-    hostnameAlias: string | null;
   }[];
 };
 
 export async function getPods(
-  userClaims: JwtClaims | undefined
+  userClaims: JwtClaims
 ): Promise<Result<GetPodsResult>> {
   const appConfig = config.get();
   const systemDb = db.getSystemDb();
@@ -42,18 +40,11 @@ export async function getPods(
       .map(mapper);
   }
 
-  if (userClaims &&
-    appConfig.tiers.some(
-      (x) =>
-        x.claims.iss === userClaims.iss &&
-        verifyAudClaim(userClaims.aud, appConfig.hostname)
-    )
-  ) {
+  if (appConfig.tiers.some((x) => x.claims.iss === userClaims.iss)) {
     const pods = getPodsFromConfig(userClaims)
       .concat(getPodsFromDb(userClaims))
       .map((x) => ({
         hostname: x.hostname,
-        hostnameAlias: x.hostnameAlias,
         name: x.name,
         description: x.description,
         dataDir: getPodDataDir(x.id),

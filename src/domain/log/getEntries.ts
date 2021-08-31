@@ -5,7 +5,7 @@ import { EntriesRow } from "../../types/db.js";
 import mapper from "../../mappers/entry.js";
 import { JwtClaims, LogEntry } from "../../types/types.js";
 import { ACCESS_DENIED } from "../../errors/codes.js";
-import { getPermissionsForLog } from "./getPermissionsForLog.js";
+import { getLogPermissionsForJwt } from "./getLogPermissionsForJwt.js";
 import { getPodDataDir } from "../../storage/index.js";
 
 export type GetEntriesResult = {
@@ -111,7 +111,7 @@ export default async function getEntries(
     const podDataDir = getPodDataDir(pod.id);
     const podDb = db.getPodDb(podDataDir);
 
-    const permissions = await getPermissionsForLog(
+    const permissions = await getLogPermissionsForJwt(
       hostname,
       logId,
       podDb,
