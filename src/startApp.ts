@@ -13,6 +13,7 @@ import * as config from "./config/index.js";
 import { AppConfig } from "./types/types.js";
 import { createHttpServer } from "./lib/servers/http.js";
 import { attachWebSocketServer } from "./lib/servers/webSocket.js";
+import * as wellKnownEndpoints from "./api/well-known/index.js";
 
 const MEGABYTE = 1024 * 1024;
 
@@ -41,6 +42,9 @@ export default async function startApp(configFile: string) {
   router.get("/logs/:log/permissions", logsApi.getPermissionsAPI);
   router.post("/logs/:log/permissions/updates", logsApi.updatePermissions);
   router.get("/logs/:log/files/(.*)", logsApi.getFile);
+
+  //.well-known
+  router.get("/.well-known/jwks.json", wellKnownEndpoints.getJwks);
 
   // Set up a custom hostname
   // router.put("/settings/hostname", podsApi.createPodAPI);

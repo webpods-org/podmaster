@@ -44,94 +44,107 @@ export default async function createPod(
 
     const podHostname = `${podId}.${appConfig.hostname}`;
 
-    const matchingTier = appConfig.tiers.find((tier) =>
-      matchObject(tier.claims, userClaims)
+    // First check if we have a valid issuer and audience.
+    // Audience defaults to hostname of podmaster, but can be overridden.
+    const isValidIssuer = appConfig.jwtIssuers.some((issuer) =>
+      matchObject({ aud: appConfig.hostname, ...issuer.claims }, userClaims)
     );
 
-    if (matchingTier) {
+    if (isValidIssuer) {
+      const matchingTier = appConfig.tiers.find((tier) =>
+        matchObject(tier.claims, userClaims)
+      );
+
       /*
-        Claims verified, create the Pod.
+        Verify the claims and create the pod.
         The rules are:
           1. If webpods.hostname and webpods.pod exists in the jwt,
           create ${webpods.pod}.${webpods.hostname}.
           2. Check maxPodsPerUser
-        If not:
-          Create a randomly named pod.
       */
-      const existingPodsResult = await getPods(userClaims);
+      if (matchingTier) {
+        const existingPodsResult = await getPods(userClaims);
 
-      if (existingPodsResult.ok) {
-        if (
-          !matchingTier.maxPodsPerUser ||
-          (existingPodsResult.ok &&
-            matchingTier.maxPodsPerUser > existingPodsResult.value.pods.length)
-        ) {
-          // Check if the pod name is available.
+        if (existingPodsResult.ok) {
+          if (
+            !matchingTier.maxPodsPerUser ||
+            (existingPodsResult.ok &&
+              matchingTier.maxPodsPerUser >
+                existingPodsResult.value.pods.length)
+          ) {
+            // Check if the pod name is available.
 
-          const existingPod = await getPodByHostname(podHostname);
-          if (!existingPod) {
-            // Gotta make a directory.
-            const podDataDir = getPodDataDir(podId);
+            const existingPod = await getPodByHostname(podHostname);
+            if (!existingPod) {
+              // Gotta make a directory.
+              const podDataDir = getPodDataDir(podId);
 
-            const podsRow: PodsRow = {
-              iss: userClaims.iss,
-              sub: userClaims.sub,
-              id: podId,
-              name: podTitle,
-              hostname: podHostname,
-              hostname_alias: null,
-              created_at: Date.now(),
-              tier: "free",
-              description,
-            };
+              const podsRow: PodsRow = {
+                iss: userClaims.iss,
+                sub: userClaims.sub,
+                id: podId,
+                name: podTitle,
+                hostname: podHostname,
+                hostname_alias: null,
+                created_at: Date.now(),
+                tier: "free",
+                description,
+              };
 
-            const insertPodStmt = systemDb.prepare(
-              generateInsertStatement("pods", podsRow)
-            );
+              const insertPodStmt = systemDb.prepare(
+                generateInsertStatement("pods", podsRow)
+              );
 
-            insertPodStmt.run(podsRow);
+              insertPodStmt.run(podsRow);
 
-            await mkdirp(podDataDir);
+              await mkdirp(podDataDir);
 
-            // Create the Pod DB
-            const podDb = db.getPodDb(podDataDir);
-            await db.initPodDb(podDb);
+              // Create the Pod DB
+              const podDb = db.getPodDb(podDataDir);
+              await db.initPodDb(podDb);
 
-            // Insert admin permissions.
-            const podPermissionsRow = {
-              iss: admin.claims.iss,
-              sub: admin.claims.sub,
-              admin: 1,
-              read: 1,
-              write: 1,
-              created_at: Date.now(),
-            };
-            const insertPodPermissionStmt = podDb.prepare(
-              generateInsertStatement("pod_permissions", podPermissionsRow)
-            );
+              // Insert admin permissions.
+              const podPermissionsRow = {
+                iss: admin.claims.iss,
+                sub: admin.claims.sub,
+                admin: 1,
+                read: 1,
+                write: 1,
+                created_at: Date.now(),
+              };
+              const insertPodPermissionStmt = podDb.prepare(
+                generateInsertStatement("pod_permissions", podPermissionsRow)
+              );
 
-            insertPodPermissionStmt.run(podPermissionsRow);
+              insertPodPermissionStmt.run(podPermissionsRow);
 
-            return {
-              ok: true,
-              value: { hostname: podHostname },
-            };
+              return {
+                ok: true,
+                value: { hostname: podHostname },
+              };
+            } else {
+              return {
+                ok: false,
+                code: POD_EXISTS,
+                error: `A pod named ${podHostname} already exists.`,
+              };
+            }
           } else {
             return {
               ok: false,
-              code: POD_EXISTS,
-              error: `A pod named ${podHostname} already exists.`,
+              code: QUOTA_EXCEEDED,
+              error: "Quota exceeded.",
             };
           }
         } else {
-          return {
-            ok: false,
-            code: QUOTA_EXCEEDED,
-            error: "Quota exceeded.",
-          };
+          return existingPodsResult;
         }
       } else {
-        return existingPodsResult;
+        return {
+          ok: false,
+          code: ACCESS_DENIED,
+          error: "Access denied.",
+        };
       }
     } else {
       return {

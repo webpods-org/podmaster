@@ -19,6 +19,7 @@ import { GetInfoAPIResult } from "../../api/logs/getInfo.js";
 import promiseSignal from "../../lib/promiseSignal.js";
 import { ErrResult } from "../../types/api.js";
 import { UpdatePermissionsAPIResult as UpdatePodPermissionsAPIResult } from "../../api/pods/updatePermissions.js";
+import { GetJwksAPIResult } from "../../api/well-known/getJwks.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -122,7 +123,7 @@ export default function run(configDir: string, configFilePath: string) {
           add: [
             {
               claims: {
-                iss: appConfig.tiers[0].claims.iss,
+                iss: appConfig.jwtIssuers[0].claims.iss,
                 sub: "alice",
               },
               access: {
@@ -162,7 +163,7 @@ export default function run(configDir: string, configFilePath: string) {
           add: [
             {
               claims: {
-                iss: appConfig.tiers[0].claims.iss,
+                iss: appConfig.jwtIssuers[0].claims.iss,
                 sub: "alice",
               },
               access: {
@@ -356,6 +357,16 @@ export default function run(configDir: string, configFilePath: string) {
       response.status.should.equal(200);
       const apiResult: GetPermissionsAPIResult = JSON.parse(response.text);
       apiResult.permissions.length.should.be.greaterThan(0);
+    });
+
+    it("gets jwks from well-known endpoint", async () => {
+      const response = await request(app)
+        .get(`/.well-known/jwks.json`)
+        .set("Host", hostnameAndPort);
+
+      response.status.should.equal(200);
+      const apiResult: GetJwksAPIResult = JSON.parse(response.text);
+      apiResult.keys.length.should.be.greaterThan(0);
     });
 
     it("adds a web socket subscription", async () => {

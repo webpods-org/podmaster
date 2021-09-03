@@ -63,7 +63,7 @@ const config = {
       These do not require a JWKS lookup.
       Only RS256 is supported now.
     */
-    jwtKeys: [
+    localJwtKeys: [
         {
             alg: "RS256",
             iss: "https://issuer.example.com/",
@@ -72,30 +72,31 @@ const config = {
         },
     ],
     /*
-      Which JWTs can create a pod on this pod-server?
-      Any JWT which matches one of these is allowed to.
-      So include the 'iss' field at a minimum.
-  
+      JWTs from these issuers are allowed to create pods on this server
+    */
+    jwtIssuers: [
+        {
+            name: "SuperSecureTM",
+            claims: {
+                iss: "https://issuer.example.com/",
+            },
+        },
+    ],
+    /*
       The first match (based on claims) is selected.
       So if you want multiple tiers, include a claim like 'plan'.
-      See commented example below.
     */
     tiers: [
-        // {
-        //   type: "pro",
-        //   maxSpaceMB: 1024,
-        //   claims: {
-        //     iss: "https://auth.example.com/",
-        //     plan: "pro",
-        //   },
-        // },
+        {
+            type: "pro",
+            maxSpaceMB: 1024,
+            claims: { plan: "pro" },
+        },
         {
             type: "free",
             maxSpaceMB: 64,
             maxPodsPerUser: 100,
-            claims: {
-                iss: "https://auth.example.com/",
-            },
+            claims: {},
         },
     ],
     storage: {

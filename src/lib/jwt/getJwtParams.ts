@@ -110,8 +110,8 @@ export default async function getJwtParams(
       }
 
       // First check if the key is statically defined in appConfig
-      if (appConfig.jwtKeys) {
-        const signingKey = appConfig.jwtKeys.find(
+      if (appConfig.localJwtKeys) {
+        const signingKey = appConfig.localJwtKeys.find(
           (x) => x.iss === iss && x.kid === kid && x.alg === alg
         );
 

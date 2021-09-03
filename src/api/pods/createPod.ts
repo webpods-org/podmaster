@@ -1,4 +1,3 @@
-import { IRouterContext } from "koa-router";
 import createPod from "../../domain/pod/createPod.js";
 import * as config from "../../config/index.js";
 import { ACCESS_DENIED, NOT_FOUND, POD_EXISTS } from "../../errors/codes.js";

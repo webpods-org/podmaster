@@ -40,7 +40,7 @@ export async function getPods(
       .map(mapper);
   }
 
-  if (appConfig.tiers.some((x) => x.claims.iss === userClaims.iss)) {
+  if (appConfig.jwtIssuers.some((x) => x.claims.iss === userClaims.iss)) {
     const pods = getPodsFromConfig(userClaims)
       .concat(getPodsFromDb(userClaims))
       .map((x) => ({

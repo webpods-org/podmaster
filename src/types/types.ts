@@ -64,7 +64,6 @@ export type Tier = {
   maxSpaceMB: number;
   maxPodsPerUser?: number;
   claims: {
-    iss: string;
     [key: string]: unknown;
   };
 };
@@ -112,6 +111,14 @@ export type QueryConfig = {
   maxResults?: number;
 };
 
+export type JwtIssuers = {
+  name: string;
+  claims: {
+    iss: string;
+    [key: string]: unknown;
+  };
+};
+
 export type AppConfig = {
   hostname: string;
   externalAuthServers: ExternalAuthServers;
@@ -120,7 +127,8 @@ export type AppConfig = {
     keys: JWK[];
   };
   jwksCacheSize?: number;
-  jwtKeys?: LocallyDefinedAsymmetricJwtKey[];
+  localJwtKeys?: LocallyDefinedAsymmetricJwtKey[];
+  jwtIssuers: JwtIssuers[];
   tiers: Tier[];
   storage: StorageConfig;
   pods?: PodInfo[];

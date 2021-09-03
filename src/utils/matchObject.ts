@@ -1,4 +1,4 @@
-export default function matchObject(subset: any, superset: any) : boolean {
+export default function matchObject(subset: any, superset: any): boolean {
   if (typeof subset !== typeof superset) {
     return false;
   }

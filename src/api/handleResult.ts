@@ -1,10 +1,10 @@
-import { IRouterContext } from "koa-router";
 import { ACCESS_DENIED, UNKNOWN_ERROR } from "../errors/codes.js";
 import { logException } from "../lib/logger/log.js";
 import { ErrResult, OkResult, Result } from "../types/api.js";
+import { IKoaAppContext } from "../types/koa.js";
 
 export default async function handleResult<T>(
-  ctx: IRouterContext,
+  ctx: IKoaAppContext,
   fn: () => Promise<Result<T>>,
   then: (x: OkResult<T>) => void,
   errorHandler?: (x: ErrResult) => { handled: boolean }
@@ -30,7 +30,7 @@ export default async function handleResult<T>(
   }
 }
 
-function genericErrorHandler(ctx: IRouterContext, result: ErrResult): void {
+function genericErrorHandler(ctx: IKoaAppContext, result: ErrResult): void {
   if (result.code === ACCESS_DENIED) {
     ctx.status = 401;
     ctx.body = {

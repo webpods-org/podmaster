@@ -24,7 +24,7 @@ export class AuthenticationError extends Error {
 export default function jwtMiddleware(options: { exclude: RegExp[] }) {
   return async (ctx: IKoaAppContext, next: Next): Promise<void> => {
     if (options.exclude.some((regex) => regex.test(ctx.path))) {
-      next();
+      await next();
     } else {
       if (!(ctx as any).state) {
         ctx.state = { jwt: undefined };
@@ -34,7 +34,7 @@ export default function jwtMiddleware(options: { exclude: RegExp[] }) {
         const jwtParams = await getJwtParametersFromContext(ctx);
 
         if (jwtParams.ok) {
-          const claims = jsonwebtoken.verify(
+          const claims = await jsonwebtoken.verify(
             jwtParams.value.token,
             jwtParams.value.publicKey,
             {
@@ -65,7 +65,7 @@ export default function jwtMiddleware(options: { exclude: RegExp[] }) {
           log("info", JSON.stringify(jwtParams));
         }
 
-        return next();
+        return await next();
       } catch (ex) {
         logException(ex);
       }
