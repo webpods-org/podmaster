@@ -1,6 +1,6 @@
-import handleResult from "../handleResult.js";
-import getInfo from "../../domain/log/getInfo.js";
-import { IKoaAppContext } from "../../types/koa.js";
+import handleResult from "../../handleResult.js";
+import getInfo from "../../../domain/log/getInfo.js";
+import { IKoaAppContext } from "../../../types/koa.js";
 
 export type GetInfoAPIResult = {
   id: number;

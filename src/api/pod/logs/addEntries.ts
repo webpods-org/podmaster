@@ -1,8 +1,8 @@
-import addEntries from "../../domain/log/addEntries.js";
-import { ACCESS_DENIED } from "../../errors/codes.js";
-import { IKoaAppContext } from "../../types/koa.js";
-import handleResult from "../handleResult.js";
-import { ensureJwt } from "../utils/ensureJwt.js";
+import addEntries from "../../../domain/log/addEntries.js";
+import { ACCESS_DENIED } from "../../../errors/codes.js";
+import { IKoaAppContext } from "../../../types/koa.js";
+import handleResult from "../../handleResult.js";
+import { ensureJwt } from "../../utils/ensureJwt.js";
 
 export type AddEntriesAPIResult = {
   entries: {

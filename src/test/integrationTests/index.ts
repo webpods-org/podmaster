@@ -7,19 +7,19 @@ import { dirname } from "path";
 import { fileURLToPath } from "url";
 
 import startApp from "../../startApp.js";
-import { GetPodsAPIResult } from "../../api/pods/getPods.js";
-import { CreatePodAPIResult } from "../../api/pods/createPod.js";
-import { GetLogsAPIResult } from "../../api/logs/getLogs.js";
-import { UpdatePermissionsAPIResult as UpdateLogPermissionsAPIResult } from "../../api/logs/updatePermissions.js";
-import { AddEntriesAPIResult } from "../../api/logs/addEntries.js";
-import { GetPermissionsAPIResult } from "../../api/logs/getPermissions.js";
-import { GetEntriesAPIResult } from "../../api/logs/getEntries.js";
+import { GetPodsAPIResult } from "../../api/podmaster/pods/getPods.js";
+import { CreatePodAPIResult } from "../../api/podmaster/pods/createPod.js";
+import { GetLogsAPIResult } from "../../api/pod/logs/getLogs.js";
+import { UpdatePermissionsAPIResult as UpdateLogPermissionsAPIResult } from "../../api/pod/logs/updatePermissions.js";
+import { AddEntriesAPIResult } from "../../api/pod/logs/addEntries.js";
+import { GetPermissionsAPIResult } from "../../api/pod/logs/getPermissions.js";
+import { GetEntriesAPIResult } from "../../api/pod/logs/getEntries.js";
 import { AppConfig, LogEntry } from "../../types/types.js";
-import { GetInfoAPIResult } from "../../api/logs/getInfo.js";
+import { GetInfoAPIResult } from "../../api/pod/logs/getInfo.js";
 import promiseSignal from "../../lib/promiseSignal.js";
 import { ErrResult } from "../../types/api.js";
-import { UpdatePermissionsAPIResult as UpdatePodPermissionsAPIResult } from "../../api/pods/updatePermissions.js";
-import { GetJwksAPIResult } from "../../api/well-known/getJwks.js";
+import { UpdatePermissionsAPIResult as UpdatePodPermissionsAPIResult } from "../../api/podmaster/pods/updatePermissions.js";
+import { GetJwksAPIResult } from "../../api/podmaster/well-known/getJwks.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -362,7 +362,7 @@ export default function run(configDir: string, configFilePath: string) {
     it("gets jwks from well-known endpoint", async () => {
       const response = await request(app)
         .get(`/.well-known/jwks.json`)
-        .set("Host", hostnameAndPort);
+        .set("Host", mainHostname);
 
       response.status.should.equal(200);
       const apiResult: GetJwksAPIResult = JSON.parse(response.text);

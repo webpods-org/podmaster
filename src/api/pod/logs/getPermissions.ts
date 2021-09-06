@@ -1,9 +1,9 @@
-import handleResult from "../handleResult.js";
-import getPermissions from "../../domain/log/getPermissions.js";
-import { LogPermission } from "../../types/types.js";
-import { IKoaAppContext } from "../../types/koa.js";
-import { ACCESS_DENIED } from "../../errors/codes.js";
-import { ensureJwt } from "../utils/ensureJwt.js";
+import handleResult from "../../handleResult.js";
+import getPermissions from "../../../domain/log/getPermissions.js";
+import { LogPermission } from "../../../types/types.js";
+import { IKoaAppContext } from "../../../types/koa.js";
+import { ACCESS_DENIED } from "../../../errors/codes.js";
+import { ensureJwt } from "../../utils/ensureJwt.js";
 
 export type GetPermissionsAPIResult = {
   permissions: LogPermission[];

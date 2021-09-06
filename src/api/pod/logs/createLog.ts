@@ -1,9 +1,9 @@
-import createLog from "../../domain/log/createLog.js";
-import handleResult from "../handleResult.js";
-import transformQuery from "../utils/transformQuery.js";
-import { IKoaAppContext } from "../../types/koa.js";
-import { ACCESS_DENIED } from "../../errors/codes.js";
-import { ensureJwt } from "../utils/ensureJwt.js";
+import createLog from "../../../domain/log/createLog.js";
+import handleResult from "../../handleResult.js";
+import transformQuery from "../../utils/transformQuery.js";
+import { IKoaAppContext } from "../../../types/koa.js";
+import { ACCESS_DENIED } from "../../../errors/codes.js";
+import { ensureJwt } from "../../utils/ensureJwt.js";
 
 export type CreateLogAPIResult = {};
 
