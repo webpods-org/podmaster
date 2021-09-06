@@ -18,7 +18,7 @@ import { AppConfig, LogEntry } from "../../types/types.js";
 import { GetInfoAPIResult } from "../../api/pod/logs/getInfo.js";
 import promiseSignal from "../../lib/promiseSignal.js";
 import { ErrResult } from "../../types/api.js";
-import { UpdatePermissionsAPIResult as UpdatePodPermissionsAPIResult } from "../../api/podmaster/pods/updatePermissions.js";
+import { UpdatePermissionsAPIResult as UpdatePodPermissionsAPIResult } from "../../api/pod/permissions/updatePermissions.js";
 import { GetJwksAPIResult } from "../../api/podmaster/well-known/getJwks.js";
 
 const __filename = fileURLToPath(import.meta.url);
