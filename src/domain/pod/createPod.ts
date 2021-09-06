@@ -24,7 +24,7 @@ export default async function createPod(
   podTitle: string,
   description: string,
   admin: {
-    claims: {
+    identity: {
       iss: string;
       sub: string;
     };
@@ -105,8 +105,8 @@ export default async function createPod(
 
               // Insert admin permissions.
               const podPermissionsRow = {
-                iss: admin.claims.iss,
-                sub: admin.claims.sub,
+                iss: admin.identity.iss,
+                sub: admin.identity.sub,
                 admin: 1,
                 read: 1,
                 write: 1,

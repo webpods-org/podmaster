@@ -29,5 +29,5 @@ node_modules
 #Nothing in dist
 dist/*
 
-.vscode/
-
+.vscode/mocha.env
+.vscode/settings.json

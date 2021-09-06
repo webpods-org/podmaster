@@ -22,7 +22,7 @@ export async function getPodPermissionsForJwt(
   const permissions = existingPermStmt.all().map(permissionMapper);
 
   const matchingPerm = permissions.find(
-    (x) => x.claims.iss === userClaims.iss && x.claims.sub === userClaims.sub
+    (x) => x.identity.iss === userClaims.iss && x.identity.sub === userClaims.sub
   );
 
   if (matchingPerm) {

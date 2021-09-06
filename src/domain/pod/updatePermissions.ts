@@ -26,7 +26,7 @@ export default async function updatePermissions(
     remove,
   }: {
     add: PodPermission[];
-    remove: { claims: { iss: string; sub: string } }[];
+    remove: { identity: { iss: string; sub: string } }[];
   },
   userClaims: JwtClaims
 ): Promise<Result<UpdatePermissionsResult>> {
@@ -46,8 +46,8 @@ export default async function updatePermissions(
           );
 
           deletePermStmt.get({
-            iss: item.claims.iss,
-            sub: item.claims.sub,
+            iss: item.identity.iss,
+            sub: item.identity.sub,
           });
         }
       }
@@ -60,15 +60,15 @@ export default async function updatePermissions(
           );
 
           const existingItem = existingPermStmt.get({
-            iss: permission.claims.iss,
-            sub: permission.claims.sub,
+            iss: permission.identity.iss,
+            sub: permission.identity.sub,
           });
 
           // Don't insert if it already exists.
           if (!existingItem) {
             const permissionsRow: PodPermissionsRow = {
-              iss: permission.claims.iss,
-              sub: permission.claims.sub,
+              iss: permission.identity.iss,
+              sub: permission.identity.sub,
               admin: permission.access.admin ? 1 : 0,
               read: permission.access.read ? 1 : 0,
               write: permission.access.write ? 1 : 0,

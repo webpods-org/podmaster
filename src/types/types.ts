@@ -76,7 +76,7 @@ export type LocallyDefinedAsymmetricJwtKey = {
 };
 
 export type PodInfo = {
-  claims: {
+  identity: {
     iss: string;
     sub: string;
   };
@@ -140,7 +140,7 @@ export type AppConfig = {
 };
 
 export type PodPermission = {
-  claims: {
+  identity: {
     iss: string;
     sub: string;
   };
@@ -152,7 +152,7 @@ export type PodPermission = {
 };
 
 export type LogPermission = {
-  claims: {
+  identity: {
     iss: string;
     sub: string;
   };

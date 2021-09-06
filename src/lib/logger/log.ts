@@ -51,5 +51,5 @@ export function log(level: LogLevel, message: string): void {
 }
 
 export function logException(ex: any): void {
-  logger.log("error", ex.toString() + ex.message ? "::" + ex.message : "");
+  logger.log("error", ex.message ? ex.message : ex.toString());
 }

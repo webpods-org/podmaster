@@ -70,7 +70,7 @@ export default function run(configDir: string, configFilePath: string) {
           name: podName,
           description: podDescription,
           admin: {
-            claims: {
+            identity: {
               iss: "https://auth.local.disks.app/",
               sub: "alice",
             },
@@ -122,7 +122,7 @@ export default function run(configDir: string, configFilePath: string) {
         .send({
           add: [
             {
-              claims: {
+              identity: {
                 iss: appConfig.jwtIssuers[0].claims.iss,
                 sub: "alice",
               },
@@ -162,7 +162,7 @@ export default function run(configDir: string, configFilePath: string) {
         .send({
           add: [
             {
-              claims: {
+              identity: {
                 iss: appConfig.jwtIssuers[0].claims.iss,
                 sub: "alice",
               },

@@ -25,7 +25,7 @@ export async function getPods(
     return appConfig.pods
       ? appConfig.pods.filter(
           (x) =>
-            x.claims.iss === userClaims.iss && x.claims.sub === userClaims.sub
+            x.identity.iss === userClaims.iss && x.identity.sub === userClaims.sub
         )
       : [];
   }

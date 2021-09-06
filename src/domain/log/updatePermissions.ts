@@ -27,7 +27,7 @@ export default async function updatePermissions(
     remove,
   }: {
     add: LogPermission[];
-    remove: { claims: { iss: string; sub: string } }[];
+    remove: { identity: { iss: string; sub: string } }[];
   },
   userClaims: JwtClaims
 ): Promise<Result<UpdatePermissionsResult>> {
@@ -48,16 +48,16 @@ export default async function updatePermissions(
 
           const existingItem = existingPermStmt.get({
             log_id: logId,
-            iss: permission.claims.iss,
-            sub: permission.claims.sub,
+            iss: permission.identity.iss,
+            sub: permission.identity.sub,
           });
 
           // Don't insert if it already exists.
           if (!existingItem) {
             const permissionsRow: LogPermissionsRow = {
               log_id: logId,
-              iss: permission.claims.iss,
-              sub: permission.claims.sub,
+              iss: permission.identity.iss,
+              sub: permission.identity.sub,
               read: permission.access.read ? 1 : 0,
               write: permission.access.write ? 1 : 0,
               publish: permission.access.publish ? 1 : 0,
@@ -83,8 +83,8 @@ export default async function updatePermissions(
 
           deletePermStmt.get({
             log_id: logId,
-            iss: item.claims.iss,
-            sub: item.claims.sub,
+            iss: item.identity.iss,
+            sub: item.identity.sub,
           });
         }
       }

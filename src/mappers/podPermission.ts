@@ -3,7 +3,7 @@ import { PodPermissionsRow } from "../types/db.js";
 
 export default function map(row: PodPermissionsRow): PodPermission {
   return {
-    claims: {
+    identity: {
       iss: row.iss,
       sub: row.sub,
     },
