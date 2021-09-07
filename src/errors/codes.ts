@@ -14,3 +14,4 @@ export const QUOTA_EXCEEDED = "QUOTA_EXCEEDED";
 export const POD_EXISTS = "POD_EXISTS";
 export const LOG_EXISTS = "LOG_EXISTS";
 export const MISSING_FIELD = "MISSING_FIELD";
+export const MISSING_PARAMETERS = "MISSING_PARAMETERS";

@@ -15,6 +15,7 @@ export default function setup() {
   const podsRouter = new Router();
   podsRouter.get("/permissions", permissionsApi.getPermissionsAPI);
   podsRouter.post("/permissions", permissionsApi.addPermissionsAPI);
+  podsRouter.del("/permissions", permissionsApi.deletePermissionsAPI);
 
   // logs
   podsRouter.get("/logs", logsApi.getLogsAPI);

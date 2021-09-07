@@ -19,6 +19,7 @@ import { ErrResult } from "../../types/api.js";
 import { UpdatePermissionsAPIResult as UpdatePodPermissionsAPIResult } from "../../api/pod/permissions/addPermissions.js";
 import { GetJwksAPIResult } from "../../api/podmaster/well-known/getJwks.js";
 import { GetPermissionsAPIResult } from "../../api/pod/permissions/getPermissions.js";
+import { DeletePermissionsAPIResult } from "../../api/pod/permissions/deletePermissions.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -174,6 +175,42 @@ export default function run(configDir: string, configFilePath: string) {
         .set("Authorization", `Bearer ${podJwt}`);
 
       response.status.should.equal(200);
+
+      response.status.should.equal(200);
+    });
+
+    it("deletes a permission to a log", async () => {
+      // Create a permission first.
+      await request(app)
+        .post("/permissions")
+        .send({
+          identity: {
+            iss: appConfig.jwtIssuers[0].claims.iss,
+            sub: "bob",
+          },
+          logs: [
+            {
+              log: logId,
+              access: {
+                write: true,
+                read: true,
+                publish: true,
+                subscribe: true,
+              },
+            },
+          ],
+        })
+        .set("Host", hostnameAndPort)
+        .set("Authorization", `Bearer ${podJwt}`);
+
+      const response = await request(app)
+        .del("/permissions")
+        .query({
+          iss: appConfig.jwtIssuers[0].claims.iss,
+          sub: "bob",
+        })
+        .set("Host", hostnameAndPort)
+        .set("Authorization", `Bearer ${podJwt}`);
 
       response.status.should.equal(200);
     });
