@@ -6,7 +6,7 @@ import { ensureJwt } from "../../utils/ensureJwt.js";
 
 export type UpdatePermissionsAPIResult = {};
 
-export default async function updatePermissionsAPI(
+export default async function addPermissionsAPI(
   ctx: IKoaAppContext
 ): Promise<void> {
   const hostname = ctx.URL.hostname;

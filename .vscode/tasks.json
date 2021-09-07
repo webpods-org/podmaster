@@ -11,6 +11,21 @@
         "kind": "build",
         "isDefault": true
       }
+    },
+    {
+      "type": "shell",
+      "label": "clear-data",
+      "options": {
+        "env": {
+          // replace the following with wherever you're setting up test data.
+          "PODMASTER_TEST_DATA_DIR": "/home/jeswin/temp/webpods"
+        }
+      },
+      "command": "${workspaceFolder}/scripts/delete-data.sh",
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      }
     }
   ]
 }

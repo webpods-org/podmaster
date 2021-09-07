@@ -126,6 +126,7 @@ export default function run(configDir: string, configFilePath: string) {
           pod: {
             access: {
               write: true,
+              read: true,
             },
           },
         })
@@ -340,9 +341,9 @@ export default function run(configDir: string, configFilePath: string) {
       entries.push(...apiResult.entries);
     });
 
-    it("gets all permissions for a log", async () => {
+    it("gets all permissions", async () => {
       const response = await request(app)
-        .get(`/logs/${logId}/permissions`)
+        .get(`/permissions`)
         .set("Host", hostnameAndPort)
         .set("Authorization", `Bearer ${podJwt}`);
 

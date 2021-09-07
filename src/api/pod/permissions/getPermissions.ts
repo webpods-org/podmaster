@@ -13,32 +13,23 @@ export type GetPermissionsAPIResult = {
 export default async function getPermissionsAPI(
   ctx: IKoaAppContext
 ): Promise<void> {
-  const appConfig = config.get();
   const hostname = ctx.URL.hostname;
 
-  if (hostname === appConfig.hostname) {
-    await handleResult(
-      ctx,
-      () =>
-        ensureJwt(ctx.state.jwt)
-          ? getPermissions(hostname, ctx.state.jwt.claims)
-          : Promise.resolve({
-              ok: false,
-              error: "Access Denied.",
-              code: ACCESS_DENIED,
-            }),
-      (result) => {
-        const body: GetPermissionsAPIResult = {
-          permissions: result.value.permissions,
-        };
-        ctx.body = body;
-      }
-    );
-  } else {
-    ctx.status = 404;
-    ctx.body = {
-      error: "Not found.",
-      code: NOT_FOUND,
-    };
-  }
+  await handleResult(
+    ctx,
+    () =>
+      ensureJwt(ctx.state.jwt)
+        ? getPermissions(hostname, ctx.state.jwt.claims)
+        : Promise.resolve({
+            ok: false,
+            error: "Access Denied.",
+            code: ACCESS_DENIED,
+          }),
+    (result) => {
+      const body: GetPermissionsAPIResult = {
+        permissions: result.value.permissions,
+      };
+      ctx.body = body;
+    }
+  );
 }

@@ -88,11 +88,11 @@ export default async function addPermissions(
             generateUpdateStatement<PodPermissionsRow>(
               "pod_permissions",
               { ...podPermissionsRow },
-              `"iss"=@iss AND "sub"=@sub`
+              `WHERE "iss"=@iss AND "sub"=@sub`
             )
           );
 
-          updatePermStatement.run();
+          updatePermStatement.run(podPermissionsRow);
         }
       }
 
@@ -143,7 +143,7 @@ export default async function addPermissions(
               generateUpdateStatement<LogPermissionsRow>(
                 "log_permissions",
                 permissionsRow,
-                `"iss"=@iss AND "sub"=@sub AND "log_id"=@log_id`
+                `WHERE "iss"=@iss AND "sub"=@sub AND "log_id"=@log_id`
               )
             );
 

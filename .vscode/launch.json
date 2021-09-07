@@ -9,17 +9,17 @@
       "type": "node",
       "request": "launch",
       "program": "${workspaceRoot}/node_modules/mocha/bin/_mocha",
-      "args": [
-        "--exit",
-        "--no-timeouts",
-        "${workspaceRoot}/dist/test/test.js"
-      ],
+      "args": ["--exit", "--no-timeouts", "${workspaceRoot}/dist/test/test.js"],
       "stopOnEntry": true,
       "sourceMaps": true,
       "cwd": "${workspaceRoot}",
-      "envFile": "${workspaceRoot}/.vscode/mocha.env",
-      "console":"integratedTerminal",
-      "internalConsoleOptions": "openOnSessionStart"
+      "env": {
+        // replace the following with wherever you're setting up test data.
+        "PODMASTER_TEST_DATA_DIR": "/home/jeswin/temp/webpods"
+      },
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "openOnSessionStart",
+      "preLaunchTask": "clear-data"
     }
   ]
 }
