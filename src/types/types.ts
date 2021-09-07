@@ -19,6 +19,9 @@ export type UncheckedJwtClaims = {
   exp?: number;
   nbf?: number;
   iat?: number;
+  webpods?: {
+    domain: string;
+  };
   [key: string]: unknown;
 };
 
@@ -29,6 +32,9 @@ export type JwtClaims = {
   exp?: number;
   nbf?: number;
   iat?: number;
+  webpods?: {
+    domain: string;
+  };
   [key: string]: unknown;
 };
 
@@ -168,13 +174,13 @@ export type LogPermission = {
 export type IdentityPermission = {
   identity: Identity;
   pod?: {
-    access: PodAccess
-  },
+    access: PodAccess;
+  };
   logs: {
     log: string;
     access: LogAccess;
-  }[]
-}
+  }[];
+};
 
 export type LogEntry = {
   id: number;

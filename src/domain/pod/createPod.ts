@@ -42,7 +42,9 @@ export default async function createPod(
     // Check if the user already has a pod.
     const systemDb = db.getSystemDb();
 
-    const podHostname = `${podId}.${appConfig.hostname}`;
+    const podHostname = userClaims.webpods?.domain
+      ? `${podId}.${userClaims.webpods.domain}.${appConfig.hostname}`
+      : `${podId}.${appConfig.hostname}`;
 
     // First check if we have a valid issuer and audience.
     // Audience defaults to hostname of podmaster, but can be overridden.
@@ -113,7 +115,10 @@ export default async function createPod(
                 created_at: Date.now(),
               };
               const insertPodPermissionStmt = podDb.prepare(
-                generateInsertStatement<PodPermissionsRow>("pod_permissions", podPermissionsRow)
+                generateInsertStatement<PodPermissionsRow>(
+                  "pod_permissions",
+                  podPermissionsRow
+                )
               );
 
               insertPodPermissionStmt.run(podPermissionsRow);
