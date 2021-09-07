@@ -1,13 +1,13 @@
 import handleResult from "../../handleResult.js";
-import getPermissions from "../../../domain/pod/getPermissions.js";
-import { PodPermission } from "../../../types/types.js";
+import getPermissions from "../../../domain/permissions/getPermissions.js";
+import { IdentityPermission, PodPermission } from "../../../types/types.js";
 import { IKoaAppContext } from "../../../types/koa.js";
 import { ACCESS_DENIED, NOT_FOUND } from "../../../errors/codes.js";
 import { ensureJwt } from "../../utils/ensureJwt.js";
 import * as config from "../../../config/index.js";
 
 export type GetPermissionsAPIResult = {
-  permissions: PodPermission[];
+  permissions: IdentityPermission[];
 };
 
 export default async function getPermissionsAPI(

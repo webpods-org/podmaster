@@ -10,16 +10,15 @@ import startApp from "../../startApp.js";
 import { GetPodsAPIResult } from "../../api/podmaster/pods/getPods.js";
 import { CreatePodAPIResult } from "../../api/podmaster/pods/createPod.js";
 import { GetLogsAPIResult } from "../../api/pod/logs/getLogs.js";
-import { UpdatePermissionsAPIResult as UpdateLogPermissionsAPIResult } from "../../api/pod/logs/updatePermissions.js";
 import { AddEntriesAPIResult } from "../../api/pod/logs/addEntries.js";
-import { GetPermissionsAPIResult } from "../../api/pod/logs/getPermissions.js";
 import { GetEntriesAPIResult } from "../../api/pod/logs/getEntries.js";
 import { AppConfig, LogEntry } from "../../types/types.js";
 import { GetInfoAPIResult } from "../../api/pod/logs/getInfo.js";
 import promiseSignal from "../../lib/promiseSignal.js";
 import { ErrResult } from "../../types/api.js";
-import { UpdatePermissionsAPIResult as UpdatePodPermissionsAPIResult } from "../../api/pod/permissions/updatePermissions.js";
+import { UpdatePermissionsAPIResult as UpdatePodPermissionsAPIResult } from "../../api/pod/permissions/addPermissions.js";
 import { GetJwksAPIResult } from "../../api/podmaster/well-known/getJwks.js";
+import { GetPermissionsAPIResult } from "../../api/pod/permissions/getPermissions.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -118,28 +117,22 @@ export default function run(configDir: string, configFilePath: string) {
 
     it("adds permissions for a pod", async () => {
       const response = await request(app)
-        .post("/permissions/updates")
+        .post("/permissions")
         .send({
-          add: [
-            {
-              identity: {
-                iss: appConfig.jwtIssuers[0].claims.iss,
-                sub: "alice",
-              },
-              access: {
-                write: true,
-              },
+          identity: {
+            iss: appConfig.jwtIssuers[0].claims.iss,
+            sub: "alice",
+          },
+          pod: {
+            access: {
+              write: true,
             },
-          ],
+          },
         })
         .set("Host", hostnameAndPort)
         .set("Authorization", `Bearer ${podJwt}`);
 
       response.status.should.equal(200);
-      const apiResult: UpdatePodPermissionsAPIResult = JSON.parse(
-        response.text
-      );
-      apiResult.added.should.equal(1);
     });
 
     it("creates a log", async () => {
@@ -158,14 +151,15 @@ export default function run(configDir: string, configFilePath: string) {
 
     it("adds a permission to a log", async () => {
       const response = await request(app)
-        .post(`/logs/${logId}/permissions/updates`)
+        .post("/permissions")
         .send({
-          add: [
+          identity: {
+            iss: appConfig.jwtIssuers[0].claims.iss,
+            sub: "alice",
+          },
+          logs: [
             {
-              identity: {
-                iss: appConfig.jwtIssuers[0].claims.iss,
-                sub: "alice",
-              },
+              log: logId,
               access: {
                 write: true,
                 read: true,
@@ -179,10 +173,8 @@ export default function run(configDir: string, configFilePath: string) {
         .set("Authorization", `Bearer ${podJwt}`);
 
       response.status.should.equal(200);
-      const apiResult: UpdateLogPermissionsAPIResult = JSON.parse(
-        response.text
-      );
-      apiResult.added.should.equal(1);
+
+      response.status.should.equal(200);
     });
 
     it("gets all logs", async () => {

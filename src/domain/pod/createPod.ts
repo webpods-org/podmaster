@@ -11,7 +11,7 @@ import {
 import matchObject from "../../utils/matchObject.js";
 import * as db from "../../db/index.js";
 import { ErrResult, Result } from "../../types/api.js";
-import { PodsRow } from "../../types/db.js";
+import { PodPermissionsRow, PodsRow } from "../../types/db.js";
 import { generateInsertStatement } from "../../lib/sqlite.js";
 import { getPodDataDir } from "../../storage/index.js";
 import { getPods } from "./getPods.js";
@@ -92,7 +92,7 @@ export default async function createPod(
               };
 
               const insertPodStmt = systemDb.prepare(
-                generateInsertStatement("pods", podsRow)
+                generateInsertStatement<PodsRow>("pods", podsRow)
               );
 
               insertPodStmt.run(podsRow);
@@ -104,7 +104,7 @@ export default async function createPod(
               await db.initPodDb(podDb);
 
               // Insert admin permissions.
-              const podPermissionsRow = {
+              const podPermissionsRow: PodPermissionsRow = {
                 iss: admin.identity.iss,
                 sub: admin.identity.sub,
                 admin: 1,
@@ -113,7 +113,7 @@ export default async function createPod(
                 created_at: Date.now(),
               };
               const insertPodPermissionStmt = podDb.prepare(
-                generateInsertStatement("pod_permissions", podPermissionsRow)
+                generateInsertStatement<PodPermissionsRow>("pod_permissions", podPermissionsRow)
               );
 
               insertPodPermissionStmt.run(podPermissionsRow);

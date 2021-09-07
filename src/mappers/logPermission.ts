@@ -3,6 +3,7 @@ import { LogPermissionsRow } from "../types/db.js";
 
 export default function map(row: LogPermissionsRow): LogPermission {
   return {
+    log: row.log_id,
     identity: {
       iss: row.iss,
       sub: row.sub,

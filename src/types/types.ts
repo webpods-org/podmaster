@@ -75,11 +75,13 @@ export type LocallyDefinedAsymmetricJwtKey = {
   publicKey: string;
 };
 
+export type Identity = {
+  iss: string;
+  sub: string;
+};
+
 export type PodInfo = {
-  identity: {
-    iss: string;
-    sub: string;
-  };
+  identity: Identity;
   id: string;
   name: string;
   hostname: string;
@@ -139,30 +141,40 @@ export type AppConfig = {
   queries?: QueryConfig;
 };
 
+export type PodAccess = {
+  admin: boolean;
+  read: boolean;
+  write: boolean;
+};
+
 export type PodPermission = {
-  identity: {
-    iss: string;
-    sub: string;
-  };
-  access: {
-    admin: boolean;
-    read: boolean;
-    write: boolean;
-  };
+  identity: Identity;
+  access: PodAccess;
+};
+
+export type LogAccess = {
+  read: boolean;
+  write: boolean;
+  publish: boolean;
+  subscribe: boolean;
 };
 
 export type LogPermission = {
-  identity: {
-    iss: string;
-    sub: string;
-  };
-  access: {
-    read: boolean;
-    write: boolean;
-    publish: boolean;
-    subscribe: boolean;
-  };
+  log: string;
+  identity: Identity;
+  access: LogAccess;
 };
+
+export type IdentityPermission = {
+  identity: Identity;
+  pod?: {
+    access: PodAccess
+  },
+  logs: {
+    log: string;
+    access: LogAccess;
+  }[]
+}
 
 export type LogEntry = {
   id: number;

@@ -66,7 +66,7 @@ export default async function updatePermissions(
             };
 
             const insertPermStmt = podDb.prepare(
-              generateInsertStatement("log_permissions", permissionsRow)
+              generateInsertStatement<LogPermissionsRow>("log_permissions", permissionsRow)
             );
 
             insertPermStmt.run(permissionsRow);

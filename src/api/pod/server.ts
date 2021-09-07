@@ -14,7 +14,7 @@ export default function setup() {
   /* POD ROUTES */
   const podsRouter = new Router();
   podsRouter.get("/permissions", permissionsApi.getPermissionsAPI);
-  podsRouter.post("/permissions/updates", permissionsApi.updatePermissionsAPI);
+  podsRouter.post("/permissions", permissionsApi.addPermissionsAPI);
 
   // logs
   podsRouter.get("/logs", logsApi.getLogsAPI);
@@ -22,8 +22,6 @@ export default function setup() {
   podsRouter.get("/logs/:log/info", logsApi.getInfoAPI);
   podsRouter.get("/logs/:log/entries", logsApi.getEntriesAPI);
   podsRouter.post("/logs/:log/entries", logsApi.addEntriesAPI);
-  podsRouter.get("/logs/:log/permissions", logsApi.getPermissionsAPI);
-  podsRouter.post("/logs/:log/permissions/updates", logsApi.updatePermissions);
   podsRouter.get("/logs/:log/files/(.*)", logsApi.getFile);
 
   const koaPod = new Koa();

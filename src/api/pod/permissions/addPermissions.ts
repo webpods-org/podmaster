@@ -1,13 +1,10 @@
-import updatePermissions from "../../../domain/log/updatePermissions.js";
+import addPermissions from "../../../domain/permissions/addPermissions.js";
 import handleResult from "../../handleResult.js";
 import { IKoaAppContext } from "../../../types/koa.js";
 import { ACCESS_DENIED } from "../../../errors/codes.js";
 import { ensureJwt } from "../../utils/ensureJwt.js";
 
-export type UpdatePermissionsAPIResult = {
-  added: number;
-  removed: number;
-};
+export type UpdatePermissionsAPIResult = {};
 
 export default async function updatePermissionsAPI(
   ctx: IKoaAppContext
@@ -18,22 +15,14 @@ export default async function updatePermissionsAPI(
     ctx,
     () =>
       ensureJwt(ctx.state.jwt)
-        ? updatePermissions(
-            hostname,
-            ctx.params.log,
-            ctx.request.body,
-            ctx.state.jwt.claims
-          )
+        ? addPermissions(hostname, ctx.request.body, ctx.state.jwt?.claims)
         : Promise.resolve({
             ok: false,
             error: "Access Denied.",
             code: ACCESS_DENIED,
           }),
     (result) => {
-      const body: UpdatePermissionsAPIResult = {
-        added: result.value.added,
-        removed: result.value.removed,
-      };
+      const body: UpdatePermissionsAPIResult = {};
       ctx.body = body;
     }
   );

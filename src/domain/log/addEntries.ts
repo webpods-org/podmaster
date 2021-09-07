@@ -155,20 +155,20 @@ export default async function addEntries(
               .update(lastCommitAndContentHash)
               .digest("hex");
 
-            const entriesRow: Omit<EntriesRow, "id"> = {
+            const entriesRow = {
               content_hash: contentHash,
               commit: newCommit,
               previous_commit: lastCommit,
               log_id: log,
               data: entry.data,
-              type: "data",
+              type: "data" as "data",
               created_at: Date.now(),
               iss: userClaims.iss,
-              sub: userClaims.sub,
+              sub: userClaims.sub,              
             };
 
             const insertEntryStmt = podDb.prepare(
-              generateInsertStatement("entries", entriesRow)
+              generateInsertStatement<EntriesRow>("entries", entriesRow)
             );
 
             insertEntryStmt.run(entriesRow);
@@ -200,12 +200,12 @@ export default async function addEntries(
               .update(lastCommitAndContentHash)
               .digest("hex");
 
-            const entryRow: Omit<EntriesRow, "id"> = {
+            const entryRow = {
               commit: newCommit,
               content_hash: movedFile.hash,
               log_id: log,
               data: movedFile.filename,
-              type: "file",
+              type: "file" as "file",
               previous_commit: lastCommit,
               created_at: Date.now(),
               iss: userClaims.iss,
@@ -213,7 +213,7 @@ export default async function addEntries(
             };
 
             const insertEntryStmt = podDb.prepare(
-              generateInsertStatement("entries", entryRow)
+              generateInsertStatement<EntriesRow>("entries", entryRow)
             );
 
             insertEntryStmt.run(entryRow);

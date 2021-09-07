@@ -1,6 +1,6 @@
-export function generateInsertStatement(
+export function generateInsertStatement<T>(
   table: string,
-  row: Record<string, unknown>
+  row: Partial<T>
 ): string {
   const keys = Object.getOwnPropertyNames(row);
   const columns = keys.map((x) => `"${x}"`).join(", ");
@@ -8,9 +8,9 @@ export function generateInsertStatement(
   return `INSERT INTO "${table}" (${columns}) VALUES (${values})`;
 }
 
-export function generateUpdateStatement(
+export function generateUpdateStatement<T>(
   table: string,
-  row: Record<string, unknown>,
+  row: Partial<T>,
   clauses?: string
 ): string {
   const keys = Object.getOwnPropertyNames(row);
