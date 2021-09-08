@@ -4,6 +4,7 @@ import { JwtClaims } from "../../types/types.js";
 import * as config from "../../config/index.js";
 import {
   ACCESS_DENIED,
+  INVALID_POD_NAME,
   MISSING_FIELD,
   POD_EXISTS,
   QUOTA_EXCEEDED,
@@ -16,6 +17,7 @@ import { generateInsertStatement } from "../../lib/sqlite.js";
 import { getPodDataDir } from "../../storage/index.js";
 import { getPods } from "./getPods.js";
 import { getPodByHostname } from "./getPodByHostname.js";
+import { isAlphanumeric } from "../../api/utils/isAlphanumeric.js";
 
 export type CreatePodResult = { hostname: string };
 
@@ -34,7 +36,7 @@ export default async function createPod(
   const appConfig = config.get();
 
   // Check fields
-  const validationErrors = isInvalid({ podId });
+  const validationErrors = validateInput({ podId });
 
   if (!validationErrors) {
     const appConfig = config.get();
@@ -163,7 +165,7 @@ export default async function createPod(
   }
 }
 
-function isInvalid(input: { podId: string }): ErrResult | undefined {
+function validateInput(input: { podId: string }): ErrResult | undefined {
   if (!input.podId) {
     return {
       ok: false,
@@ -172,6 +174,12 @@ function isInvalid(input: { podId: string }): ErrResult | undefined {
       data: {
         fields: ["id"],
       },
+    };
+  } else if (!isAlphanumeric(input.podId)) {
+    return {
+      ok: false,
+      error: "pod name can only contains letters, numbers and hyphens.",
+      code: INVALID_POD_NAME,
     };
   }
 }
