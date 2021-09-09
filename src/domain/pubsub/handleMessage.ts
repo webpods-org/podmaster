@@ -17,7 +17,7 @@ import {
 import validateClaims from "../../lib/jwt/validateClaims.js";
 import getPodByHostname from "../pods/util/getPodByHostname.js";
 import * as db from "../../db/index.js";
-import getLogPermissionsForJwt from "../logs/util/getLogPermissionsForJwt.js";
+import getLogPermissionForJwt from "../logs/util/getLogPermissionForJwt.js";
 import {
   ACCESS_DENIED,
   INVALID_JWT,
@@ -94,14 +94,14 @@ export function handleMessage(
           if (pod) {
             const podDataDir = getPodDataDir(pod.id);
             const podDb = db.getPodDb(podDataDir);
-            const permissions = await getLogPermissionsForJwt(
+            const logPermission = await getLogPermissionForJwt(
               hostname,
               log,
               podDb,
               ws.webpodsTracking.jwtClaims
             );
 
-            if (permissions.subscribe) {
+            if (logPermission.subscribe) {
               addSubscription(
                 channel,
                 ws.webpodsTracking.jwtClaims.iss,
@@ -162,13 +162,13 @@ export function handleMessage(
           if (pod) {
             const podDataDir = getPodDataDir(pod.id);
             const podDb = db.getPodDb(podDataDir);
-            const permissions = await getLogPermissionsForJwt(
+            const logPermission = await getLogPermissionForJwt(
               hostname,
               log,
               podDb,
               ws.webpodsTracking.jwtClaims
             );
-            if (permissions.publish) {
+            if (logPermission.publish) {
               publish(
                 channel,
                 ws.webpodsTracking.jwtClaims.iss,

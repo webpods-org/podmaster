@@ -11,5 +11,6 @@ export default function map(row: EntriesRow): LogEntry {
     type: row.type,
     iss: row.iss,
     sub: row.sub,
+    createdAt: row.created_at
   };
 }

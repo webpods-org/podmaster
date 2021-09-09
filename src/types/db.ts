@@ -35,22 +35,37 @@ export type EntriesRow = {
   sub: string;
 };
 
-export type PodPermissionsRow = {
-  iss: string;
-  sub: string;
+export type PodAccessRow = {
   admin: SqliteBoolean;
   read: SqliteBoolean;
   write: SqliteBoolean;
+};
+
+export type PodPermissionsRow = {
+  iss: string;
+  sub: string;
   created_at: number;
+} & PodAccessRow;
+
+export type LogAccessRow = {
+  read: SqliteBoolean;
+  write: SqliteBoolean;
+  publish: SqliteBoolean;
+  subscribe: SqliteBoolean;
 };
 
 export type LogPermissionsRow = {
   log_id: string;
   iss: string;
   sub: string;
-  read: SqliteBoolean;
-  write: SqliteBoolean;
-  publish: SqliteBoolean;
-  subscribe: SqliteBoolean;
+  created_at: number;
+} & LogAccessRow;
+
+export type PermissionTokensRow = {
+  id: string;
+  permissions_json: string;
+  max_redemptions: number;
+  redemptions: number;
+  expiry: number;
   created_at: number;
 };

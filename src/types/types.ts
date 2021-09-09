@@ -193,4 +193,17 @@ export type LogEntry = {
   type: EntryContentTypes;
   iss: string;
   sub: string;
+  createdAt: number;
+};
+
+export type PermissionToken = {
+  id: string;
+  permissions: {
+    log: string;
+    access: LogAccess;
+  };
+  maxRedemptions: number;
+  redemptions: number;
+  expiry: number;
+  createdAt: number;
 };

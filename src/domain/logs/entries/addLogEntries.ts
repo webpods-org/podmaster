@@ -10,7 +10,7 @@ import * as db from "../../../db/index.js";
 import { ErrResult, Result } from "../../../types/api.js";
 import { EntriesRow } from "../../../types/db.js";
 import ensurePod from "../../pods/util/ensurePod.js";
-import getLogPermissionsForJwt from "../util/getLogPermissionsForJwt.js";
+import getLogPermissionForJwt from "../util/getLogPermissionForJwt.js";
 import { ACCESS_DENIED, INVALID_FILENAME } from "../../../errors/codes.js";
 import isFilenameValid from "../../../lib/validation/checkFilename.js";
 import { generateInsertStatement } from "../../../lib/sqlite.js";
@@ -69,14 +69,14 @@ export default async function addEntries(
     const podDataDir = getPodDataDir(pod.id);
     const podDb = db.getPodDb(podDataDir);
 
-    const permissions = await getLogPermissionsForJwt(
+    const logPermission = await getLogPermissionForJwt(
       hostname,
       log,
       podDb,
       userClaims
     );
 
-    if (permissions.write) {
+    if (logPermission.write) {
       // First move the files into the the log directory.
       const movedFiles: {
         [key: string]: {

@@ -5,7 +5,7 @@ import ensurePod from "../pods/util/ensurePod.js";
 import { ACCESS_DENIED } from "../../errors/codes.js";
 import { getPodDataDir } from "../../storage/index.js";
 import { JwtClaims } from "../../types/types.js";
-import getPodPermissionsForJwt from "../pods/util/getPodPermissionsForJwt.js";
+import getPodPermissionForJwt from "../pods/util/getPodPermissionForJwt.js";
 
 export type GetLogsResult = {
   logs: {
@@ -23,8 +23,8 @@ export default async function getLogs(
     const podDataDir = getPodDataDir(pod.id);
     const podDb = db.getPodDb(podDataDir);
 
-    const podPermissions = await getPodPermissionsForJwt(podDb, userClaims);
-    if (podPermissions.read) {
+    const podPermission = await getPodPermissionForJwt(podDb, userClaims);
+    if (podPermission.read) {
       const getLogsStmt = podDb.prepare(`SELECT * FROM "logs"`);
 
       const logs = getLogsStmt.all().map((x: LogsRow) => ({

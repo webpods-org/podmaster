@@ -3,7 +3,7 @@ import { Result } from "../../../types/api.js";
 import ensurePod from "../../pods/util/ensurePod.js";
 import { EntriesRow } from "../../../types/db.js";
 import { ACCESS_DENIED } from "../../../errors/codes.js";
-import getLogPermissionsForJwt from "../util/getLogPermissionsForJwt.js";
+import getLogPermissionForJwt from "../util/getLogPermissionForJwt.js";
 import { getPodDataDir } from "../../../storage/index.js";
 import { JwtClaims } from "../../../types/types.js";
 
@@ -22,14 +22,14 @@ export default async function getInfo(
     const podDataDir = getPodDataDir(pod.id);
     const podDb = db.getPodDb(podDataDir);
 
-    const permissions = await getLogPermissionsForJwt(
+    const logPermission = await getLogPermissionForJwt(
       hostname,
       logId,
       podDb,
       userClaims
     );
 
-    if (permissions.read) {
+    if (logPermission.read) {
       // Get the last item
       const lastItemStmt = podDb.prepare(
         `SELECT "id", "commit" FROM "entries" ORDER BY id DESC LIMIT 1`

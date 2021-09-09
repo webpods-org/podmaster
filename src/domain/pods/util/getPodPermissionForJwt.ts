@@ -3,13 +3,13 @@ import Sqlite3 from "better-sqlite3";
 import { JwtClaims } from "../../../types/types.js";
 import permissionMapper from "../../../mappers/podPermission.js";
 
-const noPermissions = {
+const noAccess = {
   admin: false,
   read: false,
   write: false,
 };
 
-export default async function getPodPermissionsForJwt(
+export default async function getPodPermissionForJwt(
   podDb: Sqlite3.Database,
   userClaims: JwtClaims
 ): Promise<{
@@ -32,6 +32,6 @@ export default async function getPodPermissionsForJwt(
       read: matchingPerm.access.admin || matchingPerm.access.read,
     };
   } else {
-    return noPermissions;
+    return noAccess;
   }
 }

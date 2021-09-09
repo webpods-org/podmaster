@@ -15,7 +15,7 @@ import { generateInsertStatement } from "../../lib/sqlite.js";
 import { getPodDataDir } from "../../storage/index.js";
 import getLogs from "./getLogs.js";
 import { JwtClaims } from "../../types/types.js";
-import getPodPermissionsForJwt from "../pods/util/getPodPermissionsForJwt.js";
+import getPodPermissionForJwt from "../pods/util/getPodPermissionForJwt.js";
 import { isAlphanumeric } from "../../api/utils/isAlphanumeric.js";
 
 export type CreateLogResult = {};
@@ -37,9 +37,9 @@ export default async function createLog(
       const logDir = join(podDataDir, logId);
       const podDb = db.getPodDb(podDataDir);
 
-      const podPermissions = await getPodPermissionsForJwt(podDb, userClaims);
+      const podPermission = await getPodPermissionForJwt(podDb, userClaims);
 
-      if (podPermissions.write) {
+      if (podPermission.write) {
         // Let's see if the log already exists.
         const existingLogsResult = await getLogs(hostname, userClaims);
 

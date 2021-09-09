@@ -4,14 +4,14 @@ import permissionMapper from "../../../mappers/logPermission.js";
 import logMapper from "../../../mappers/log.js";
 import { JwtClaims } from "../../../types/types.js";
 
-const noPermissions = {
+const noAccess = {
   read: false,
   write: false,
   publish: false,
   subscribe: false,
 };
 
-export default async function getLogPermissionsForJwt(
+export default async function getLogPermissionForJwt(
   hostname: string,
   name: string,
   podDb: Sqlite3.Database,
@@ -33,31 +33,31 @@ export default async function getLogPermissionsForJwt(
         `SELECT * FROM "log_permissions" WHERE "log_id"=@log_id AND "iss"=@iss AND ("sub"=@sub OR "sub"='*')`
       );
 
-      const permissions = existingPermStmt
+      const logPermissionsInDb = existingPermStmt
         .all({ log_id: name, iss: userClaims.iss, sub: userClaims.sub })
         .map(permissionMapper);
 
-      const permission = permissions.length ? permissions[0] : undefined;
+      const logPermission = logPermissionsInDb.length ? logPermissionsInDb[0] : undefined;
 
-      if (permission) {
+      if (logPermission) {
         return {
-          ...permission.access,
-          read: permission.access.read || logInfo.public,
-          subscribe: permission.access.subscribe || logInfo.public,
+          ...logPermission.access,
+          read: logPermission.access.read || logInfo.public,
+          subscribe: logPermission.access.subscribe || logInfo.public,
         };
       } else {
         return {
-          ...noPermissions,
+          ...noAccess,
           read: logInfo.public,
         };
       }
     } else {
       return {
-        ...noPermissions,
+        ...noAccess,
         read: logInfo.public,
       };
     }
   } else {
-    return noPermissions;
+    return noAccess;
   }
 }

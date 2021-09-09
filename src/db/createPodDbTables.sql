@@ -44,3 +44,13 @@ CREATE TABLE IF NOT EXISTS log_permissions (
   PRIMARY KEY ("iss", "sub", "log_id")
   FOREIGN KEY ("log_id") REFERENCES logs("id")
 );
+
+CREATE TABLE IF NOT EXISTS permission_tokens (
+  "id" TEXT NOT NULL UNIQUE,
+  "permissions_json" TEXT NOT NULL,
+  "max_redemptions" INTEGER NOT NULL,
+  "redemptions" INTEGER NOT NULL,
+  "expiry" INTEGER NOT NULL,
+  "created_at" INTEGER NOT NULL,
+  PRIMARY KEY ("id")
+);

@@ -1,15 +1,12 @@
 import * as db from "../../db/index.js";
-import {
-  IdentityPermission,
-  JwtClaims,
-} from "../../types/types.js";
+import { IdentityPermission, JwtClaims } from "../../types/types.js";
 import { Result } from "../../types/api.js";
 import podPermissionMapper from "../../mappers/podPermission.js";
 import logPermissionMapper from "../../mappers/logPermission.js";
 import ensurePod from "../pods/util/ensurePod.js";
 import { ACCESS_DENIED } from "../../errors/codes.js";
 import { getPodDataDir } from "../../storage/index.js";
-import getPodPermissionsForJwt from "../pods/util/getPodPermissionsForJwt.js";
+import getPodPermissionForJwt from "../pods/util/getPodPermissionForJwt.js";
 
 export type GetPermissionsResult = {
   permissions: IdentityPermission[];
@@ -23,24 +20,31 @@ export default async function getPermissions(
     const podDataDir = getPodDataDir(pod.id);
     const podDb = db.getPodDb(podDataDir);
 
-    const podPermissions = await getPodPermissionsForJwt(podDb, userClaims);
+    const podPermission = await getPodPermissionForJwt(podDb, userClaims);
 
-    if (podPermissions.read) {
+    if (podPermission.admin || podPermission.write) {
+      const permissions: IdentityPermission[] = [];
+
       // Get pod permissions
-      const podPermsStmt = podDb.prepare(`SELECT * FROM "pod_permissions"`);
-      const podPermissions = podPermsStmt.all().map(podPermissionMapper);
+      // But only if you're admin.
+      if (podPermission.admin) {
+        const podPermsStmt = podDb.prepare(`SELECT * FROM "pod_permissions"`);
+        const podPermissionsInDb = podPermsStmt.all().map(podPermissionMapper);
 
-      const permissions: IdentityPermission[] = podPermissions.map((x) => ({
-        identity: x.identity,
-        pod: { access: x.access },
-        logs: [],
-      }));
+        podPermissionsInDb
+          .map((x) => ({
+            identity: x.identity,
+            pod: { access: x.access },
+            logs: [],
+          }))
+          .forEach((x) => permissions.push(x));
+      }
 
       // Get log permissions.
       const logPermsStmt = podDb.prepare(`SELECT * FROM "log_permissions"`);
-      const logPermissions = logPermsStmt.all().map(logPermissionMapper);
+      const logPermissionsInDb = logPermsStmt.all().map(logPermissionMapper);
 
-      for (const logPermission of logPermissions) {
+      for (const logPermission of logPermissionsInDb) {
         const existing = permissions.find(
           (x) =>
             x.identity.iss === logPermission.identity.iss &&
