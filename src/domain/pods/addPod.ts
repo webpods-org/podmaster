@@ -16,12 +16,12 @@ import { PodPermissionsRow, PodsRow } from "../../types/db.js";
 import { generateInsertStatement } from "../../lib/sqlite.js";
 import { getPodDataDir } from "../../storage/index.js";
 import { getPods } from "./getPods.js";
-import { getPodByHostname } from "./getPodByHostname.js";
+import getPodByHostname from "./util/getPodByHostname.js";
 import { isAlphanumeric } from "../../api/utils/isAlphanumeric.js";
 
 export type CreatePodResult = { hostname: string };
 
-export default async function createPod(
+export default async function addPod(
   podId: string,
   podTitle: string,
   description: string,
@@ -33,8 +33,6 @@ export default async function createPod(
   },
   userClaims: JwtClaims
 ): Promise<Result<CreatePodResult>> {
-  const appConfig = config.get();
-
   // Check fields
   const validationErrors = validateInput({ podId });
 

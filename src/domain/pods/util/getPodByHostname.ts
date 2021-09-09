@@ -1,9 +1,9 @@
-import * as config from "../../config/index.js";
-import * as db from "../../db/index.js";
-import mapper from "../../mappers/pod.js";
-import { PodInfo } from "../../types/types.js";
+import * as config from "../../../config/index.js";
+import * as db from "../../../db/index.js";
+import mapper from "../../../mappers/pod.js";
+import { PodInfo } from "../../../types/types.js";
 
-export async function getPodByHostname(
+export default async function getPodByHostname(
   hostname: string
 ): Promise<PodInfo | undefined> {
   const appConfig = config.get();

@@ -15,9 +15,9 @@ import {
   removeSubscription,
 } from "./subscriptions.js";
 import validateClaims from "../../lib/jwt/validateClaims.js";
-import { getPodByHostname } from "../pods/getPodByHostname.js";
+import getPodByHostname from "../pods/util/getPodByHostname.js";
 import * as db from "../../db/index.js";
-import { getLogPermissionsForJwt } from "../logs/util/getLogPermissionsForJwt.js";
+import getLogPermissionsForJwt from "../logs/util/getLogPermissionsForJwt.js";
 import {
   ACCESS_DENIED,
   INVALID_JWT,

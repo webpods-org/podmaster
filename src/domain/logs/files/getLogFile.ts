@@ -1,9 +1,9 @@
 import { join } from "path";
 import * as db from "../../../db/index.js";
 import { Result } from "../../../types/api.js";
-import ensurePod from "../../pods/ensurePod.js";
+import ensurePod from "../../pods/util/ensurePod.js";
 import { ACCESS_DENIED, NOT_FOUND } from "../../../errors/codes.js";
-import { getLogPermissionsForJwt } from "../util/getLogPermissionsForJwt.js";
+import getLogPermissionsForJwt from "../util/getLogPermissionsForJwt.js";
 import isFilenameValid from "../../../lib/validation/checkFilename.js";
 import { getDirNumber, getPodDataDir } from "../../../storage/index.js";
 import { JwtClaims } from "../../../types/types.js";

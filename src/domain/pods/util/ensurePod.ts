@@ -1,7 +1,7 @@
-import { MISSING_POD } from "../../errors/codes.js";
-import { getPodByHostname } from "./getPodByHostname.js";
-import { PodInfo } from "../../types/types.js";
-import { ErrResult, OkResult } from "../../types/api.js";
+import { MISSING_POD } from "../../../errors/codes.js";
+import getPodByHostname from "./getPodByHostname.js";
+import { PodInfo } from "../../../types/types.js";
+import { ErrResult, OkResult } from "../../../types/api.js";
 
 export default async function ensurePod<T>(
   hostname: string,

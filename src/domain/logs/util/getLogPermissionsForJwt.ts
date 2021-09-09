@@ -11,7 +11,7 @@ const noPermissions = {
   subscribe: false,
 };
 
-export async function getLogPermissionsForJwt(
+export default async function getLogPermissionsForJwt(
   hostname: string,
   name: string,
   podDb: Sqlite3.Database,

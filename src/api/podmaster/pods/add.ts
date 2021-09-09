@@ -1,4 +1,4 @@
-import createPod from "../../../domain/pods/createPod.js";
+import addPod from "../../../domain/pods/addPod.js";
 import * as config from "../../../config/index.js";
 import { ACCESS_DENIED, NOT_FOUND, POD_EXISTS } from "../../../errors/codes.js";
 import handleResult from "../../handleResult.js";
@@ -17,7 +17,7 @@ export default async function addAPI(ctx: IKoaAppContext): Promise<void> {
       ctx,
       () =>
         ensureJwt(ctx.state.jwt)
-          ? createPod(
+          ? addPod(
               ctx.request.body.id,
               ctx.request.body.name,
               ctx.request.body.description || "",
