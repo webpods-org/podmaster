@@ -46,6 +46,7 @@ export default async function addPermissions(
         await addPodPermission(
           permissions.identity,
           permissions.pod.access,
+          false,
           podDb
         );
       }
@@ -56,6 +57,7 @@ export default async function addPermissions(
             logPermission.log,
             permissions.identity,
             logPermission.access,
+            false,
             podDb
           );
         }

@@ -27,7 +27,7 @@ export default async function deletePermissions(
 
       const podPermission = await getPodPermissionForJwt(podDb, userClaims);
 
-      if (podPermission.admin || podPermission.write) {
+      if (podPermission.write) {
         if (podPermission.admin) {
           const deletePodPermsStmt = podDb.prepare(
             `DELETE FROM "pod_permissions" WHERE "iss"=@iss AND "sub"=@sub`

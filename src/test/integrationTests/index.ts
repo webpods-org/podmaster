@@ -15,19 +15,25 @@ import { AppConfig, LogEntry } from "../../types/types.js";
 import { GetLogInfoAPIResult } from "../../api/pod/logs/info/get.js";
 import promiseSignal from "../../lib/promiseSignal.js";
 import { ErrResult } from "../../types/api.js";
-import { GetJwksAPIResult } from "../../api/podmaster/well-known/jwks/get.js";
+import { GetJwksAPIResult } from "../../api/podmaster/wellKnown/jwks/get.js";
 import { GetPermissionsAPIResult } from "../../api/pod/permissions/get.js";
 import { GetLogEntriesAPIResult } from "../../api/pod/logs/entries/get.js";
+import { AddPermissionTokenAPIResult } from "../../api/pod/permissionsTokens/add.js";
+import { RedeemPermissionTokenAPIResult } from "../../api/pod/permissionsTokens/redeem.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 export default function run(configDir: string, configFilePath: string) {
-  const podmasterJwt = readFileSync(join(configDir, "podmaster_jwt"))
+  const alicePodmasterJwt = readFileSync(join(configDir, "alice_podmaster_jwt"))
     .toString()
     .replace(/\r?\n|\r/g, "");
 
-  const podJwt = readFileSync(join(configDir, "pod_jwt"))
+  const alicePodJwt = readFileSync(join(configDir, "alice_pod_jwt"))
+    .toString()
+    .replace(/\r?\n|\r/g, "");
+
+  const carolPodJwt = readFileSync(join(configDir, "carol_pod_jwt"))
     .toString()
     .replace(/\r?\n|\r/g, "");
 
@@ -75,7 +81,7 @@ export default function run(configDir: string, configFilePath: string) {
           },
         })
         .set("Host", mainHostname)
-        .set("Authorization", `Bearer ${podmasterJwt}`);
+        .set("Authorization", `Bearer ${alicePodmasterJwt}`);
 
       response.status.should.equal(200);
       const apiResult: AddPodAPIResult = JSON.parse(response.text);
@@ -93,7 +99,7 @@ export default function run(configDir: string, configFilePath: string) {
           description: "This is my very own pod.",
         })
         .set("Host", mainHostname)
-        .set("Authorization", `Bearer ${podmasterJwt}`);
+        .set("Authorization", `Bearer ${alicePodmasterJwt}`);
 
       response.status.should.equal(403);
       const apiResult: ErrResult = JSON.parse(response.text);
@@ -104,7 +110,7 @@ export default function run(configDir: string, configFilePath: string) {
       const response = await request(app)
         .get("/pods")
         .set("Host", mainHostname)
-        .set("Authorization", `Bearer ${podmasterJwt}`);
+        .set("Authorization", `Bearer ${alicePodmasterJwt}`);
 
       response.status.should.equal(200);
       const apiResult: GetPodsAPIResult = JSON.parse(response.text);
@@ -130,7 +136,7 @@ export default function run(configDir: string, configFilePath: string) {
           },
         })
         .set("Host", hostnameAndPort)
-        .set("Authorization", `Bearer ${podJwt}`);
+        .set("Authorization", `Bearer ${alicePodJwt}`);
 
       response.status.should.equal(200);
     });
@@ -144,7 +150,7 @@ export default function run(configDir: string, configFilePath: string) {
           description: logDescription,
         })
         .set("Host", hostnameAndPort)
-        .set("Authorization", `Bearer ${podJwt}`);
+        .set("Authorization", `Bearer ${alicePodJwt}`);
 
       response.status.should.equal(200);
     });
@@ -170,7 +176,7 @@ export default function run(configDir: string, configFilePath: string) {
           ],
         })
         .set("Host", hostnameAndPort)
-        .set("Authorization", `Bearer ${podJwt}`);
+        .set("Authorization", `Bearer ${alicePodJwt}`);
 
       response.status.should.equal(200);
 
@@ -199,7 +205,7 @@ export default function run(configDir: string, configFilePath: string) {
           ],
         })
         .set("Host", hostnameAndPort)
-        .set("Authorization", `Bearer ${podJwt}`);
+        .set("Authorization", `Bearer ${alicePodJwt}`);
 
       const response = await request(app)
         .del("/permissions")
@@ -208,7 +214,7 @@ export default function run(configDir: string, configFilePath: string) {
           sub: "bob",
         })
         .set("Host", hostnameAndPort)
-        .set("Authorization", `Bearer ${podJwt}`);
+        .set("Authorization", `Bearer ${alicePodJwt}`);
 
       response.status.should.equal(200);
     });
@@ -217,7 +223,7 @@ export default function run(configDir: string, configFilePath: string) {
       const response = await request(app)
         .get("/logs")
         .set("Host", hostnameAndPort)
-        .set("Authorization", `Bearer ${podJwt}`);
+        .set("Authorization", `Bearer ${alicePodJwt}`);
 
       response.status.should.equal(200);
       const apiResult: GetLogsAPIResult = JSON.parse(response.text);
@@ -243,7 +249,7 @@ export default function run(configDir: string, configFilePath: string) {
           ],
         })
         .set("Host", hostnameAndPort)
-        .set("Authorization", `Bearer ${podJwt}`);
+        .set("Authorization", `Bearer ${alicePodJwt}`);
 
       response.status.should.equal(200);
       const apiResult: AddLogEntriesAPIResult = JSON.parse(response.text);
@@ -258,7 +264,7 @@ export default function run(configDir: string, configFilePath: string) {
       const response = await request(app)
         .post(`/logs/${logId}/entries`)
         .set("Host", hostnameAndPort)
-        .set("Authorization", `Bearer ${podJwt}`)
+        .set("Authorization", `Bearer ${alicePodJwt}`)
         .attach("hello.txt", file1)
         .attach("world.txt", file2);
 
@@ -272,7 +278,7 @@ export default function run(configDir: string, configFilePath: string) {
       const response = await request(app)
         .get(`/logs/${logId}/info`)
         .set("Host", hostnameAndPort)
-        .set("Authorization", `Bearer ${podJwt}`);
+        .set("Authorization", `Bearer ${alicePodJwt}`);
 
       response.status.should.equal(200);
       const apiResult: GetLogInfoAPIResult = JSON.parse(response.text);
@@ -284,7 +290,7 @@ export default function run(configDir: string, configFilePath: string) {
       const response = await request(app)
         .get(`/logs/${logId}/entries`)
         .set("Host", hostnameAndPort)
-        .set("Authorization", `Bearer ${podJwt}`);
+        .set("Authorization", `Bearer ${alicePodJwt}`);
 
       response.status.should.equal(200);
       const apiResult: GetLogEntriesAPIResult = JSON.parse(response.text);
@@ -296,7 +302,7 @@ export default function run(configDir: string, configFilePath: string) {
       const response = await request(app)
         .get(`/logs/${logId}/entries?sinceId=1`)
         .set("Host", hostnameAndPort)
-        .set("Authorization", `Bearer ${podJwt}`);
+        .set("Authorization", `Bearer ${alicePodJwt}`);
 
       response.status.should.equal(200);
       const apiResult: GetLogEntriesAPIResult = JSON.parse(response.text);
@@ -307,7 +313,7 @@ export default function run(configDir: string, configFilePath: string) {
       const response = await request(app)
         .get(`/logs/${logId}/entries?sinceCommit=${entries[1].commit}`)
         .set("Host", hostnameAndPort)
-        .set("Authorization", `Bearer ${podJwt}`);
+        .set("Authorization", `Bearer ${alicePodJwt}`);
 
       response.status.should.equal(200);
       const apiResult: GetLogEntriesAPIResult = JSON.parse(response.text);
@@ -318,7 +324,7 @@ export default function run(configDir: string, configFilePath: string) {
       const response = await request(app)
         .get(`/logs/${logId}/entries?offset=1&limit=1`)
         .set("Host", hostnameAndPort)
-        .set("Authorization", `Bearer ${podJwt}`);
+        .set("Authorization", `Bearer ${alicePodJwt}`);
 
       response.status.should.equal(200);
       const apiResult: GetLogEntriesAPIResult = JSON.parse(response.text);
@@ -330,7 +336,7 @@ export default function run(configDir: string, configFilePath: string) {
       const response = await request(app)
         .get(`/logs/${logId}/entries?offset=1&order=desc&limit=1`)
         .set("Host", hostnameAndPort)
-        .set("Authorization", `Bearer ${podJwt}`);
+        .set("Authorization", `Bearer ${alicePodJwt}`);
 
       response.status.should.equal(200);
       const apiResult: GetLogEntriesAPIResult = JSON.parse(response.text);
@@ -346,7 +352,7 @@ export default function run(configDir: string, configFilePath: string) {
       const response = await request(app)
         .get(`/logs/${logId}/entries?commits=${commits}`)
         .set("Host", hostnameAndPort)
-        .set("Authorization", `Bearer ${podJwt}`);
+        .set("Authorization", `Bearer ${alicePodJwt}`);
 
       response.status.should.equal(200);
       const apiResult: GetLogEntriesAPIResult = JSON.parse(response.text);
@@ -360,7 +366,7 @@ export default function run(configDir: string, configFilePath: string) {
       const response = await request(app)
         .get(uploadedPath)
         .set("Host", hostnameAndPort)
-        .set("Authorization", `Bearer ${podJwt}`);
+        .set("Authorization", `Bearer ${alicePodJwt}`);
       response.status.should.equal(200);
     });
 
@@ -368,7 +374,7 @@ export default function run(configDir: string, configFilePath: string) {
       const response = await request(app)
         .get(`/logs/${logId}/entries?limit=2`)
         .set("Host", hostnameAndPort)
-        .set("Authorization", `Bearer ${podJwt}`);
+        .set("Authorization", `Bearer ${alicePodJwt}`);
 
       response.status.should.equal(200);
       const apiResult: GetLogEntriesAPIResult = JSON.parse(response.text);
@@ -380,11 +386,53 @@ export default function run(configDir: string, configFilePath: string) {
       const response = await request(app)
         .get(`/permissions`)
         .set("Host", hostnameAndPort)
-        .set("Authorization", `Bearer ${podJwt}`);
+        .set("Authorization", `Bearer ${alicePodJwt}`);
 
       response.status.should.equal(200);
       const apiResult: GetPermissionsAPIResult = JSON.parse(response.text);
       apiResult.permissions.length.should.be.greaterThan(0);
+    });
+
+    let permissionTokenId: string;
+    it("adds a permission token", async () => {
+      const response = await request(app)
+        .post("/permission-tokens")
+        .send({
+          identity: {
+            iss: appConfig.jwtIssuers[0].claims.iss,
+            sub: "carol",
+          },
+          permissions: {
+            logs: [
+              {
+                log: logId,
+                access: {
+                  read: true,
+                },
+              },
+            ],
+          },
+        })
+        .set("Host", hostnameAndPort)
+        .set("Authorization", `Bearer ${alicePodJwt}`);
+
+      response.status.should.equal(200);
+      const apiResult: AddPermissionTokenAPIResult = JSON.parse(response.text);
+      should.exist(apiResult.id);
+      permissionTokenId = apiResult.id;
+    });
+
+    it("redeems a permission token", async () => {
+      const response = await request(app)
+        .post(`/permission-tokens/${permissionTokenId}`)
+        .send({})
+        .set("Host", hostnameAndPort)
+        .set("Authorization", `Bearer ${carolPodJwt}`);
+
+      response.status.should.equal(200);
+      const apiResult: RedeemPermissionTokenAPIResult = JSON.parse(
+        response.text
+      );
     });
 
     it("gets jwks from well-known endpoint", async () => {
@@ -401,7 +449,7 @@ export default function run(configDir: string, configFilePath: string) {
       const wsSender = new WebSocket(`ws://${hostname}:${port}/channels`);
       const wsReceiver = new WebSocket(`ws://${hostname}:${port}/channels`);
 
-      const authMessage = JSON.stringify({ token: podJwt });
+      const authMessage = JSON.stringify({ token: alicePodJwt });
       const result = await new Promise<string>((resolve, reject) => {
         wsSender.addEventListener("open", function (event) {
           wsSender.send(authMessage);

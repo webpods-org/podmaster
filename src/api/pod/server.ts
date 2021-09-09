@@ -4,6 +4,7 @@ import bodyParser from "koa-body";
 import jwtMiddleware from "../../lib/jwt/middleware.js";
 import * as logsApi from "./logs/index.js";
 import * as permissionsApi from "./permissions/index.js";
+import * as permissionTokensApi from "./permissionsTokens/index.js";
 import * as config from "../../config/index.js";
 
 const MEGABYTE = 1024 * 1024;
@@ -12,17 +13,18 @@ export default function setup() {
   const appConfig = config.get();
 
   const podsRouter = new Router();
-  
+
   // permissions
   podsRouter.get("/permissions", permissionsApi.get);
   podsRouter.post("/permissions", permissionsApi.add);
   podsRouter.del("/permissions", permissionsApi.remove);
 
   // permission tokens. Can be exchanged for a permission later by holder.
-  podsRouter.get("/permission-tokens", permissionsApi.get);
-  podsRouter.post("/permission-tokens", permissionsApi.add);
-  podsRouter.del("/permission-tokens", permissionsApi.remove);
-  
+  podsRouter.get("/permission-tokens", permissionTokensApi.get);
+  podsRouter.post("/permission-tokens", permissionTokensApi.add);
+  podsRouter.post("/permission-tokens/:id", permissionTokensApi.redeem);
+  podsRouter.del("/permission-tokens/:id", permissionTokensApi.remove);
+
   // logs
   podsRouter.get("/logs", logsApi.get);
   podsRouter.post("/logs", logsApi.add);

@@ -22,7 +22,7 @@ export default async function getPermissions(
 
     const podPermission = await getPodPermissionForJwt(podDb, userClaims);
 
-    if (podPermission.admin || podPermission.write) {
+    if (podPermission.write) {
       const permissions: IdentityPermission[] = [];
 
       // Get pod permissions

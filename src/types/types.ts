@@ -199,8 +199,10 @@ export type LogEntry = {
 export type PermissionToken = {
   id: string;
   permissions: {
-    log: string;
-    access: LogAccess;
+    logs: {
+      log: string;
+      access: LogAccess;
+    }[];
   };
   maxRedemptions: number;
   redemptions: number;

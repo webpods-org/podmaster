@@ -6,22 +6,24 @@ import {
   generateInsertStatement,
   generateUpdateStatement,
 } from "../../../lib/sqlite.js";
+import podPermissionMapper from "../../../mappers/podPermission.js";
 
 export default async function addPodPermission(
   identity: Identity,
   access: PodAccess,
+  appendPermissions: boolean,
   podDb: Sqlite3.Database
 ): Promise<void> {
   const existingPermStmt = podDb.prepare(
     `SELECT * FROM "pod_permissions" WHERE "iss"=@iss AND "sub"=@sub`
   );
 
-  const existingItem = existingPermStmt.get({
+  const existingRow = existingPermStmt.get({
     iss: identity.iss,
     sub: identity.sub,
   });
 
-  if (!existingItem) {
+  if (!existingRow) {
     const podPermissionsRow: PodPermissionsRow = {
       iss: identity.iss,
       sub: identity.sub,
@@ -40,10 +42,30 @@ export default async function addPodPermission(
 
     insertPermStmt.run(podPermissionsRow);
   } else {
+    const existingPodPermission = podPermissionMapper(existingRow);
+
     const podPermissionsRow: PodAccessRow = {
-      admin: access.admin ? 1 : 0,
-      write: access.write ? 1 : 0,
-      read: access.read ? 1 : 0,
+      admin: (
+        appendPermissions
+          ? existingPodPermission.access.admin || access.admin
+          : access.admin
+      )
+        ? 1
+        : 0,
+      write: (
+        appendPermissions
+          ? existingPodPermission.access.write || access.write
+          : access.write
+      )
+        ? 1
+        : 0,
+      read: (
+        appendPermissions
+          ? existingPodPermission.access.read || access.read
+          : access.read
+      )
+        ? 1
+        : 0,
     };
 
     const updatePermStatement = podDb.prepare(

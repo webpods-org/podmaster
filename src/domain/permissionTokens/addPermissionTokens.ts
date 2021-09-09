@@ -9,7 +9,9 @@ import { getPodDataDir } from "../../storage/index.js";
 import getPodPermissionForJwt from "../pods/util/getPodPermissionForJwt.js";
 import random from "../../utils/random.js";
 
-export type AddPermissionTokenResult = {};
+export type AddPermissionTokenResult = {
+  id: string;
+};
 
 export default async function addPermissionToken(
   hostname: string,
@@ -30,7 +32,7 @@ export default async function addPermissionToken(
 
     const podPermission = await getPodPermissionForJwt(podDb, userClaims);
 
-    if (podPermission.admin) {
+    if (podPermission.write) {
       const id = random();
       const permissionsJson = JSON.stringify(permissions);
 

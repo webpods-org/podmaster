@@ -24,7 +24,7 @@ export default async function getPermissionTokens(
     if (podPermission.admin) {
       // Get pod permissions
       const permissionTokensStmt = podDb.prepare(
-        `SELECT * FROM "permission_tokens WHERE "expiry">@expiry AND "max_redemptions">"redemptions"`
+        `SELECT * FROM "permission_tokens" WHERE "expiry" > @expiry AND "max_redemptions" > "redemptions"`
       );
       const permissionTokens = permissionTokensStmt
         .all({ expiry: Date.now() })
