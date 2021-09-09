@@ -1,7 +1,7 @@
 import send from "koa-send";
 import handleResult from "../../../handleResult.js";
 import { IKoaAppContext } from "../../../../types/koa.js";
-import getFile from "../../../../domain/log/getFile.js";
+import getLogFile from "../../../../domain/logs/files/getLogFile.js";
 import * as config from "../../../../config/index.js";
 import path from "path/posix";
 
@@ -12,7 +12,7 @@ export default async function item(ctx: IKoaAppContext): Promise<void> {
   await handleResult(
     ctx,
     () =>
-      getFile(
+      getLogFile(
         hostname,
         ctx.params.log,
         ctx.url,

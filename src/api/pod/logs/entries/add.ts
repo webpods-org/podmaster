@@ -1,4 +1,4 @@
-import addEntries from "../../../../domain/log/addEntries.js";
+import addLogEntries from "../../../../domain/logs/entries/addLogEntries.js";
 import { ACCESS_DENIED } from "../../../../errors/codes.js";
 import { IKoaAppContext } from "../../../../types/koa.js";
 import handleResult from "../../../handleResult.js";
@@ -20,7 +20,7 @@ export default async function addAPI(
     ctx,
     () =>
       ensureJwt(ctx.state.jwt)
-        ? addEntries(
+        ? addLogEntries(
             hostname,
             ctx.params.log,
             ctx.request.body.entries,

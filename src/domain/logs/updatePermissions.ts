@@ -1,12 +1,12 @@
 import * as db from "../../db/index.js";
 import { JwtClaims, LogPermission } from "../../types/types.js";
 import { Result } from "../../types/api.js";
-import ensurePod from "../pod/ensurePod.js";
+import ensurePod from "../pods/ensurePod.js";
 import { ACCESS_DENIED } from "../../errors/codes.js";
 import { LogPermissionsRow } from "../../types/db.js";
 import { generateInsertStatement } from "../../lib/sqlite.js";
 import { getPodDataDir } from "../../storage/index.js";
-import { getPodPermissionsForJwt } from "../pod/getPodPermissionsForJwt.js";
+import { getPodPermissionsForJwt } from "../pods/getPodPermissionsForJwt.js";
 
 export type UpdatePermissionsResult = {
   added: number;

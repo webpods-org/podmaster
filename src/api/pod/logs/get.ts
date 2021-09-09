@@ -1,4 +1,4 @@
-import getLogs from "../../../domain/log/getLogs.js";
+import getLogs from "../../../domain/logs/getLogs.js";
 import handleResult from "../../handleResult.js";
 import { IKoaAppContext } from "../../../types/koa.js";
 import { ACCESS_DENIED } from "../../../errors/codes.js";

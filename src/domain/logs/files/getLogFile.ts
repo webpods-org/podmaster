@@ -1,12 +1,12 @@
 import { join } from "path";
-import * as db from "../../db/index.js";
-import { Result } from "../../types/api.js";
-import ensurePod from "../pod/ensurePod.js";
-import { ACCESS_DENIED, NOT_FOUND } from "../../errors/codes.js";
-import { getLogPermissionsForJwt } from "./getLogPermissionsForJwt.js";
-import isFilenameValid from "../../lib/validation/checkFilename.js";
-import { getDirNumber, getPodDataDir } from "../../storage/index.js";
-import { JwtClaims } from "../../types/types.js";
+import * as db from "../../../db/index.js";
+import { Result } from "../../../types/api.js";
+import ensurePod from "../../pods/ensurePod.js";
+import { ACCESS_DENIED, NOT_FOUND } from "../../../errors/codes.js";
+import { getLogPermissionsForJwt } from "../util/getLogPermissionsForJwt.js";
+import isFilenameValid from "../../../lib/validation/checkFilename.js";
+import { getDirNumber, getPodDataDir } from "../../../storage/index.js";
+import { JwtClaims } from "../../../types/types.js";
 
 export type GetFileResult = {
   relativeFilePath: string;

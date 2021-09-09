@@ -1,4 +1,4 @@
-import createLog from "../../../domain/log/createLog.js";
+import addLog from "../../../domain/logs/addLog.js";
 import handleResult from "../../handleResult.js";
 import transformQuery from "../../utils/transformQuery.js";
 import { IKoaAppContext } from "../../../types/koa.js";
@@ -14,7 +14,7 @@ export default async function addAPI(ctx: IKoaAppContext): Promise<void> {
     ctx,
     () =>
       ensureJwt(ctx.state.jwt)
-        ? createLog(
+        ? addLog(
             hostname,
             ctx.request.body.id,
             ctx.request.body.name,

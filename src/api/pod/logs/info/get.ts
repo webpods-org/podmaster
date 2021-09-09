@@ -1,5 +1,5 @@
 import handleResult from "../../../handleResult.js";
-import getInfo from "../../../../domain/log/getInfo.js";
+import getLogInfo from "../../../../domain/logs/info/getLogInfo.js";
 import { IKoaAppContext } from "../../../../types/koa.js";
 
 export type GetLogInfoAPIResult = {
@@ -14,7 +14,7 @@ export default async function getAPI(
 
   await handleResult(
     ctx,
-    () => getInfo(hostname, ctx.params.log, ctx.state.jwt?.claims),
+    () => getLogInfo(hostname, ctx.params.log, ctx.state.jwt?.claims),
     (result) => {
       const body: GetLogInfoAPIResult = {
         id: result.value.id,

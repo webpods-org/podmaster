@@ -2,10 +2,10 @@ import * as db from "../../db/index.js";
 import { JwtClaims, LogPermission } from "../../types/types.js";
 import { Result } from "../../types/api.js";
 import mapper from "../../mappers/logPermission.js";
-import ensurePod from "../pod/ensurePod.js";
+import ensurePod from "../pods/ensurePod.js";
 import { ACCESS_DENIED } from "../../errors/codes.js";
 import { getPodDataDir } from "../../storage/index.js";
-import { getPodPermissionsForJwt } from "../pod/getPodPermissionsForJwt.js";
+import { getPodPermissionsForJwt } from "../pods/getPodPermissionsForJwt.js";
 
 export type GetPermissionsResult = {
   permissions: LogPermission[];

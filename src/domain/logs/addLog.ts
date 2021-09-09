@@ -3,7 +3,7 @@ import { join } from "path";
 
 import * as db from "../../db/index.js";
 import { ErrResult, Result } from "../../types/api.js";
-import ensurePod from "../pod/ensurePod.js";
+import ensurePod from "../pods/ensurePod.js";
 import {
   ACCESS_DENIED,
   INVALID_LOG_NAME,
@@ -15,7 +15,7 @@ import { generateInsertStatement } from "../../lib/sqlite.js";
 import { getPodDataDir } from "../../storage/index.js";
 import getLogs from "./getLogs.js";
 import { JwtClaims } from "../../types/types.js";
-import { getPodPermissionsForJwt } from "../pod/getPodPermissionsForJwt.js";
+import { getPodPermissionsForJwt } from "../pods/getPodPermissionsForJwt.js";
 import { isAlphanumeric } from "../../api/utils/isAlphanumeric.js";
 
 export type CreateLogResult = {};

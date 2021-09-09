@@ -2,20 +2,20 @@ import { extname, join } from "path";
 import { Files } from "formidable";
 import { createHash } from "crypto";
 import mv from "mv";
-import random from "../../utils/random.js";
+import random from "../../../utils/random.js";
 import { promisify } from "util";
 import { existsSync, readFileSync } from "fs";
 
-import * as db from "../../db/index.js";
-import { ErrResult, Result } from "../../types/api.js";
-import { EntriesRow } from "../../types/db.js";
-import ensurePod from "../pod/ensurePod.js";
-import { getLogPermissionsForJwt } from "./getLogPermissionsForJwt.js";
-import { ACCESS_DENIED, INVALID_FILENAME } from "../../errors/codes.js";
-import isFilenameValid from "../../lib/validation/checkFilename.js";
-import { generateInsertStatement } from "../../lib/sqlite.js";
-import { getPodDataDir } from "../../storage/index.js";
-import { JwtClaims } from "../../types/types.js";
+import * as db from "../../../db/index.js";
+import { ErrResult, Result } from "../../../types/api.js";
+import { EntriesRow } from "../../../types/db.js";
+import ensurePod from "../../pods/ensurePod.js";
+import { getLogPermissionsForJwt } from "../util/getLogPermissionsForJwt.js";
+import { ACCESS_DENIED, INVALID_FILENAME } from "../../../errors/codes.js";
+import isFilenameValid from "../../../lib/validation/checkFilename.js";
+import { generateInsertStatement } from "../../../lib/sqlite.js";
+import { getPodDataDir } from "../../../storage/index.js";
+import { JwtClaims } from "../../../types/types.js";
 
 const moveFile = promisify(mv);
 

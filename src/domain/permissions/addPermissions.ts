@@ -7,7 +7,7 @@ import {
   PodPermission,
 } from "../../types/types.js";
 import { Result } from "../../types/api.js";
-import ensurePod from "../pod/ensurePod.js";
+import ensurePod from "../pods/ensurePod.js";
 import { ACCESS_DENIED } from "../../errors/codes.js";
 import { LogPermissionsRow, PodPermissionsRow } from "../../types/db.js";
 import {
@@ -15,7 +15,7 @@ import {
   generateUpdateStatement,
 } from "../../lib/sqlite.js";
 import { getPodDataDir } from "../../storage/index.js";
-import { getPodPermissionsForJwt } from "../pod/getPodPermissionsForJwt.js";
+import { getPodPermissionsForJwt } from "../pods/getPodPermissionsForJwt.js";
 
 export type UpdatePermissionsResult = {};
 
