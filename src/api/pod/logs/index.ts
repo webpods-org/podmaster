@@ -1,7 +1,5 @@
-export { default as createLogAPI } from "./createLog.js";
-export { default as getInfoAPI } from "./getInfo.js";
-export { default as getLogsAPI } from "./getLogs.js";
-export { default as addEntriesAPI } from "./addEntries.js";
-export { default as getEntriesAPI } from "./getEntries.js";
-export { default as getFile } from "./getFile.js";
-
+export { default as get } from "./get.js";
+export { default as add } from "./add.js";
+export * as info from "./info/index.js";
+export * as entries from "./entries/index.js";
+export * as files from "./files/index.js";

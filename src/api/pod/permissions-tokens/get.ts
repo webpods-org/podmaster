@@ -6,11 +6,11 @@ import { ACCESS_DENIED, NOT_FOUND } from "../../../errors/codes.js";
 import { ensureJwt } from "../../utils/ensureJwt.js";
 import * as config from "../../../config/index.js";
 
-export type GetPermissionsAPIResult = {
+export type GetPermissionsTokensAPIResult = {
   permissions: IdentityPermission[];
 };
 
-export default async function getPermissionsAPI(
+export default async function getAPI(
   ctx: IKoaAppContext
 ): Promise<void> {
   const hostname = ctx.URL.hostname;
@@ -26,7 +26,7 @@ export default async function getPermissionsAPI(
             code: ACCESS_DENIED,
           }),
     (result) => {
-      const body: GetPermissionsAPIResult = {
+      const body: GetPermissionsTokensAPIResult = {
         permissions: result.value.permissions,
       };
       ctx.body = body;

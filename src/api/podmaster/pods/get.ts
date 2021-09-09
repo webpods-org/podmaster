@@ -13,7 +13,7 @@ export type GetPodsAPIResult = {
   }[];
 };
 
-export default async function getPodsAPI(ctx: IKoaAppContext): Promise<void> {
+export default async function getAPI(ctx: IKoaAppContext): Promise<void> {
   const appConfig = config.get();
   const hostname = ctx.URL.hostname;
 

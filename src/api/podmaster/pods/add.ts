@@ -5,11 +5,11 @@ import handleResult from "../../handleResult.js";
 import { ensureJwt as ensureJwt } from "../../utils/ensureJwt.js";
 import { IKoaAppContext } from "../../../types/koa.js";
 
-export type CreatePodAPIResult = {
+export type AddPodAPIResult = {
   hostname: string;
 };
 
-export default async function createPodAPI(ctx: IKoaAppContext): Promise<void> {
+export default async function addAPI(ctx: IKoaAppContext): Promise<void> {
   const appConfig = config.get();
   const hostname = ctx.URL.hostname;
   if (hostname === appConfig.hostname) {
@@ -30,7 +30,7 @@ export default async function createPodAPI(ctx: IKoaAppContext): Promise<void> {
               code: ACCESS_DENIED,
             }),
       (result) => {
-        const body: CreatePodAPIResult = {
+        const body: AddPodAPIResult = {
           hostname: result.value.hostname,
         };
         ctx.body = body;

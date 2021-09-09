@@ -1,2 +1,2 @@
-export { default as createPodAPI } from "./createPod.js";
-export { default as getPodsAPI } from "./getPods.js";
+export { default as add } from "./add.js";
+export { default as get } from "./get.js";

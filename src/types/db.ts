@@ -1,3 +1,5 @@
+import { EntryContentTypes } from "./types.js";
+
 export type SqliteBoolean = 1 | 0;
 
 export type PodsRow = {
@@ -26,7 +28,7 @@ export type EntriesRow = {
   commit: string;
   previous_commit: string;
   log_id: string;
-  type: "data" | "file";
+  type: EntryContentTypes;
   data: string;
   created_at: number;
   iss: string;
@@ -38,7 +40,7 @@ export type PodPermissionsRow = {
   sub: string;
   admin: SqliteBoolean;
   read: SqliteBoolean;
-  write: SqliteBoolean;  
+  write: SqliteBoolean;
   created_at: number;
 };
 

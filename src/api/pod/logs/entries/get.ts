@@ -1,11 +1,11 @@
-import getEntries from "../../../domain/log/getEntries.js";
-import transformQuery from "../../utils/transformQuery.js";
-import handleResult from "../../handleResult.js";
-import getQuery from "../../utils/getParam.js";
-import { LogEntry } from "../../../types/types.js";
-import { IKoaAppContext } from "../../../types/koa.js";
+import getEntries from "../../../../domain/log/getEntries.js";
+import transformQuery from "../../../utils/transformQuery.js";
+import handleResult from "../../../handleResult.js";
+import getQuery from "../../../utils/getParam.js";
+import { LogEntry } from "../../../../types/types.js";
+import { IKoaAppContext } from "../../../../types/koa.js";
 
-export type GetEntriesAPIResult = {
+export type GetLogEntriesAPIResult = {
   entries: LogEntry[];
 };
 
@@ -31,7 +31,7 @@ export default async function getEntriesAPI(
         ctx.state.jwt?.claims
       ),
     (result) => {
-      const body: GetEntriesAPIResult = {
+      const body: GetLogEntriesAPIResult = {
         entries: result.value.entries,
       };
       ctx.body = body;

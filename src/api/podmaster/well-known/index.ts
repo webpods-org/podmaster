@@ -1,1 +1,1 @@
-export { default as getJwks } from "./getJwks.js";
+export * as jwks from "./jwks/index.js";

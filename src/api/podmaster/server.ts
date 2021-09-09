@@ -13,11 +13,11 @@ export default function setup() {
   const podMasterRouter = new Router();
 
   // pods
-  podMasterRouter.post("/pods", podsApi.createPodAPI);
-  podMasterRouter.get("/pods", podsApi.getPodsAPI);
-  
+  podMasterRouter.post("/pods", podsApi.add);
+  podMasterRouter.get("/pods", podsApi.get);
+
   //.well-known
-  podMasterRouter.get("/.well-known/jwks.json", wellKnownEndpoints.getJwks);
+  podMasterRouter.get("/.well-known/jwks.json", wellKnownEndpoints.jwks.get);
 
   const koaPodmaster = new Koa();
   koaPodmaster.use(jwtMiddleware({ exclude: [/^\/\.well-known\//] }));

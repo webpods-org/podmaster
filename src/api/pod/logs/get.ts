@@ -12,7 +12,7 @@ export type GetLogsAPIResult = {
   }[];
 };
 
-export default async function getLogsAPI(ctx: IKoaAppContext): Promise<void> {
+export default async function getAPI(ctx: IKoaAppContext): Promise<void> {
   const hostname = ctx.URL.hostname;
 
   await handleResult(

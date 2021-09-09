@@ -182,13 +182,15 @@ export type IdentityPermission = {
   }[];
 };
 
+export type EntryContentTypes = "data" | "file" | "deleted";
+
 export type LogEntry = {
   id: number;
   contentHash: string;
   commit: string;
   previousCommit: string;
   data: string;
-  type: "data" | "file";
+  type: EntryContentTypes;
   iss: string;
   sub: string;
 };

@@ -11,19 +11,25 @@ const MEGABYTE = 1024 * 1024;
 export default function setup() {
   const appConfig = config.get();
 
-  /* POD ROUTES */
   const podsRouter = new Router();
-  podsRouter.get("/permissions", permissionsApi.getPermissionsAPI);
-  podsRouter.post("/permissions", permissionsApi.addPermissionsAPI);
-  podsRouter.del("/permissions", permissionsApi.deletePermissionsAPI);
+  
+  // permissions
+  podsRouter.get("/permissions", permissionsApi.get);
+  podsRouter.post("/permissions", permissionsApi.add);
+  podsRouter.del("/permissions", permissionsApi.remove);
 
+  // permission tokens. Can be exchanged for a permission later by holder.
+  podsRouter.get("/permission-tokens", permissionsApi.get);
+  podsRouter.post("/permission-tokens", permissionsApi.add);
+  podsRouter.del("/permission-tokens", permissionsApi.remove);
+  
   // logs
-  podsRouter.get("/logs", logsApi.getLogsAPI);
-  podsRouter.post("/logs", logsApi.createLogAPI);
-  podsRouter.get("/logs/:log/info", logsApi.getInfoAPI);
-  podsRouter.get("/logs/:log/entries", logsApi.getEntriesAPI);
-  podsRouter.post("/logs/:log/entries", logsApi.addEntriesAPI);
-  podsRouter.get("/logs/:log/files/(.*)", logsApi.getFile);
+  podsRouter.get("/logs", logsApi.get);
+  podsRouter.post("/logs", logsApi.add);
+  podsRouter.get("/logs/:log/info", logsApi.info.get);
+  podsRouter.get("/logs/:log/entries", logsApi.entries.get);
+  podsRouter.post("/logs/:log/entries", logsApi.entries.add);
+  podsRouter.get("/logs/:log/files/(.*)", logsApi.files.item);
 
   const koaPod = new Koa();
   koaPod.use(jwtMiddleware({ exclude: [/^\/channels$/] }));

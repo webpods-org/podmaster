@@ -4,9 +4,9 @@ import { IKoaAppContext } from "../../../types/koa.js";
 import { ACCESS_DENIED } from "../../../errors/codes.js";
 import { ensureJwt } from "../../utils/ensureJwt.js";
 
-export type UpdatePermissionsAPIResult = {};
+export type AddPermissionTokensAPIResult = {};
 
-export default async function addPermissionsAPI(
+export default async function addAPI(
   ctx: IKoaAppContext
 ): Promise<void> {
   const hostname = ctx.URL.hostname;
@@ -22,7 +22,7 @@ export default async function addPermissionsAPI(
             code: ACCESS_DENIED,
           }),
     (result) => {
-      const body: UpdatePermissionsAPIResult = {};
+      const body: AddPermissionTokensAPIResult = {};
       ctx.body = body;
     }
   );

@@ -1,11 +1,11 @@
 import send from "koa-send";
-import handleResult from "../../handleResult.js";
-import { IKoaAppContext } from "../../../types/koa.js";
-import getFile from "../../../domain/log/getFile.js";
-import * as config from "../../../config/index.js";
+import handleResult from "../../../handleResult.js";
+import { IKoaAppContext } from "../../../../types/koa.js";
+import getFile from "../../../../domain/log/getFile.js";
+import * as config from "../../../../config/index.js";
 import path from "path/posix";
 
-export default async function getFileAPI(ctx: IKoaAppContext): Promise<void> {
+export default async function item(ctx: IKoaAppContext): Promise<void> {
   const appConfig = config.get();
   const hostname = ctx.URL.hostname;
 

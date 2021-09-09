@@ -5,9 +5,9 @@ import { IKoaAppContext } from "../../../types/koa.js";
 import { ACCESS_DENIED } from "../../../errors/codes.js";
 import { ensureJwt } from "../../utils/ensureJwt.js";
 
-export type CreateLogAPIResult = {};
+export type AddLogAPIResult = {};
 
-export default async function createLogAPI(ctx: IKoaAppContext): Promise<void> {
+export default async function addAPI(ctx: IKoaAppContext): Promise<void> {
   const hostname = ctx.URL.hostname;
 
   await handleResult(
@@ -28,7 +28,7 @@ export default async function createLogAPI(ctx: IKoaAppContext): Promise<void> {
             code: ACCESS_DENIED,
           }),
     (result) => {
-      const body: CreateLogAPIResult = {};
+      const body: AddLogAPIResult = {};
       ctx.body = body;
     }
   );

@@ -2,16 +2,15 @@ import handleResult from "../../handleResult.js";
 import { IKoaAppContext } from "../../../types/koa.js";
 import {
   ACCESS_DENIED,
-  MISSING_FIELD,
   MISSING_PARAMETERS,
 } from "../../../errors/codes.js";
 import { ensureJwt } from "../../utils/ensureJwt.js";
 import deletePermissions from "../../../domain/permissions/deletePermissions.js";
 import getQuery from "../../utils/getParam.js";
 
-export type DeletePermissionsAPIResult = {};
+export type RemovePermissionsAPIResult = {};
 
-export default async function deletePermissionsAPI(
+export default async function removeAPI(
   ctx: IKoaAppContext
 ): Promise<void> {
   const hostname = ctx.URL.hostname;
@@ -36,7 +35,7 @@ export default async function deletePermissionsAPI(
               code: ACCESS_DENIED,
             }),
       (result) => {
-        const body: DeletePermissionsAPIResult = {};
+        const body: RemovePermissionsAPIResult = {};
         ctx.body = body;
       }
     );
@@ -44,7 +43,7 @@ export default async function deletePermissionsAPI(
     ctx.status = 400;
     ctx.body = {
       ok: false,
-      error: "The iss and sub parameters are mandatory.",
+      error: "The iss and sub query parameters are mandatory.",
       code: MISSING_PARAMETERS,
     };
   }
