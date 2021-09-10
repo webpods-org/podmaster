@@ -425,7 +425,6 @@ export default function run(configDir: string, configFilePath: string) {
     it("redeems a permission token", async () => {
       const response = await request(app)
         .post(`/permission-tokens/${permissionTokenId}`)
-        .send({})
         .set("Host", hostnameAndPort)
         .set("Authorization", `Bearer ${carolPodJwt}`);
 
@@ -433,6 +432,18 @@ export default function run(configDir: string, configFilePath: string) {
       const apiResult: RedeemPermissionTokenAPIResult = JSON.parse(
         response.text
       );
+    });
+
+    it("validates redeemded permissions", async () => {
+      const response = await request(app)
+        .get(`/permissions`)
+        .set("Host", hostnameAndPort)
+        .set("Authorization", `Bearer ${alicePodJwt}`);
+
+      response.status.should.equal(200);
+      const apiResult: GetPermissionsAPIResult = JSON.parse(response.text);
+      apiResult.permissions.length.should.equal(3);
+      apiResult.permissions[2].identity.sub.should.equal("carol");
     });
 
     it("gets jwks from well-known endpoint", async () => {
