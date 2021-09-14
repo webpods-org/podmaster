@@ -7,18 +7,23 @@ import {
   INVALID_JWT,
   JWT_INVALID_ALGORITHM,
 } from "../../errors/codes.js";
-import { AsymmetricAlgorithm } from "../../types/crypto.js";
+import { AsymmetricAlgorithm, KeyTypes } from "../../types/crypto.js";
 import { LRUMap } from "../lruCache/lru.js";
 import { Result } from "../../types/api.js";
+import { asymmetricAlgorithms, getKeyType } from "./crypto.js";
 
-// Only this for now.
-const supportedAlgorithms: string[] = ["RS256"];
-
-type CacheItem = { alg: AsymmetricAlgorithm; publicKey: string };
+type CacheItem = {
+  kid: string;
+  kty: KeyTypes | "UNKNOWN";
+  alg: AsymmetricAlgorithm;
+  publicKey: string;
+};
 
 let cache: LRUMap<string, CacheItem>;
 
-export type JwtParamsForAsymmetricAlgorithm = {
+export type JWKInfo = {
+  kid: string;
+  kty: KeyTypes | "UNKNOWN";
   alg: AsymmetricAlgorithm;
   publicKey: string;
   token: string;
@@ -37,7 +42,7 @@ function getItemFromCache(key: string): CacheItem | undefined {
 
 export default async function getJwtParams(
   token: string
-): Promise<Result<JwtParamsForAsymmetricAlgorithm>> {
+): Promise<Result<JWKInfo>> {
   const decodeResult = jsonwebtoken.decode(token, {
     complete: true,
   });
@@ -65,7 +70,7 @@ export default async function getJwtParams(
   };
 
   //
-  if (!supportedAlgorithms.includes(alg.toUpperCase())) {
+  if (!asymmetricAlgorithms.includes(alg.toUpperCase())) {
     return {
       ok: false,
       error: `Authentication error. Unsupported algorithm ${alg}.`,
@@ -77,7 +82,7 @@ export default async function getJwtParams(
 
   const { iss, kid } = payload;
   if (payload && iss && kid) {
-    const issuerIsUrl = iss.startsWith("http://" || "https://");
+    const issuerIsUrl = iss.startsWith("http://") || iss.startsWith("https://");
     const issuerHostname = issuerIsUrl ? new URL(iss).hostname : iss;
 
     if (iss) {
@@ -109,8 +114,24 @@ export default async function getJwtParams(
         }
       }
 
-      // First check if the key is statically defined in appConfig
-      if (appConfig.localJwtKeys) {
+      // First check if:
+      // a) this was issued by a pod, OR
+      // b) if the key is statically defined in appConfig
+      const issuerIsPod = issuerHostname === appConfig.hostname;
+      if (issuerIsPod && kid === appConfig.auth.keys.kid) {
+        return {
+          ok: true,
+          value: {
+            kid: appConfig.auth.keys.kid,
+            kty: appConfig.auth.keys.kty,
+            alg: appConfig.auth.keys.alg,
+            publicKey: appConfig.auth.keys.publicKey,
+            token,
+            payload,
+            signature,
+          },
+        };
+      } else if (appConfig.localJwtKeys) {
         const signingKey = appConfig.localJwtKeys.find(
           (x) => x.iss === iss && x.kid === kid && x.alg === alg
         );
@@ -140,12 +161,14 @@ export default async function getJwtParams(
           };
         }
       } else {
-        const issuerWithoutTrailingSlash = iss.replace(/\/$/, "");
-        const issuerUrl = issuerIsUrl
-          ? issuerWithoutTrailingSlash
-          : "https://" + issuerWithoutTrailingSlash;
+        // First check if we have JWKS endpoint override.
+        const overriddenEndpoint = appConfig.jwksEndpoints?.find(
+          (x) => x.iss === iss
+        );
 
-        const jwksUri = `${issuerUrl}/.well-known/jwks.json`;
+        const jwksUri = overriddenEndpoint
+          ? overriddenEndpoint.url
+          : `https://${new URL(iss).hostname}/.well-known/jwks.json`;
 
         const client = jwksClient({
           jwksUri,
@@ -155,9 +178,12 @@ export default async function getJwtParams(
         });
 
         const key = await client.getSigningKey(kid);
-        if (supportedAlgorithms.includes(key.alg.toUpperCase())) {
+
+        if (asymmetricAlgorithms.includes(key.alg.toUpperCase())) {
           const publicKey = key.getPublicKey();
           cache.set(cacheKey, {
+            kid: key.kid,
+            kty: getKeyType(key.alg),
             alg: key.alg as AsymmetricAlgorithm,
             publicKey,
           });
@@ -165,6 +191,8 @@ export default async function getJwtParams(
             ok: true,
             value: {
               token,
+              kid: key.kid,
+              kty: getKeyType(key.alg),
               alg: key.alg as AsymmetricAlgorithm,
               publicKey,
               payload,

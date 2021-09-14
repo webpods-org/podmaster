@@ -27,8 +27,7 @@ const externalAuthServers = {
 */
 const jwksEndpoints = [
     {
-        type: "jwks",
-        iss: "https://abc.example.com",
+        iss: "https://abc.example.com/",
         url: "https://example.com/oauth2/v3/certs",
     },
 ];
@@ -46,29 +45,33 @@ const config = {
       - eg: When alice connects to external pods, they will expect the
         JWKS to be at {iss}/.well-known/jwks.json
     */
-    jwks: {
-        keys: [
-            {
-                kty: "RSA",
-                n: "xYm1YQ....dC9pyw",
-                kid: "de9556ad4680312c117afaef2920f5f99a4c79fd",
-                use: "sig",
-                alg: "RS256",
-                e: "AQAB",
-            },
-        ],
+    auth: {
+        keys: {
+            kid: "kid_alice_podmaster",
+            kty: "RSA",
+            alg: "RS256",
+            publicKey: `alice-podmaster-publickey`,
+            privateKey: `alice-podmaster-privatekey`
+        }
     },
     /*
       Locally defined JWT keys.
       These do not require a JWKS lookup.
-      Only RS256 is supported now.
     */
     localJwtKeys: [
         {
+            kid: "kid_provider",
+            kty: "RSA",
             alg: "RS256",
-            iss: "https://issuer.example.com/",
-            kid: "007",
-            publicKey: `issuerpubkey`,
+            iss: "https://auth.example.com/",
+            publicKey: `provider-publickey`,
+        },
+        {
+            kid: "kid_carol_podmaster",
+            kty: "RSA",
+            alg: "RS256",
+            iss: "https://some.other.podmaster.example.com/",
+            publicKey: `carol-podmaster-publickey`,
         },
     ],
     /*
@@ -78,7 +81,7 @@ const config = {
         {
             name: "SuperSecureTM",
             claims: {
-                iss: "https://issuer.example.com/",
+                iss: "https://auth.example.com/",
             },
         },
     ],

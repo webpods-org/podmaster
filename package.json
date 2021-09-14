@@ -31,6 +31,7 @@
     "@types/mkdirp": "^1.0.2",
     "@types/mv": "^2.1.2",
     "@types/node": "^16.7.10",
+    "@types/node-jose": "^1.1.8",
     "@types/ws": "^7.4.7",
     "@types/yargs": "^17.0.2",
     "better-sqlite3": "^7.4.3",
@@ -43,6 +44,7 @@
     "koa-router": "^10.1.1",
     "koa-send": "^5.0.1",
     "mv": "^2.1.1",
+    "node-jose": "^2.0.0",
     "winston": "^3.3.3",
     "ws": "^8.2.1",
     "yargs": "^17.1.1"

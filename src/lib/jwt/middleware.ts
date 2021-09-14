@@ -6,7 +6,7 @@ import { Result } from "../../types/api.js";
 import { log, logException } from "../logger/log.js";
 import { IKoaAppContext } from "../../types/koa.js";
 import getJwtParams, {
-  JwtParamsForAsymmetricAlgorithm,
+  JWKInfo,
 } from "./getJwtParams.js";
 import validateClaims from "./validateClaims.js";
 import { checkAud, checkExp, checkNbf } from "./validations.js";
@@ -75,7 +75,7 @@ export default function jwtMiddleware(options: { exclude: RegExp[] }) {
 
 async function getJwtParametersFromContext(
   ctx: ParameterizedContext
-): Promise<Result<JwtParamsForAsymmetricAlgorithm>> {
+): Promise<Result<JWKInfo>> {
   const token = resolveAuthorizationHeader(ctx);
 
   if (token === null) {

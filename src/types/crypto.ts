@@ -1,5 +1,7 @@
 export type SymmetricAlgorithm = "HS256" | "HS384" | "HS512";
 
+export type KeyTypes = "EC" | "RSA";
+
 export type AsymmetricAlgorithm =
   | "RS256"
   | "RS384"

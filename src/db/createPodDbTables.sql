@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS pod_permissions (
-	"iss" INTEGER,
-  "sub" TEXT NOT NULL UNIQUE,
+	"iss" TEXT NOT NULL,
+  "sub" TEXT NOT NULL,
   "admin" INTEGER NOT NULL,
   "read" INTEGER NOT NULL,
   "write" INTEGER NOT NULL,
@@ -34,8 +34,8 @@ CREATE TABLE IF NOT EXISTS entries (
 
 CREATE TABLE IF NOT EXISTS log_permissions (
 	"log_id" TEXT NOT NULL,
-  "iss" INTEGER,
-  "sub" TEXT NOT NULL UNIQUE,
+  "iss" TEXT NOT NULL,
+  "sub" TEXT NOT NULL,
   "read" INTEGER NOT NULL,
   "write" INTEGER NOT NULL,
   "publish" INTEGER NOT NULL,

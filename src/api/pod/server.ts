@@ -5,6 +5,7 @@ import jwtMiddleware from "../../lib/jwt/middleware.js";
 import * as logsApi from "./logs/index.js";
 import * as permissionsApi from "./permissions/index.js";
 import * as permissionTokensApi from "./permissionsTokens/index.js";
+import * as authApi from "./auth/index.js";
 import * as config from "../../config/index.js";
 
 const MEGABYTE = 1024 * 1024;
@@ -32,6 +33,9 @@ export default function setup() {
   podsRouter.get("/logs/:log/entries", logsApi.entries.get);
   podsRouter.post("/logs/:log/entries", logsApi.entries.add);
   podsRouter.get("/logs/:log/files/(.*)", logsApi.files.item);
+
+  // jwt
+  podsRouter.post("/auth/tokens", authApi.tokens.add);
 
   const koaPod = new Koa();
   koaPod.use(jwtMiddleware({ exclude: [/^\/channels$/] }));

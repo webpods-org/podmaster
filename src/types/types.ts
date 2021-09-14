@@ -1,4 +1,4 @@
-import { AsymmetricAlgorithm, SymmetricAlgorithm } from "./crypto";
+import { AsymmetricAlgorithm, KeyTypes, SymmetricAlgorithm } from "./crypto";
 
 export type ExternalAuthServers = {
   allow: boolean;
@@ -7,7 +7,6 @@ export type ExternalAuthServers = {
 };
 
 export type JwksEndpoint = {
-  type: "jwks";
   iss: string;
   url: string;
 };
@@ -76,6 +75,7 @@ export type Tier = {
 
 export type LocallyDefinedAsymmetricJwtKey = {
   kid: string;
+  kty: "RSA",
   iss: string;
   alg: AsymmetricAlgorithm;
   publicKey: string;
@@ -131,9 +131,6 @@ export type AppConfig = {
   hostname: string;
   externalAuthServers: ExternalAuthServers;
   jwksEndpoints?: JwksEndpoint[];
-  jwks: {
-    keys: JWK[];
-  };
   jwksCacheSize?: number;
   localJwtKeys?: LocallyDefinedAsymmetricJwtKey[];
   jwtIssuers: JwtIssuers[];
@@ -145,6 +142,15 @@ export type AppConfig = {
   useHttps?: HttpsConfig;
   pubsub?: PubSubConfig;
   queries?: QueryConfig;
+  auth: {
+    keys: {
+      kid: string;
+      kty: KeyTypes,
+      alg: AsymmetricAlgorithm,
+      publicKey: string;
+      privateKey: string;
+    };
+  };
 };
 
 export type PodAccess = {

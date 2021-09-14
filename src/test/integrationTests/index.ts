@@ -1,3 +1,4 @@
+import "mocha";
 import request from "supertest";
 import { join } from "path";
 import { readFileSync } from "fs";
@@ -25,7 +26,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 export default function run(configDir: string, configFilePath: string) {
-  const alicePodmasterJwt = readFileSync(join(configDir, "alice_podmaster_jwt"))
+  const alicePodmasterJwt = readFileSync(join(configDir, "alice_provider_jwt"))
     .toString()
     .replace(/\r?\n|\r/g, "");
 
@@ -49,10 +50,10 @@ export default function run(configDir: string, configFilePath: string) {
       .default;
     let app: any;
     let port: number;
-    let mainHostname: string = appConfig.hostname;
+    let podmasterHostname: string = appConfig.hostname;
 
-    let hostname: string;
-    let hostnameAndPort: string;
+    let podHostname: string;
+    let podHostnameAndPort: string;
     let uploadedPath: string;
     const entries: LogEntry[] = [];
 
@@ -60,8 +61,10 @@ export default function run(configDir: string, configFilePath: string) {
       const service = await startApp(configFilePath);
       app = service.listen(port);
       port = app.address().port;
-      mainHostname =
-        port === 80 || port === 443 ? mainHostname : `${mainHostname}:${port}`;
+      podmasterHostname =
+        port === 80 || port === 443
+          ? podmasterHostname
+          : `${podmasterHostname}:${port}`;
     });
 
     beforeEach(() => {});
@@ -75,20 +78,20 @@ export default function run(configDir: string, configFilePath: string) {
           description: podDescription,
           admin: {
             identity: {
-              iss: "https://auth.local.disks.app/",
+              iss: `https://${appConfig.hostname}/`,
               sub: "alice",
             },
           },
         })
-        .set("Host", mainHostname)
+        .set("Host", podmasterHostname)
         .set("Authorization", `Bearer ${alicePodmasterJwt}`);
 
       response.status.should.equal(200);
       const apiResult: AddPodAPIResult = JSON.parse(response.text);
       should.exist(apiResult.hostname);
-      hostname = apiResult.hostname;
-      hostnameAndPort =
-        port === 80 || port === 443 ? hostname : `${hostname}:${port}`;
+      podHostname = apiResult.hostname;
+      podHostnameAndPort =
+        port === 80 || port === 443 ? podHostname : `${podHostname}:${port}`;
     });
 
     it("cannot create pod with existing id", async () => {
@@ -98,7 +101,7 @@ export default function run(configDir: string, configFilePath: string) {
           id: "myweblog",
           description: "This is my very own pod.",
         })
-        .set("Host", mainHostname)
+        .set("Host", podmasterHostname)
         .set("Authorization", `Bearer ${alicePodmasterJwt}`);
 
       response.status.should.equal(403);
@@ -109,7 +112,7 @@ export default function run(configDir: string, configFilePath: string) {
     it("gets all pods", async () => {
       const response = await request(app)
         .get("/pods")
-        .set("Host", mainHostname)
+        .set("Host", podmasterHostname)
         .set("Authorization", `Bearer ${alicePodmasterJwt}`);
 
       response.status.should.equal(200);
@@ -125,7 +128,7 @@ export default function run(configDir: string, configFilePath: string) {
         .post("/permissions")
         .send({
           identity: {
-            iss: appConfig.jwtIssuers[0].claims.iss,
+            iss: `https://${podHostname}/`,
             sub: "alice",
           },
           pod: {
@@ -135,7 +138,7 @@ export default function run(configDir: string, configFilePath: string) {
             },
           },
         })
-        .set("Host", hostnameAndPort)
+        .set("Host", podHostnameAndPort)
         .set("Authorization", `Bearer ${alicePodJwt}`);
 
       response.status.should.equal(200);
@@ -149,7 +152,7 @@ export default function run(configDir: string, configFilePath: string) {
           name: logName,
           description: logDescription,
         })
-        .set("Host", hostnameAndPort)
+        .set("Host", podHostnameAndPort)
         .set("Authorization", `Bearer ${alicePodJwt}`);
 
       response.status.should.equal(200);
@@ -160,7 +163,7 @@ export default function run(configDir: string, configFilePath: string) {
         .post("/permissions")
         .send({
           identity: {
-            iss: appConfig.jwtIssuers[0].claims.iss,
+            iss: `https://${appConfig.hostname}/`,
             sub: "alice",
           },
           logs: [
@@ -175,7 +178,7 @@ export default function run(configDir: string, configFilePath: string) {
             },
           ],
         })
-        .set("Host", hostnameAndPort)
+        .set("Host", podHostnameAndPort)
         .set("Authorization", `Bearer ${alicePodJwt}`);
 
       response.status.should.equal(200);
@@ -189,7 +192,7 @@ export default function run(configDir: string, configFilePath: string) {
         .post("/permissions")
         .send({
           identity: {
-            iss: appConfig.jwtIssuers[0].claims.iss,
+            iss: "https://some.other.podmaster.example.com/",
             sub: "bob",
           },
           logs: [
@@ -204,16 +207,16 @@ export default function run(configDir: string, configFilePath: string) {
             },
           ],
         })
-        .set("Host", hostnameAndPort)
+        .set("Host", podHostnameAndPort)
         .set("Authorization", `Bearer ${alicePodJwt}`);
 
       const response = await request(app)
         .del("/permissions")
         .query({
-          iss: appConfig.jwtIssuers[0].claims.iss,
+          iss: "https://some.other.podmaster.example.com/",
           sub: "bob",
         })
-        .set("Host", hostnameAndPort)
+        .set("Host", podHostnameAndPort)
         .set("Authorization", `Bearer ${alicePodJwt}`);
 
       response.status.should.equal(200);
@@ -222,7 +225,7 @@ export default function run(configDir: string, configFilePath: string) {
     it("gets all logs", async () => {
       const response = await request(app)
         .get("/logs")
-        .set("Host", hostnameAndPort)
+        .set("Host", podHostnameAndPort)
         .set("Authorization", `Bearer ${alicePodJwt}`);
 
       response.status.should.equal(200);
@@ -248,7 +251,7 @@ export default function run(configDir: string, configFilePath: string) {
             },
           ],
         })
-        .set("Host", hostnameAndPort)
+        .set("Host", podHostnameAndPort)
         .set("Authorization", `Bearer ${alicePodJwt}`);
 
       response.status.should.equal(200);
@@ -263,7 +266,7 @@ export default function run(configDir: string, configFilePath: string) {
 
       const response = await request(app)
         .post(`/logs/${logId}/entries`)
-        .set("Host", hostnameAndPort)
+        .set("Host", podHostnameAndPort)
         .set("Authorization", `Bearer ${alicePodJwt}`)
         .attach("hello.txt", file1)
         .attach("world.txt", file2);
@@ -277,7 +280,7 @@ export default function run(configDir: string, configFilePath: string) {
     it("gets info about a log", async () => {
       const response = await request(app)
         .get(`/logs/${logId}/info`)
-        .set("Host", hostnameAndPort)
+        .set("Host", podHostnameAndPort)
         .set("Authorization", `Bearer ${alicePodJwt}`);
 
       response.status.should.equal(200);
@@ -289,7 +292,7 @@ export default function run(configDir: string, configFilePath: string) {
     it("gets entries from a log", async () => {
       const response = await request(app)
         .get(`/logs/${logId}/entries`)
-        .set("Host", hostnameAndPort)
+        .set("Host", podHostnameAndPort)
         .set("Authorization", `Bearer ${alicePodJwt}`);
 
       response.status.should.equal(200);
@@ -301,7 +304,7 @@ export default function run(configDir: string, configFilePath: string) {
     it("gets entries from a log after id", async () => {
       const response = await request(app)
         .get(`/logs/${logId}/entries?sinceId=1`)
-        .set("Host", hostnameAndPort)
+        .set("Host", podHostnameAndPort)
         .set("Authorization", `Bearer ${alicePodJwt}`);
 
       response.status.should.equal(200);
@@ -312,7 +315,7 @@ export default function run(configDir: string, configFilePath: string) {
     it("gets entries from a log after commit", async () => {
       const response = await request(app)
         .get(`/logs/${logId}/entries?sinceCommit=${entries[1].commit}`)
-        .set("Host", hostnameAndPort)
+        .set("Host", podHostnameAndPort)
         .set("Authorization", `Bearer ${alicePodJwt}`);
 
       response.status.should.equal(200);
@@ -323,7 +326,7 @@ export default function run(configDir: string, configFilePath: string) {
     it("gets entries with offset", async () => {
       const response = await request(app)
         .get(`/logs/${logId}/entries?offset=1&limit=1`)
-        .set("Host", hostnameAndPort)
+        .set("Host", podHostnameAndPort)
         .set("Authorization", `Bearer ${alicePodJwt}`);
 
       response.status.should.equal(200);
@@ -335,7 +338,7 @@ export default function run(configDir: string, configFilePath: string) {
     it("gets last entries with offset", async () => {
       const response = await request(app)
         .get(`/logs/${logId}/entries?offset=1&order=desc&limit=1`)
-        .set("Host", hostnameAndPort)
+        .set("Host", podHostnameAndPort)
         .set("Authorization", `Bearer ${alicePodJwt}`);
 
       response.status.should.equal(200);
@@ -351,7 +354,7 @@ export default function run(configDir: string, configFilePath: string) {
         .join(",");
       const response = await request(app)
         .get(`/logs/${logId}/entries?commits=${commits}`)
-        .set("Host", hostnameAndPort)
+        .set("Host", podHostnameAndPort)
         .set("Authorization", `Bearer ${alicePodJwt}`);
 
       response.status.should.equal(200);
@@ -365,7 +368,7 @@ export default function run(configDir: string, configFilePath: string) {
     it("downloads files", async () => {
       const response = await request(app)
         .get(uploadedPath)
-        .set("Host", hostnameAndPort)
+        .set("Host", podHostnameAndPort)
         .set("Authorization", `Bearer ${alicePodJwt}`);
       response.status.should.equal(200);
     });
@@ -373,7 +376,7 @@ export default function run(configDir: string, configFilePath: string) {
     it("limit results by count", async () => {
       const response = await request(app)
         .get(`/logs/${logId}/entries?limit=2`)
-        .set("Host", hostnameAndPort)
+        .set("Host", podHostnameAndPort)
         .set("Authorization", `Bearer ${alicePodJwt}`);
 
       response.status.should.equal(200);
@@ -385,7 +388,7 @@ export default function run(configDir: string, configFilePath: string) {
     it("gets all permissions", async () => {
       const response = await request(app)
         .get(`/permissions`)
-        .set("Host", hostnameAndPort)
+        .set("Host", podHostnameAndPort)
         .set("Authorization", `Bearer ${alicePodJwt}`);
 
       response.status.should.equal(200);
@@ -399,7 +402,7 @@ export default function run(configDir: string, configFilePath: string) {
         .post("/permission-tokens")
         .send({
           identity: {
-            iss: appConfig.jwtIssuers[0].claims.iss,
+            iss: "https://some.other.podmaster.example.com/",
             sub: "carol",
           },
           permissions: {
@@ -413,7 +416,7 @@ export default function run(configDir: string, configFilePath: string) {
             ],
           },
         })
-        .set("Host", hostnameAndPort)
+        .set("Host", podHostnameAndPort)
         .set("Authorization", `Bearer ${alicePodJwt}`);
 
       response.status.should.equal(200);
@@ -425,7 +428,7 @@ export default function run(configDir: string, configFilePath: string) {
     it("redeems a permission token", async () => {
       const response = await request(app)
         .post(`/permission-tokens/${permissionTokenId}`)
-        .set("Host", hostnameAndPort)
+        .set("Host", podHostnameAndPort)
         .set("Authorization", `Bearer ${carolPodJwt}`);
 
       response.status.should.equal(200);
@@ -437,7 +440,7 @@ export default function run(configDir: string, configFilePath: string) {
     it("validates redeemded permissions", async () => {
       const response = await request(app)
         .get(`/permissions`)
-        .set("Host", hostnameAndPort)
+        .set("Host", podHostnameAndPort)
         .set("Authorization", `Bearer ${alicePodJwt}`);
 
       response.status.should.equal(200);
@@ -449,7 +452,7 @@ export default function run(configDir: string, configFilePath: string) {
     it("gets jwks from well-known endpoint", async () => {
       const response = await request(app)
         .get(`/.well-known/jwks.json`)
-        .set("Host", mainHostname);
+        .set("Host", podmasterHostname);
 
       response.status.should.equal(200);
       const apiResult: GetJwksAPIResult = JSON.parse(response.text);
@@ -457,8 +460,8 @@ export default function run(configDir: string, configFilePath: string) {
     });
 
     it("adds a web socket subscription", async () => {
-      const wsSender = new WebSocket(`ws://${hostname}:${port}/channels`);
-      const wsReceiver = new WebSocket(`ws://${hostname}:${port}/channels`);
+      const wsSender = new WebSocket(`ws://${podHostname}:${port}/channels`);
+      const wsReceiver = new WebSocket(`ws://${podHostname}:${port}/channels`);
 
       const authMessage = JSON.stringify({ token: alicePodJwt });
       const result = await new Promise<string>((resolve, reject) => {
