@@ -5,29 +5,33 @@ import jwtMiddleware from "../../lib/jwt/middleware.js";
 import * as podsApi from "./pods/index.js";
 import * as wellKnownEndpoints from "./wellKnown/index.js";
 import * as config from "../../config/index.js";
+import * as authApi from "./auth/index.js";
 
 const MEGABYTE = 1024 * 1024;
 
 export default function setup() {
   const appConfig = config.get();
-  const podMasterRouter = new Router();
+  const router = new Router();
 
   // pods
-  podMasterRouter.post("/pods", podsApi.add);
-  podMasterRouter.get("/pods", podsApi.get);
+  router.post("/pods", podsApi.create);
+  router.get("/pods", podsApi.get);
 
   //.well-known
-  podMasterRouter.get("/.well-known/jwks.json", wellKnownEndpoints.jwks.get);
+  router.get("/.well-known/jwks.json", wellKnownEndpoints.jwks.get);
 
-  const koaPodmaster = new Koa();
-  koaPodmaster.use(jwtMiddleware({ exclude: [/^\/\.well-known\//] }));
-  koaPodmaster.use(
+  // jwt
+  router.post("/auth/tokens", authApi.tokens.create);
+
+  const koa = new Koa();
+  koa.use(jwtMiddleware({ exclude: [/^\/\.well-known\//] }));
+  koa.use(
     bodyParser({
       multipart: true,
       formidable: { maxFieldsSize: appConfig.maxFileSize || 8 * MEGABYTE },
     })
   );
-  koaPodmaster.use(podMasterRouter.routes());
-  koaPodmaster.use(podMasterRouter.allowedMethods());
-  return koaPodmaster.callback();
+  koa.use(router.routes());
+  koa.use(router.allowedMethods());
+  return koa.callback();
 }

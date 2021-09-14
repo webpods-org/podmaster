@@ -1,12 +1,11 @@
+import addLog from "../../../domain/logs/createLog.js";
 import handleResult from "../../handleResult.js";
+import transformQuery from "../../utils/transformQuery.js";
 import { IKoaAppContext } from "../../../types/koa.js";
 import { ACCESS_DENIED } from "../../../errors/codes.js";
 import { ensureJwt } from "../../utils/ensureJwt.js";
-import addPermissionToken from "../../../domain/permissionTokens/addPermissionTokens.js";
 
-export type AddPermissionTokenAPIResult = {
-  id: string;
-};
+export type CreateLogAPIResult = {};
 
 export default async function addAPI(ctx: IKoaAppContext): Promise<void> {
   const hostname = ctx.URL.hostname;
@@ -15,15 +14,12 @@ export default async function addAPI(ctx: IKoaAppContext): Promise<void> {
     ctx,
     () =>
       ensureJwt(ctx.state.jwt)
-        ? addPermissionToken(
+        ? addLog(
             hostname,
-            ctx.request.body.permissions,
-            ctx.request.body.maxRedemptions
-              ? parseInt(ctx.request.body.maxRedemptions)
-              : 1,
-            ctx.request.body.expiry
-              ? parseInt(ctx.request.body.expiry)
-              : Date.now() + 24 * 3600 * 1000,
+            ctx.request.body.id,
+            ctx.request.body.name,
+            ctx.request.body.description,
+            transformQuery(ctx.request.body.public, (x) => !!x),
             ctx.state.jwt.claims
           )
         : Promise.resolve({
@@ -32,9 +28,7 @@ export default async function addAPI(ctx: IKoaAppContext): Promise<void> {
             code: ACCESS_DENIED,
           }),
     (result) => {
-      const body: AddPermissionTokenAPIResult = {
-        id: result.value.id,
-      };
+      const body: CreateLogAPIResult = {};
       ctx.body = body;
     }
   );

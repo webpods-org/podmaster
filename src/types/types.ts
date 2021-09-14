@@ -75,7 +75,7 @@ export type Tier = {
 
 export type LocallyDefinedAsymmetricJwtKey = {
   kid: string;
-  kty: "RSA",
+  kty: "RSA";
   iss: string;
   alg: AsymmetricAlgorithm;
   publicKey: string;
@@ -119,7 +119,7 @@ export type QueryConfig = {
   maxResults?: number;
 };
 
-export type JwtIssuers = {
+export type Authenticators = {
   name: string;
   claims: {
     iss: string;
@@ -133,7 +133,7 @@ export type AppConfig = {
   jwksEndpoints?: JwksEndpoint[];
   jwksCacheSize?: number;
   localJwtKeys?: LocallyDefinedAsymmetricJwtKey[];
-  jwtIssuers: JwtIssuers[];
+  authenticators: Authenticators[];
   tiers: Tier[];
   storage: StorageConfig;
   pods?: PodInfo[];
@@ -143,10 +143,11 @@ export type AppConfig = {
   pubsub?: PubSubConfig;
   queries?: QueryConfig;
   auth: {
+    expiry: number;
     keys: {
       kid: string;
-      kty: KeyTypes,
-      alg: AsymmetricAlgorithm,
+      kty: KeyTypes;
+      alg: AsymmetricAlgorithm;
       publicKey: string;
       privateKey: string;
     };

@@ -6,11 +6,11 @@ PROVIDER_HOSTNAME=$3
 ssh-keygen -t rsa -b 4096 -m PEM -f "$CONFIG_DIR/provider.RS256.key" -q -N ""
 ssh-keygen -f "$CONFIG_DIR/provider.RS256.key.pub" -e -m pkcs8 >"$CONFIG_DIR/provider.RS256.key.pub.pem"
 
-ssh-keygen -t rsa -b 4096 -m PEM -f "$CONFIG_DIR/alice-podmaster.RS256.key" -q -N ""
-ssh-keygen -f "$CONFIG_DIR/alice-podmaster.RS256.key.pub" -e -m pkcs8 >"$CONFIG_DIR/alice-podmaster.RS256.key.pub.pem"
+ssh-keygen -t rsa -b 4096 -m PEM -f "$CONFIG_DIR/podmaster.RS256.key" -q -N ""
+ssh-keygen -f "$CONFIG_DIR/podmaster.RS256.key.pub" -e -m pkcs8 >"$CONFIG_DIR/podmaster.RS256.key.pub.pem"
 
-ssh-keygen -t rsa -b 4096 -m PEM -f "$CONFIG_DIR/carol-podmaster.RS256.key" -q -N ""
-ssh-keygen -f "$CONFIG_DIR/carol-podmaster.RS256.key.pub" -e -m pkcs8 >"$CONFIG_DIR/carol-podmaster.RS256.key.pub.pem"
+ssh-keygen -t rsa -b 4096 -m PEM -f "$CONFIG_DIR/podzilla.RS256.key" -q -N ""
+ssh-keygen -f "$CONFIG_DIR/podzilla.RS256.key.pub" -e -m pkcs8 >"$CONFIG_DIR/podzilla.RS256.key.pub.pem"
 
 function create_jwt() {
   local P_SUB=$1
@@ -48,24 +48,24 @@ create_jwt \
 
 create_jwt \
   alice \
-  kid_alice_podmaster \
+  kid_podmaster \
   "myweblog.$PODMASTER_HOSTNAME" \
   $PODMASTER_HOSTNAME \
-  "alice-podmaster.RS256.key" \
+  "podmaster.RS256.key" \
   alice_pod_jwt
 
 create_jwt \
   carol \
-  kid_carol_podmaster \
+  kid_some_other_podmaster \
   "myweblog.$PODMASTER_HOSTNAME" \
-  "some.other.podmaster.example.com" \
-  "carol-podmaster.RS256.key" \
+  "podzilla.example.com" \
+  "podzilla.RS256.key" \
   carol_pod_jwt
 
-ssh-to-jwk ~/temp/webpods/alice-podmaster.RS256.key.pub |
+ssh-to-jwk ~/temp/webpods/podmaster.RS256.key.pub |
   basho --json '{ ...x, "alg": "RS256", kid: "k1_" + Date.now() }' \
-    >"$CONFIG_DIR/alice-podmaster.jwk.json"
+    >"$CONFIG_DIR/podmaster.jwk.json"
 
-ssh-to-jwk ~/temp/webpods/carol-podmaster.RS256.key.pub |
+ssh-to-jwk ~/temp/webpods/podzilla.RS256.key.pub |
   basho --json '{ ...x, "alg": "RS256", kid: "k1_" + Date.now() }' \
-    >"$CONFIG_DIR/carol-podmaster.jwk.json"
+    >"$CONFIG_DIR/podzilla.jwk.json"

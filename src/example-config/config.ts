@@ -34,14 +34,14 @@ const externalAuthServers = {
 */
 const jwksEndpoints = [
   {
-    iss: "https://abc.example.com/",
-    url: "https://example.com/oauth2/v3/certs",
+    iss: "https://abc.apple.example.com/",
+    url: "https://abc.apple.example.com/oauth2/v3/certs",
   },
 ];
 
 const config: AppConfig = {
   // Primary host name for this server.
-  hostname: "pods.example.com",
+  hostname: "pods.podhost.example.com",
 
   // External Auth Server config created earlier.
   externalAuthServers,
@@ -57,12 +57,13 @@ const config: AppConfig = {
       JWKS to be at {iss}/.well-known/jwks.json
   */
   auth: {
+    expiry: 60 * 5, // five mins from now.
     keys: {
-      kid: "kid_alice_podmaster",
+      kid: "kid_podmaster",
       kty: "RSA",
       alg: "RS256",
-      publicKey: `alice-podmaster-publickey`,
-      privateKey: `alice-podmaster-privatekey`
+      publicKey: `podmaster-publickey`,
+      privateKey: `podmaster-privatekey`
     }
   },
   
@@ -75,26 +76,26 @@ const config: AppConfig = {
       kid: "kid_provider",
       kty: "RSA",
       alg: "RS256",
-      iss: "https://auth.example.com/",
+      iss: "https://auth.podhost.example.com/",
       publicKey: `provider-publickey`,
     },
     {
-      kid: "kid_carol_podmaster",
+      kid: "kid_some_other_podmaster",
       kty: "RSA",
       alg: "RS256",
-      iss: "https://some.other.podmaster.example.com/",
-      publicKey: `carol-podmaster-publickey`,
+      iss: "https://podzilla.example.com/",
+      publicKey: `podzilla-publickey`,
     },
   ],
 
   /*
     JWTs from these issuers are allowed to create pods on this server
   */
-  jwtIssuers: [
+  authenticators: [
     {
-      name: "SuperSecureTM",
+      name: "authenticatah",
       claims: {
-        iss: "https://auth.example.com/",
+        iss: "https://auth.podhost.example.com/",
       },
     },
   ],

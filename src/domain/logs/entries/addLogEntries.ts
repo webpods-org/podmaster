@@ -19,7 +19,7 @@ import { JwtClaims } from "../../../types/types.js";
 
 const moveFile = promisify(mv);
 
-export type AddEntriesResult = {
+export type AddLogEntriesResult = {
   entries: {
     id: number;
     commit: string;
@@ -38,7 +38,7 @@ export default async function addEntries(
   entries: LogEntry[] | undefined,
   files: Files | undefined,
   userClaims: JwtClaims
-): Promise<Result<AddEntriesResult>> {
+): Promise<Result<AddLogEntriesResult>> {
   return ensurePod(hostname, async (pod) => {
     function getFilePathBasedOnOriginalName(filename: string) {
       const podDataDir = getPodDataDir(pod.id);

@@ -9,7 +9,7 @@ import { fileURLToPath } from "url";
 
 import startApp from "../../startApp.js";
 import { GetPodsAPIResult } from "../../api/podmaster/pods/get.js";
-import { AddPodAPIResult } from "../../api/podmaster/pods/add.js";
+import { CreatePodAPIResult } from "../../api/podmaster/pods/create.js";
 import { GetLogsAPIResult } from "../../api/pod/logs/get.js";
 import { AddLogEntriesAPIResult } from "../../api/pod/logs/entries/add.js";
 import { AppConfig, LogEntry } from "../../types/types.js";
@@ -19,8 +19,9 @@ import { ErrResult } from "../../types/api.js";
 import { GetJwksAPIResult } from "../../api/podmaster/wellKnown/jwks/get.js";
 import { GetPermissionsAPIResult } from "../../api/pod/permissions/get.js";
 import { GetLogEntriesAPIResult } from "../../api/pod/logs/entries/get.js";
-import { AddPermissionTokenAPIResult } from "../../api/pod/permissionsTokens/add.js";
+import { CreatePermissionTokenAPIResult } from "../../api/pod/permissionsTokens/create.js";
 import { RedeemPermissionTokenAPIResult } from "../../api/pod/permissionsTokens/redeem.js";
+import { CreateAuthTokenAPIResult } from "../../api/podmaster/auth/tokens/create.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -87,7 +88,7 @@ export default function run(configDir: string, configFilePath: string) {
         .set("Authorization", `Bearer ${alicePodmasterJwt}`);
 
       response.status.should.equal(200);
-      const apiResult: AddPodAPIResult = JSON.parse(response.text);
+      const apiResult: CreatePodAPIResult = JSON.parse(response.text);
       should.exist(apiResult.hostname);
       podHostname = apiResult.hostname;
       podHostnameAndPort =
@@ -192,7 +193,7 @@ export default function run(configDir: string, configFilePath: string) {
         .post("/permissions")
         .send({
           identity: {
-            iss: "https://some.other.podmaster.example.com/",
+            iss: "https://podzilla.example.com/",
             sub: "bob",
           },
           logs: [
@@ -213,7 +214,7 @@ export default function run(configDir: string, configFilePath: string) {
       const response = await request(app)
         .del("/permissions")
         .query({
-          iss: "https://some.other.podmaster.example.com/",
+          iss: "https://podzilla.example.com/",
           sub: "bob",
         })
         .set("Host", podHostnameAndPort)
@@ -402,7 +403,7 @@ export default function run(configDir: string, configFilePath: string) {
         .post("/permission-tokens")
         .send({
           identity: {
-            iss: "https://some.other.podmaster.example.com/",
+            iss: "https://podzilla.example.com/",
             sub: "carol",
           },
           permissions: {
@@ -420,7 +421,9 @@ export default function run(configDir: string, configFilePath: string) {
         .set("Authorization", `Bearer ${alicePodJwt}`);
 
       response.status.should.equal(200);
-      const apiResult: AddPermissionTokenAPIResult = JSON.parse(response.text);
+      const apiResult: CreatePermissionTokenAPIResult = JSON.parse(
+        response.text
+      );
       should.exist(apiResult.id);
       permissionTokenId = apiResult.id;
     });
@@ -457,6 +460,18 @@ export default function run(configDir: string, configFilePath: string) {
       response.status.should.equal(200);
       const apiResult: GetJwksAPIResult = JSON.parse(response.text);
       apiResult.keys.length.should.be.greaterThan(0);
+    });
+
+    it("creates a jwt", async () => {
+      const response = await request(app)
+        .post(`/auth/tokens`)
+        .send({ aud: "podzilla.example.com" })
+        .set("Host", podmasterHostname)
+        .set("Authorization", `Bearer ${alicePodmasterJwt}`);
+
+      response.status.should.equal(200);
+      const apiResult: CreateAuthTokenAPIResult = JSON.parse(response.text);
+      should.exist(apiResult.jwt);
     });
 
     it("adds a web socket subscription", async () => {

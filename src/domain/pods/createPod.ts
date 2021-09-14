@@ -21,7 +21,7 @@ import { isAlphanumeric } from "../../api/utils/isAlphanumeric.js";
 
 export type CreatePodResult = { hostname: string };
 
-export default async function addPod(
+export default async function createPod(
   podId: string,
   podTitle: string,
   description: string,
@@ -38,8 +38,6 @@ export default async function addPod(
 
   if (!validationErrors) {
     const appConfig = config.get();
-
-    // Check if the user already has a pod.
     const systemDb = db.getSystemDb();
 
     const podHostname = userClaims.webpods?.domain
@@ -48,7 +46,7 @@ export default async function addPod(
 
     // First check if we have a valid issuer and audience.
     // Audience defaults to hostname of podmaster, but can be overridden.
-    const isValidIssuer = appConfig.jwtIssuers.some((issuer) =>
+    const isValidIssuer = appConfig.authenticators.some((issuer) =>
       matchObject({ aud: appConfig.hostname, ...issuer.claims }, userClaims)
     );
 

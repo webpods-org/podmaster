@@ -9,11 +9,11 @@ import { getPodDataDir } from "../../storage/index.js";
 import getPodPermissionForJwt from "../pods/util/getPodPermissionForJwt.js";
 import random from "../../utils/random.js";
 
-export type AddPermissionTokenResult = {
+export type CreatePermissionTokenResult = {
   id: string;
 };
 
-export default async function addPermissionToken(
+export default async function createPermissionTokens(
   hostname: string,
   permissions: {
     logs?: {
@@ -24,7 +24,7 @@ export default async function addPermissionToken(
   maxRedemptions: number,
   expiry: number,
   userClaims: JwtClaims
-): Promise<Result<AddPermissionTokenResult>> {
+): Promise<Result<CreatePermissionTokenResult>> {
   return ensurePod(hostname, async (pod) => {
     // Let's see if the log already exists.
     const podDataDir = getPodDataDir(pod.id);
