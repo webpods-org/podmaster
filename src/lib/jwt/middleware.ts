@@ -5,11 +5,10 @@ import jsonwebtoken from "jsonwebtoken";
 import { Result } from "../../types/api.js";
 import { log, logException } from "../logger/log.js";
 import { IKoaAppContext } from "../../types/koa.js";
-import getJwtParams, {
-  JWKInfo,
-} from "./getJwtParams.js";
+import getJwtParams, { JWKInfo } from "./getJwtParams.js";
 import validateClaims from "./validateClaims.js";
 import { checkAud, checkExp, checkNbf } from "./validations.js";
+import * as config from "../../config/index.js";
 
 export class AuthenticationError extends Error {
   code: string;
@@ -22,6 +21,7 @@ export class AuthenticationError extends Error {
 }
 
 export default function jwtMiddleware(options: { exclude: RegExp[] }) {
+  const appConfig = config.get();
   return async (ctx: IKoaAppContext, next: Next): Promise<void> => {
     if (options.exclude.some((regex) => regex.test(ctx.path))) {
       await next();
@@ -49,7 +49,7 @@ export default function jwtMiddleware(options: { exclude: RegExp[] }) {
             if (
               checkExp(claims) &&
               checkNbf(claims) &&
-              checkAud(claims, hostname)
+              checkAud(claims, [hostname])
             ) {
               ctx.state.jwt = {
                 claims,

@@ -23,8 +23,8 @@ function create_jwt() {
   basho \
     --import fs fs \
     --import crypto crypto \
-    -d header '{ "alg": "RS256", "type": "JWT" }' \
-    -d payload '{ "sub": "'$P_SUB'", "iss": "https://'$P_ISS_HOSTNAME'/", kid: "'$P_KID'", "aud": "'$P_AUD'", "exp": Math.floor(Date.now()/1000)  + 3600, "iat": Math.floor(Date.now()/1000) }' \
+    -d header '{ "alg": "RS256", "type": "JWT", kid: "'$P_KID'" }' \
+    -d payload '{ "sub": "'$P_SUB'", "iss": "https://'$P_ISS_HOSTNAME'/", "aud": "'$P_AUD'", "exp": Math.floor(Date.now()/1000)  + 3600, "iat": Math.floor(Date.now()/1000) }' \
     -d toBase64 'x => Buffer.from(JSON.stringify(x)).toString("base64")' \
     -d toBase64Url 'x => x.replace(/=/g, "").replace(/\+/g, "-").replace(/\//g, "_")' \
     -d base64Header 'k.toBase64Url(k.toBase64(k.header))' \
@@ -47,14 +47,6 @@ create_jwt \
   alice_provider_jwt
 
 create_jwt \
-  alice \
-  kid_podmaster \
-  "myweblog.$PODMASTER_HOSTNAME" \
-  $PODMASTER_HOSTNAME \
-  "podmaster.RS256.key" \
-  alice_pod_jwt
-
-create_jwt \
   carol \
   kid_some_other_podmaster \
   "myweblog.$PODMASTER_HOSTNAME" \
@@ -65,7 +57,3 @@ create_jwt \
 ssh-to-jwk ~/temp/webpods/podmaster.RS256.key.pub |
   basho --json '{ ...x, "alg": "RS256", kid: "k1_" + Date.now() }' \
     >"$CONFIG_DIR/podmaster.jwk.json"
-
-ssh-to-jwk ~/temp/webpods/podzilla.RS256.key.pub |
-  basho --json '{ ...x, "alg": "RS256", kid: "k1_" + Date.now() }' \
-    >"$CONFIG_DIR/podzilla.jwk.json"

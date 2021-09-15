@@ -5,7 +5,10 @@ import matchObject from "../../../utils/matchObject.js";
 import { Result } from "../../../types/api.js";
 import jsonwebtoken, { SignOptions } from "jsonwebtoken";
 
-export type CreateAuthTokenResult = { jwt: string };
+export type CreateAuthTokenResult = {
+  jwt: string;
+  identity: { iss: string; sub: string };
+};
 
 export default async function createAuthToken(
   aud: string,
@@ -40,7 +43,10 @@ export default async function createAuthToken(
         signOptions
       );
 
-      return { ok: true, value: { jwt } };
+      return {
+        ok: true,
+        value: { jwt, identity: { iss: issuer, sub: subject } },
+      };
     } else {
       return {
         ok: false,

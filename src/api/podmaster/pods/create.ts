@@ -21,7 +21,6 @@ export default async function createAPI(ctx: IKoaAppContext): Promise<void> {
               ctx.request.body.id,
               ctx.request.body.name,
               ctx.request.body.description || "",
-              ctx.request.body.admin,
               ctx.state.jwt.claims
             )
           : Promise.resolve({

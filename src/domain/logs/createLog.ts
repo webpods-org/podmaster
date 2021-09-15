@@ -17,6 +17,7 @@ import getLogs from "./getLogs.js";
 import { JwtClaims } from "../../types/types.js";
 import getPodPermissionForJwt from "../pods/util/getPodPermissionForJwt.js";
 import { isAlphanumeric } from "../../api/utils/isAlphanumeric.js";
+import addLogPermission from "../permissions/util/addLogPermission.js";
 
 export type CreateLogResult = {};
 
@@ -58,6 +59,23 @@ export default async function createLog(
             );
 
             insertLogStmt.run(logsRow);
+
+            // Creator gets full permissions.
+            await addLogPermission(
+              logId,
+              {
+                iss: userClaims.iss,
+                sub: userClaims.sub,
+              },
+              {
+                read: true,
+                write: true,
+                publish: true,
+                subscribe: true,
+              },
+              false,
+              podDb
+            );
 
             await mkdirp(logDir);
 

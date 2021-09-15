@@ -25,12 +25,6 @@ export default async function createPod(
   podId: string,
   podTitle: string,
   description: string,
-  admin: {
-    identity: {
-      iss: string;
-      sub: string;
-    };
-  },
   userClaims: JwtClaims
 ): Promise<Result<CreatePodResult>> {
   // Check fields
@@ -46,11 +40,11 @@ export default async function createPod(
 
     // First check if we have a valid issuer and audience.
     // Audience defaults to hostname of podmaster, but can be overridden.
-    const isValidIssuer = appConfig.authenticators.some((issuer) =>
+    const authenticator = appConfig.authenticators.find((issuer) =>
       matchObject({ aud: appConfig.hostname, ...issuer.claims }, userClaims)
     );
 
-    if (isValidIssuer) {
+    if (authenticator) {
       const matchingTier = appConfig.tiers.find((tier) =>
         matchObject(tier.claims, userClaims)
       );
@@ -105,8 +99,8 @@ export default async function createPod(
 
               // Insert admin permissions.
               const podPermissionsRow: PodPermissionsRow = {
-                iss: admin.identity.iss,
-                sub: admin.identity.sub,
+                iss: `https://${appConfig.hostname}/`,
+                sub: `${authenticator.name}/${userClaims.sub}`,
                 admin: 1,
                 read: 1,
                 write: 1,

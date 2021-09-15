@@ -12,7 +12,7 @@ import { GetPodsAPIResult } from "../../api/podmaster/pods/get.js";
 import { CreatePodAPIResult } from "../../api/podmaster/pods/create.js";
 import { GetLogsAPIResult } from "../../api/pod/logs/get.js";
 import { AddLogEntriesAPIResult } from "../../api/pod/logs/entries/add.js";
-import { AppConfig, LogEntry } from "../../types/types.js";
+import { AppConfig, Identity, LogEntry } from "../../types/types.js";
 import { GetLogInfoAPIResult } from "../../api/pod/logs/info/get.js";
 import promiseSignal from "../../lib/promiseSignal.js";
 import { ErrResult } from "../../types/api.js";
@@ -31,9 +31,8 @@ export default function run(configDir: string, configFilePath: string) {
     .toString()
     .replace(/\r?\n|\r/g, "");
 
-  const alicePodJwt = readFileSync(join(configDir, "alice_pod_jwt"))
-    .toString()
-    .replace(/\r?\n|\r/g, "");
+  let alicePodJwt: string;
+  let aliceIdentity: Identity;
 
   const carolPodJwt = readFileSync(join(configDir, "carol_pod_jwt"))
     .toString()
@@ -77,12 +76,6 @@ export default function run(configDir: string, configFilePath: string) {
           id: podId,
           name: podName,
           description: podDescription,
-          admin: {
-            identity: {
-              iss: `https://${appConfig.hostname}/`,
-              sub: "alice",
-            },
-          },
         })
         .set("Host", podmasterHostname)
         .set("Authorization", `Bearer ${alicePodmasterJwt}`);
@@ -93,6 +86,20 @@ export default function run(configDir: string, configFilePath: string) {
       podHostname = apiResult.hostname;
       podHostnameAndPort =
         port === 80 || port === 443 ? podHostname : `${podHostname}:${port}`;
+    });
+
+    it("gets a jwt", async () => {
+      const response = await request(app)
+        .post(`/auth/tokens`)
+        .send({ aud: podHostname })
+        .set("Host", podmasterHostname)
+        .set("Authorization", `Bearer ${alicePodmasterJwt}`);
+
+      response.status.should.equal(200);
+      const apiResult: CreateAuthTokenAPIResult = JSON.parse(response.text);
+      should.exist(apiResult.jwt);
+      alicePodJwt = apiResult.jwt;
+      aliceIdentity = apiResult.identity;
     });
 
     it("cannot create pod with existing id", async () => {
@@ -124,27 +131,6 @@ export default function run(configDir: string, configFilePath: string) {
       apiResult.pods[0].description.should.equal(podDescription);
     });
 
-    it("adds permissions for a pod", async () => {
-      const response = await request(app)
-        .post("/permissions")
-        .send({
-          identity: {
-            iss: `https://${podHostname}/`,
-            sub: "alice",
-          },
-          pod: {
-            access: {
-              write: true,
-              read: true,
-            },
-          },
-        })
-        .set("Host", podHostnameAndPort)
-        .set("Authorization", `Bearer ${alicePodJwt}`);
-
-      response.status.should.equal(200);
-    });
-
     it("creates a log", async () => {
       const response = await request(app)
         .post("/logs")
@@ -164,25 +150,23 @@ export default function run(configDir: string, configFilePath: string) {
         .post("/permissions")
         .send({
           identity: {
-            iss: `https://${appConfig.hostname}/`,
-            sub: "alice",
+            iss: "https://podzilla.example.com/",
+            sub: "podzilla/dan",
           },
           logs: [
             {
               log: logId,
               access: {
-                write: true,
+                write: false,
                 read: true,
-                publish: true,
-                subscribe: true,
+                publish: false,
+                subscribe: false,
               },
             },
           ],
         })
         .set("Host", podHostnameAndPort)
         .set("Authorization", `Bearer ${alicePodJwt}`);
-
-      response.status.should.equal(200);
 
       response.status.should.equal(200);
     });
@@ -460,18 +444,6 @@ export default function run(configDir: string, configFilePath: string) {
       response.status.should.equal(200);
       const apiResult: GetJwksAPIResult = JSON.parse(response.text);
       apiResult.keys.length.should.be.greaterThan(0);
-    });
-
-    it("creates a jwt", async () => {
-      const response = await request(app)
-        .post(`/auth/tokens`)
-        .send({ aud: "podzilla.example.com" })
-        .set("Host", podmasterHostname)
-        .set("Authorization", `Bearer ${alicePodmasterJwt}`);
-
-      response.status.should.equal(200);
-      const apiResult: CreateAuthTokenAPIResult = JSON.parse(response.text);
-      should.exist(apiResult.jwt);
     });
 
     it("adds a web socket subscription", async () => {

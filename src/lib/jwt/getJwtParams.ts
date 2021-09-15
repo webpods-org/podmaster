@@ -55,20 +55,18 @@ export default async function getJwtParams(
     };
   }
 
-  const {
-    header: { alg },
-    payload,
-    signature,
-  } = decodeResult as {
-    header: { alg: string; type: "JWT" };
+  const { header, payload, signature } = decodeResult as {
+    header: { alg: string; type: "JWT"; kid: string };
     payload: {
-      kid: string;
       iss: string;
       [key: string]: any;
     };
     signature: string;
   };
 
+  const { alg, kid } = header;
+  const { iss } = payload;
+  
   //
   if (!asymmetricAlgorithms.includes(alg.toUpperCase())) {
     return {
@@ -80,7 +78,6 @@ export default async function getJwtParams(
 
   const appConfig = config.get();
 
-  const { iss, kid } = payload;
   if (payload && iss && kid) {
     const issuerIsUrl = iss.startsWith("http://") || iss.startsWith("https://");
     const issuerHostname = issuerIsUrl ? new URL(iss).hostname : iss;

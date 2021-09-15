@@ -5,7 +5,13 @@ import { ensureJwt } from "../../../utils/ensureJwt.js";
 import createAuthToken from "../../../../domain/auth/tokens/createToken.js";
 import * as config from "../../../../config/index.js";
 
-export type CreateAuthTokenAPIResult = { jwt: string };
+export type CreateAuthTokenAPIResult = {
+  jwt: string;
+  identity: {
+    iss: string;
+    sub: string;
+  };
+};
 
 export default async function createAPI(ctx: IKoaAppContext): Promise<void> {
   const appConfig = config.get();
@@ -22,7 +28,10 @@ export default async function createAPI(ctx: IKoaAppContext): Promise<void> {
               code: ACCESS_DENIED,
             }),
       (result) => {
-        const body: CreateAuthTokenAPIResult = { jwt: result.value.jwt };
+        const body: CreateAuthTokenAPIResult = {
+          jwt: result.value.jwt,
+          identity: result.value.identity,
+        };
         ctx.body = body;
       }
     );

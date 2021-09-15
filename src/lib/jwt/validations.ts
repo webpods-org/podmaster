@@ -1,4 +1,4 @@
-import { JwtClaims, UncheckedJwtClaims } from "../../types/types.js";
+import { UncheckedJwtClaims } from "../../types/types.js";
 
 /*
   If exp is missing, assume it's valid for iat + 300 seconds.
@@ -17,9 +17,11 @@ export function checkNbf(claims: UncheckedJwtClaims) {
   return !claims.nbf || now > claims.nbf * 1000;
 }
 
-export function checkAud(claims: UncheckedJwtClaims, hostname: string) {
+export function checkAud(claims: UncheckedJwtClaims, hostnames: string[]) {
+  const aud: string | string[] | undefined = claims.aud;
+
   return (
-    claims.aud === hostname ||
-    (Array.isArray(claims.aud) && claims.aud.includes(hostname))
+    (typeof aud === "string" && hostnames.includes(aud)) ||
+    (Array.isArray(aud) && hostnames.some((hostname) => aud.includes(hostname)))
   );
 }
