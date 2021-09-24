@@ -454,7 +454,7 @@ export default function run(configDir: string, configFilePath: string) {
       const wsReceiver = new WebSocket(`ws://${podHostname}:${port}/channels`);
 
       const authMessage = JSON.stringify({ token: alicePodJwt });
-      const result = await new Promise<string>((resolve, reject) => {
+      const result = await new Promise<string>((resolve) => {
         wsSender.addEventListener("open", function (event) {
           wsSender.send(authMessage);
         });
