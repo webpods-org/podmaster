@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS pods (
   "sub" TEXT NOT NULL,
   "id" TEXT NOT NULL UNIQUE,
   "name" TEXT NOT NULL UNIQUE,
+  "app" TEXT NOT NULL UNIQUE,
   "hostname" TEXT NOT NULL UNIQUE,
   "hostname_alias" TEXT UNIQUE,
 	"created_at" INTEGER NOT NULL,

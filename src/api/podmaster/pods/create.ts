@@ -20,6 +20,7 @@ export default async function createAPI(ctx: IKoaAppContext): Promise<void> {
           ? createPod(
               ctx.request.body.id,
               ctx.request.body.name,
+              ctx.request.body.app,
               ctx.request.body.description || "",
               ctx.state.jwt.claims
             )

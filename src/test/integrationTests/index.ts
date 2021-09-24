@@ -41,6 +41,7 @@ export default function run(configDir: string, configFilePath: string) {
   describe("integration tests", async () => {
     const podId = "myweblog";
     const podName = "My Blog Db";
+    const appId = "myweblog.com";
     const podDescription = "This is a test pod.";
     const logId = "myposts";
     const logName = "Table of Posts";
@@ -75,6 +76,7 @@ export default function run(configDir: string, configFilePath: string) {
         .send({
           id: podId,
           name: podName,
+          app: appId,
           description: podDescription,
         })
         .set("Host", podmasterHostname)
@@ -107,6 +109,7 @@ export default function run(configDir: string, configFilePath: string) {
         .post("/pods")
         .send({
           id: "myweblog",
+          app: appId,
           description: "This is my very own pod.",
         })
         .set("Host", podmasterHostname)

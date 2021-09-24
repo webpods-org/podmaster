@@ -7,6 +7,7 @@ export type PodsRow = {
   sub: string;
   id: string;
   name: string;
+  app: string;
   hostname: string;
   hostname_alias: string | null;
   created_at: number;

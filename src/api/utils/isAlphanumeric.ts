@@ -1,3 +1,3 @@
 export function isAlphanumeric(text: string) {
-  return /^[a-zA-Z][a-zA-Z0-9-]+$/.test(text);
+  return text && /^[a-zA-Z][a-zA-Z0-9-]+$/.test(text);
 }

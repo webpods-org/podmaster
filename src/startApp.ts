@@ -17,9 +17,6 @@ export default async function startApp(configFile: string) {
 
   await init(appConfig);
 
-  // Set up a custom hostname
-  // router.put("/settings/hostname", podsApi.createPodAPI);
-  // router.get("/profile", userApi.getProfile);
   const podmasterCallback = podmasterServerSetup();
   const podCallback = podServerSetup();
 

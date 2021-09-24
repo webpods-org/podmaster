@@ -38,7 +38,9 @@ export default async function createAuthToken(
         subject,
       };
       const jwt = jsonwebtoken.sign(
-        {},
+        {
+          scope: userClaims.scope,
+        },
         appConfig.auth.keys.privateKey,
         signOptions
       );

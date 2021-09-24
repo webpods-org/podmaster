@@ -28,6 +28,7 @@ export type JwtClaims = {
   iss: string;
   sub: string;
   aud: string | string[];
+  scope?: string;
   exp?: number;
   nbf?: number;
   iat?: number;
@@ -90,6 +91,7 @@ export type PodInfo = {
   identity: Identity;
   id: string;
   name: string;
+  app: string;
   hostname: string;
   createdAt: number;
   tier: string;

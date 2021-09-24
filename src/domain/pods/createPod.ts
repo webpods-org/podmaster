@@ -4,6 +4,7 @@ import { JwtClaims } from "../../types/types.js";
 import * as config from "../../config/index.js";
 import {
   ACCESS_DENIED,
+  INVALID_APP_ID,
   INVALID_POD_NAME,
   MISSING_FIELD,
   POD_EXISTS,
@@ -24,13 +25,14 @@ export type CreatePodResult = { hostname: string };
 export default async function createPod(
   podId: string,
   podTitle: string,
+  app: string,
   description: string,
   userClaims: JwtClaims
 ): Promise<Result<CreatePodResult>> {
   // Check fields
-  const validationErrors = validateInput({ podId });
+  const validationErrors = validateInput({ podId, app });
 
-  if (!validationErrors) {
+  if (validationErrors === null) {
     const appConfig = config.get();
     const systemDb = db.getSystemDb();
 
@@ -78,6 +80,7 @@ export default async function createPod(
                 sub: userClaims.sub,
                 id: podId,
                 name: podTitle,
+                app: app,
                 hostname: podHostname,
                 hostname_alias: null,
                 created_at: Date.now(),
@@ -155,7 +158,10 @@ export default async function createPod(
   }
 }
 
-function validateInput(input: { podId: string }): ErrResult | undefined {
+function validateInput(input: {
+  podId: string;
+  app: string;
+}): ErrResult | null {
   if (!input.podId) {
     return {
       ok: false,
@@ -168,8 +174,15 @@ function validateInput(input: { podId: string }): ErrResult | undefined {
   } else if (!isAlphanumeric(input.podId)) {
     return {
       ok: false,
-      error: "pod name can only contains letters, numbers and hyphens.",
+      error: "Pod name can only contains letters, numbers and hyphens.",
       code: INVALID_POD_NAME,
     };
+  } else if (input.app && input.app.length > 32) {
+    return {
+      ok: false,
+      error: "App id must be a non-empty string which is at most 32 characters long.",
+      code: INVALID_APP_ID,
+    };
   }
+  return null;
 }
