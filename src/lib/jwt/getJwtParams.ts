@@ -1,4 +1,4 @@
-import * as jsonwebtoken from "jsonwebtoken";
+import jsonwebtoken from "jsonwebtoken";
 import jwksClient from "jwks-rsa";
 
 import * as config from "../../config/index.js";

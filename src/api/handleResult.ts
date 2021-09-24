@@ -7,7 +7,7 @@ export default async function handleResult<T>(
   ctx: IKoaAppContext,
   fn: () => Promise<Result<T>>,
   then: (x: OkResult<T>) => void,
-  errorHandler?: (x: ErrResult) => { handled: boolean }
+  errorHandler?: (x: ErrResult) => { handled: boolean } | undefined
 ): Promise<void> {
   try {
     const result = await fn();
@@ -15,8 +15,8 @@ export default async function handleResult<T>(
       return then(result);
     } else {
       if (errorHandler) {
-        const { handled } = errorHandler(result);
-        if (!handled) {
+        const handlerResult = errorHandler(result);
+        if (!handlerResult || !handlerResult.handled) {
           return genericErrorHandler(ctx, result);
         }
       } else {

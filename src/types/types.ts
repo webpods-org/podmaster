@@ -120,7 +120,7 @@ export type QueryConfig = {
   maxResults?: number;
 };
 
-export type Authenticators = {
+export type Authenticator = {
   name: string;
   claims: {
     iss: string;
@@ -134,7 +134,7 @@ export type AppConfig = {
   jwksEndpoints?: JwksEndpoint[];
   jwksCacheSize?: number;
   localJwtKeys?: LocallyDefinedAsymmetricJwtKey[];
-  authenticators: Authenticators[];
+  authenticators: Authenticator[];
   tiers: Tier[];
   storage: StorageConfig;
   pods?: PodInfo[];
@@ -144,7 +144,7 @@ export type AppConfig = {
   pubsub?: PubSubConfig;
   queries?: QueryConfig;
   auth: {
-    expiry: number;
+    defaultExpiry?: number;
     keys: {
       kid: string;
       kty: KeyTypes;

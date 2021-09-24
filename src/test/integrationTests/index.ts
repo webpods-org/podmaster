@@ -21,7 +21,7 @@ import { GetPermissionsAPIResult } from "../../api/pod/permissions/get.js";
 import { GetLogEntriesAPIResult } from "../../api/pod/logs/entries/get.js";
 import { CreatePermissionTokenAPIResult } from "../../api/pod/permissionsTokens/create.js";
 import { RedeemPermissionTokenAPIResult } from "../../api/pod/permissionsTokens/redeem.js";
-import { CreateAuthTokenAPIResult } from "../../api/podmaster/auth/tokens/create.js";
+import { CreateAuthTokenAPIResult } from "../../api/podmaster/oauth/token/create.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -32,7 +32,6 @@ export default function run(configDir: string, configFilePath: string) {
     .replace(/\r?\n|\r/g, "");
 
   let alicePodJwt: string;
-  let aliceIdentity: Identity;
 
   const carolPodJwt = readFileSync(join(configDir, "carol_pod_jwt"))
     .toString()
@@ -92,16 +91,20 @@ export default function run(configDir: string, configFilePath: string) {
 
     it("gets a jwt", async () => {
       const response = await request(app)
-        .post(`/auth/tokens`)
-        .send({ aud: podHostname })
-        .set("Host", podmasterHostname)
-        .set("Authorization", `Bearer ${alicePodmasterJwt}`);
+        .post(`/oauth/token`)
+        .send({
+          grant_type: "webpods-jwt-bearer",
+          assertion: alicePodmasterJwt,
+          audience: podHostname,
+        })
+        .set("Host", podmasterHostname);
 
       response.status.should.equal(200);
       const apiResult: CreateAuthTokenAPIResult = JSON.parse(response.text);
-      should.exist(apiResult.jwt);
-      alicePodJwt = apiResult.jwt;
-      aliceIdentity = apiResult.identity;
+      should.exist(apiResult.access_token);
+      should.exist(apiResult.token_type);
+      should.exist(apiResult.expires_in);
+      alicePodJwt = apiResult.access_token;
     });
 
     it("cannot create pod with existing id", async () => {

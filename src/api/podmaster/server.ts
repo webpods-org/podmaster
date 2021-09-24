@@ -5,7 +5,7 @@ import jwtMiddleware from "../../lib/jwt/middleware.js";
 import * as podsApi from "./pods/index.js";
 import * as wellKnownEndpoints from "./wellKnown/index.js";
 import * as config from "../../config/index.js";
-import * as authApi from "./auth/index.js";
+import * as authApi from "./oauth/index.js";
 
 const MEGABYTE = 1024 * 1024;
 
@@ -21,10 +21,10 @@ export default function setup() {
   router.get("/.well-known/jwks.json", wellKnownEndpoints.jwks.get);
 
   // jwt
-  router.post("/auth/tokens", authApi.tokens.create);
+  router.post("/oauth/token", authApi.tokens.create);
 
   const koa = new Koa();
-  koa.use(jwtMiddleware({ exclude: [/^\/\.well-known\//] }));
+  koa.use(jwtMiddleware({ exclude: [/^\/\.well-known\//, /^\/oauth\//] }));
   koa.use(
     bodyParser({
       multipart: true,

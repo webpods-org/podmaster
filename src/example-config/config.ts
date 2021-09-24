@@ -57,7 +57,7 @@ const config: AppConfig = {
       JWKS to be at {iss}/.well-known/jwks.json
   */
   auth: {
-    expiry: 60 * 5, // five mins from now.
+    defaultExpiry: 60 * 5, // five mins from now.
     keys: {
       kid: "kid_podmaster",
       kty: "RSA",
