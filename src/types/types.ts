@@ -43,7 +43,6 @@ export type PermissionGrant = {
   read?: boolean;
   write?: boolean;
   metadata?: boolean;
-  admin?: boolean;
 };
 
 export type JWK = {
@@ -88,7 +87,7 @@ export type Identity = {
 };
 
 export type PodInfo = {
-  identity: Identity;
+  createdBy: Identity;
   id: string;
   name: string;
   app: string;
@@ -157,7 +156,6 @@ export type AppConfig = {
 };
 
 export type PodAccess = {
-  admin: boolean;
   read: boolean;
   write: boolean;
 };

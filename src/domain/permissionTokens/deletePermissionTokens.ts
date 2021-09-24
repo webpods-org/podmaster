@@ -20,7 +20,7 @@ export default async function deletePermissionTokens(
 
     const podPermission = await getPodPermissionForJwt(podDb, userClaims);
 
-    if (podPermission.admin) {
+    if (podPermission.write) {
       const deleteTokensStmt = podDb.prepare(
         `DELETE FROM "permission_tokens" WHERE "id"=@id`
       );

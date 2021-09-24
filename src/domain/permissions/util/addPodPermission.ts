@@ -27,7 +27,6 @@ export default async function addPodPermission(
     const podPermissionsRow: PodPermissionsRow = {
       iss: identity.iss,
       sub: identity.sub,
-      admin: access.admin ? 1 : 0,
       write: access.write ? 1 : 0,
       read: access.read ? 1 : 0,
       created_at: Date.now(),
@@ -45,13 +44,6 @@ export default async function addPodPermission(
     const existingPodPermission = podPermissionMapper(existingRow);
 
     const podPermissionsRow: PodAccessRow = {
-      admin: (
-        appendPermissions
-          ? existingPodPermission.access.admin || access.admin
-          : access.admin
-      )
-        ? 1
-        : 0,
       write: (
         appendPermissions
           ? existingPodPermission.access.write || access.write

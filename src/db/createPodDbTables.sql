@@ -1,7 +1,6 @@
 CREATE TABLE IF NOT EXISTS pod_permissions (
 	"iss" TEXT NOT NULL,
   "sub" TEXT NOT NULL,
-  "admin" INTEGER NOT NULL,
   "read" INTEGER NOT NULL,
   "write" INTEGER NOT NULL,
   "created_at" INTEGER NOT NULL,

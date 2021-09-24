@@ -4,7 +4,6 @@ import { JwtClaims } from "../../../types/types.js";
 import permissionMapper from "../../../mappers/podPermission.js";
 
 const noAccess = {
-  admin: false,
   read: false,
   write: false,
 };
@@ -13,7 +12,6 @@ export default async function getPodPermissionForJwt(
   podDb: Sqlite3.Database,
   userClaims: JwtClaims
 ): Promise<{
-  admin: boolean;
   read: boolean;
   write: boolean;
 }> {
@@ -22,14 +20,15 @@ export default async function getPodPermissionForJwt(
   const permissions = existingPermStmt.all().map(permissionMapper);
 
   const matchingPerm = permissions.find(
-    (x) => x.identity.iss === userClaims.iss && x.identity.sub === userClaims.sub
+    (x) =>
+      x.identity.iss === userClaims.iss && x.identity.sub === userClaims.sub
   );
 
   if (matchingPerm) {
     return {
       ...matchingPerm.access,
-      write: matchingPerm.access.admin || matchingPerm.access.write,
-      read: matchingPerm.access.admin || matchingPerm.access.read,
+      write: matchingPerm.access.write,
+      read: matchingPerm.access.read,
     };
   } else {
     return noAccess;

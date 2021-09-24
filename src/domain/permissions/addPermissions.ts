@@ -36,12 +36,7 @@ export default async function addPermissions(
 
     const podPermission = await getPodPermissionForJwt(podDb, userClaims);
 
-    // To write podPermissions, you need to be admin
-    const hasPermission = permissions.pod
-      ? podPermission.admin
-      : podPermission.write;
-
-    if (hasPermission) {
+    if (podPermission.write) {
       if (permissions.pod) {
         await addPodPermission(
           permissions.identity,

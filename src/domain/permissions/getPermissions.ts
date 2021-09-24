@@ -26,8 +26,7 @@ export default async function getPermissions(
       const permissions: IdentityPermission[] = [];
 
       // Get pod permissions
-      // But only if you're admin.
-      if (podPermission.admin) {
+      if (podPermission.write) {
         const podPermsStmt = podDb.prepare(`SELECT * FROM "pod_permissions"`);
         const podPermissionsInDb = podPermsStmt.all().map(podPermissionMapper);
 

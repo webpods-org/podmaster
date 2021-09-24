@@ -21,7 +21,7 @@ export default async function getPermissionTokens(
 
     const podPermission = await getPodPermissionForJwt(podDb, userClaims);
 
-    if (podPermission.admin) {
+    if (podPermission.write) {
       // Get pod permissions
       const permissionTokensStmt = podDb.prepare(
         `SELECT * FROM "permission_tokens" WHERE "expiry" > @expiry AND "max_redemptions" > "redemptions"`

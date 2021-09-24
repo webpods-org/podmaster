@@ -37,7 +37,6 @@ export type EntriesRow = {
 };
 
 export type PodAccessRow = {
-  admin: SqliteBoolean;
   read: SqliteBoolean;
   write: SqliteBoolean;
 };

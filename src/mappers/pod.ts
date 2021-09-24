@@ -3,7 +3,7 @@ import { PodsRow } from "../types/db.js";
 
 export default function map(row: PodsRow): PodInfo {
   return {
-    identity: { iss: row.iss, sub: row.sub },
+    createdBy: { iss: row.iss, sub: row.sub },
     id: row.id,
     name: row.name,
     app: row.app,

@@ -100,11 +100,10 @@ export default async function createPod(
               const podDb = db.getPodDb(podDataDir);
               await db.initPodDb(podDb);
 
-              // Insert admin permissions.
+              // Insert write permissions.
               const podPermissionsRow: PodPermissionsRow = {
                 iss: `https://${appConfig.hostname}/`,
                 sub: `${authenticator.name}/${userClaims.sub}`,
-                admin: 1,
                 read: 1,
                 write: 1,
                 created_at: Date.now(),

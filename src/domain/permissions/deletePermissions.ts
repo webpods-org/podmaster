@@ -28,27 +28,23 @@ export default async function deletePermissions(
       const podPermission = await getPodPermissionForJwt(podDb, userClaims);
 
       if (podPermission.write) {
-        if (podPermission.admin) {
-          const deletePodPermsStmt = podDb.prepare(
-            `DELETE FROM "pod_permissions" WHERE "iss"=@iss AND "sub"=@sub`
-          );
+        const deletePodPermsStmt = podDb.prepare(
+          `DELETE FROM "pod_permissions" WHERE "iss"=@iss AND "sub"=@sub`
+        );
 
-          deletePodPermsStmt.run({
-            iss: identity.iss,
-            sub: identity.sub,
-          });
-        }
+        deletePodPermsStmt.run({
+          iss: identity.iss,
+          sub: identity.sub,
+        });
 
-        if (podPermission.admin) {
-          const deleteLogPermsStmt = podDb.prepare(
-            `DELETE FROM "log_permissions" WHERE "iss"=@iss AND "sub"=@sub`
-          );
+        const deleteLogPermsStmt = podDb.prepare(
+          `DELETE FROM "log_permissions" WHERE "iss"=@iss AND "sub"=@sub`
+        );
 
-          deleteLogPermsStmt.run({
-            iss: identity.iss,
-            sub: identity.sub,
-          });
-        }
+        deleteLogPermsStmt.run({
+          iss: identity.iss,
+          sub: identity.sub,
+        });
 
         return {
           ok: true,
