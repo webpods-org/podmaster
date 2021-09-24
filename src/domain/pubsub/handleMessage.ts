@@ -1,7 +1,7 @@
 import jsonwebtoken from "jsonwebtoken";
 import { IncomingMessage } from "http";
 
-import getJwtParams from "../../lib/jwt/getJwtParams.js";
+import getJwtValidationParams from "../../lib/jwt/getJwtValidationParams.js";
 import {
   TrackedWebSocket,
   WebSocketAuthMessage,
@@ -36,7 +36,7 @@ export function handleMessage(
     if (!ws.webpodsTracking) {
       try {
         const authMessage: WebSocketAuthMessage = JSON.parse(message);
-        const jwtResult = await getJwtParams(authMessage.token);
+        const jwtResult = await getJwtValidationParams(authMessage.token);
         if (jwtResult.ok) {
           const jwtClaims = jsonwebtoken.verify(
             jwtResult.value.token,

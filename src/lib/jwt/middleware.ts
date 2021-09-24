@@ -5,7 +5,7 @@ import jsonwebtoken from "jsonwebtoken";
 import { Result } from "../../types/api.js";
 import { log, logException } from "../logger/log.js";
 import { IKoaAppContext } from "../../types/koa.js";
-import getJwtParams, { JWKInfo } from "./getJwtParams.js";
+import getJwtValidationParams, { JWKInfo } from "./getJwtValidationParams.js";
 import validateClaims from "./validateClaims.js";
 import { checkAud, checkExp, checkNbf } from "./validations.js";
 import * as config from "../../config/index.js";
@@ -86,7 +86,7 @@ async function getJwtParametersFromContext(
     };
   }
 
-  return getJwtParams(token);
+  return getJwtValidationParams(token);
 }
 
 function resolveAuthorizationHeader(ctx: ParameterizedContext): string | null {

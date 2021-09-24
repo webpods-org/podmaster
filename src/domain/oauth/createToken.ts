@@ -9,7 +9,7 @@ import {
 import matchObject from "../../utils/matchObject.js";
 import { Result } from "../../types/api.js";
 import jsonwebtoken, { SignOptions } from "jsonwebtoken";
-import getJwtParams from "../../lib/jwt/getJwtParams.js";
+import getJwtValidationParams from "../../lib/jwt/getJwtValidationParams.js";
 import validateJwt from "../../lib/jwt/validateJwt.js";
 
 export type CreateAuthTokenResult = {
@@ -33,7 +33,7 @@ export default async function createAuthToken(
 
         if (getAuthenticatorResult.ok) {
           const authenticator = getAuthenticatorResult.value;
-          const jwtParamsResult = await getJwtParams(assertion);
+          const jwtParamsResult = await getJwtValidationParams(assertion);
 
           if (jwtParamsResult.ok) {
             const { value: jwtParams } = jwtParamsResult;

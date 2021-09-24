@@ -40,7 +40,7 @@ function getItemFromCache(key: string): CacheItem | undefined {
   return cache.find(key);
 }
 
-export default async function getJwtParams(
+export default async function getJwtValidationParams(
   token: string
 ): Promise<Result<JWKInfo>> {
   const decodeResult = jsonwebtoken.decode(token, {

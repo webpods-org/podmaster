@@ -1,4 +1,4 @@
-import { init as libJwtInit } from "./lib/jwt/getJwtParams.js";
+import { init as libJwtInit } from "./lib/jwt/getJwtValidationParams.js";
 import * as db from "./db/index.js";
 import { init as loggerInit } from "./lib/logger/log.js";
 import * as config from "./config/index.js";
