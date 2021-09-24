@@ -155,6 +155,8 @@ export type AppConfig = {
   };
 };
 
+export type PodScope = "read" | "write";
+
 export type PodAccess = {
   read: boolean;
   write: boolean;

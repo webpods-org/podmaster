@@ -20,7 +20,7 @@ export default async function getPermissions(
     const podDataDir = getPodDataDir(pod.id);
     const podDb = db.getPodDb(podDataDir);
 
-    const podPermission = await getPodPermissionForJwt(podDb, userClaims);
+    const podPermission = await getPodPermissionForJwt(pod.app, podDb, userClaims);
 
     if (podPermission.write) {
       const permissions: IdentityPermission[] = [];

@@ -70,6 +70,7 @@ export default async function addEntries(
     const podDb = db.getPodDb(podDataDir);
 
     const logPermission = await getLogPermissionForJwt(
+      pod.app,
       hostname,
       log,
       podDb,
@@ -164,7 +165,7 @@ export default async function addEntries(
               type: "data" as "data",
               created_at: Date.now(),
               iss: userClaims.iss,
-              sub: userClaims.sub,              
+              sub: userClaims.sub,
             };
 
             const insertEntryStmt = podDb.prepare(

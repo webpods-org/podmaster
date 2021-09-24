@@ -30,7 +30,7 @@ export default async function createPermissionTokens(
     const podDataDir = getPodDataDir(pod.id);
     const podDb = db.getPodDb(podDataDir);
 
-    const podPermission = await getPodPermissionForJwt(podDb, userClaims);
+    const podPermission = await getPodPermissionForJwt(pod.app, podDb, userClaims);
 
     if (podPermission.write) {
       const id = random();

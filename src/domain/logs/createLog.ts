@@ -38,7 +38,11 @@ export default async function createLog(
       const logDir = join(podDataDir, logId);
       const podDb = db.getPodDb(podDataDir);
 
-      const podPermission = await getPodPermissionForJwt(podDb, userClaims);
+      const podPermission = await getPodPermissionForJwt(
+        pod.app,
+        podDb,
+        userClaims
+      );
 
       if (podPermission.write) {
         // Let's see if the log already exists.

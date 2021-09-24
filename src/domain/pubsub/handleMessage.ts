@@ -95,6 +95,7 @@ export function handleMessage(
             const podDataDir = getPodDataDir(pod.id);
             const podDb = db.getPodDb(podDataDir);
             const logPermission = await getLogPermissionForJwt(
+              pod.app,
               hostname,
               log,
               podDb,
@@ -163,6 +164,7 @@ export function handleMessage(
             const podDataDir = getPodDataDir(pod.id);
             const podDb = db.getPodDb(podDataDir);
             const logPermission = await getLogPermissionForJwt(
+              pod.app,
               hostname,
               log,
               podDb,

@@ -24,6 +24,7 @@ export default async function getFile(
     const podDb = db.getPodDb(podDataDir);
 
     const logPermission = await getLogPermissionForJwt(
+      pod.app,
       hostname,
       logId,
       podDb,

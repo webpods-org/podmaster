@@ -41,7 +41,7 @@ export default function run(configDir: string, configFilePath: string) {
   describe("integration tests", async () => {
     const podId = "myweblog";
     const podName = "My Blog Db";
-    const appId = "myweblog.com";
+    const appId = "myweblog.example.com";
     const podDescription = "This is a test pod.";
     const logId = "myposts";
     const logName = "Table of Posts";

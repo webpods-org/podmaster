@@ -3,6 +3,7 @@ import Sqlite3 from "better-sqlite3";
 import permissionMapper from "../../../mappers/logPermission.js";
 import logMapper from "../../../mappers/log.js";
 import { JwtClaims } from "../../../types/types.js";
+import hasScope from "../../../lib/jwt/hasScope.js";
 
 const noAccess = {
   read: false,
@@ -12,6 +13,7 @@ const noAccess = {
 };
 
 export default async function getLogPermissionForJwt(
+  app: string,
   hostname: string,
   name: string,
   podDb: Sqlite3.Database,
@@ -37,13 +39,30 @@ export default async function getLogPermissionForJwt(
         .all({ log_id: name, iss: userClaims.iss, sub: userClaims.sub })
         .map(permissionMapper);
 
-      const logPermission = logPermissionsInDb.length ? logPermissionsInDb[0] : undefined;
+      const logPermission = logPermissionsInDb.length
+        ? logPermissionsInDb[0]
+        : undefined;
 
       if (logPermission) {
         return {
-          ...logPermission.access,
-          read: logPermission.access.read || logInfo.public,
-          subscribe: logPermission.access.subscribe || logInfo.public,
+          write:
+            (logPermission.access.write &&
+              hasScope(userClaims.scope, app, "write")) ||
+            logInfo.public,
+          read:
+            (logPermission.access.read &&
+              hasScope(userClaims.scope, app, "read")) ||
+            logInfo.public,
+          publish:
+            (logPermission.access.read &&
+              (hasScope(userClaims.scope, app, "read") ||
+                hasScope(userClaims.scope, app, "write"))) ||
+            logInfo.public,
+          subscribe:
+            (logPermission.access.subscribe &&
+              (hasScope(userClaims.scope, app, "read") ||
+                hasScope(userClaims.scope, app, "write"))) ||
+            logInfo.public,
         };
       } else {
         return {
