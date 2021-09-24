@@ -19,6 +19,7 @@ import { getPodDataDir } from "../../storage/index.js";
 import { getPods } from "./getPods.js";
 import getPodByHostname from "./util/getPodByHostname.js";
 import { isAlphanumeric } from "../../api/utils/isAlphanumeric.js";
+import getPodByHostnameOrApp from "./util/getPodByHostnameOrApp.js";
 
 export type CreatePodResult = { hostname: string };
 
@@ -70,7 +71,8 @@ export default async function createPod(
           ) {
             // Check if the pod name is available.
 
-            const existingPod = await getPodByHostname(podHostname);
+            const existingPod = await getPodByHostnameOrApp(podHostname, app);
+
             if (!existingPod) {
               // Gotta make a directory.
               const podDataDir = getPodDataDir(podId);
@@ -125,7 +127,7 @@ export default async function createPod(
               return {
                 ok: false,
                 code: POD_EXISTS,
-                error: `A pod named ${podHostname} already exists.`,
+                error: `A pod with ${podHostname} connected to app ${app} already exists.`,
               };
             }
           } else {
@@ -179,7 +181,8 @@ function validateInput(input: {
   } else if (input.app && input.app.length > 32) {
     return {
       ok: false,
-      error: "App id must be a non-empty string which is at most 32 characters long.",
+      error:
+        "App id must be a non-empty string which is at most 32 characters long.",
       code: INVALID_APP_ID,
     };
   }
