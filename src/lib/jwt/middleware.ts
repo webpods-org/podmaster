@@ -3,7 +3,7 @@ import { ParameterizedContext, Next } from "koa";
 import { INVALID_JWT } from "../../errors/codes.js";
 import jsonwebtoken from "jsonwebtoken";
 import { Result } from "../../types/api.js";
-import { log, logException } from "../logger/log.js";
+import { log, logException } from "../logger/index.js";
 import { IKoaAppContext } from "../../types/koa.js";
 import getJwtValidationParams, { JWKInfo } from "./getJwtValidationParams.js";
 import validateClaims from "./validateClaims.js";

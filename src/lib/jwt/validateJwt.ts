@@ -3,7 +3,7 @@ import { checkAud, checkExp, checkNbf } from "./validations.js";
 import jsonwebtoken from "jsonwebtoken";
 import { JWKInfo } from "./getJwtValidationParams.js";
 import { JwtClaims } from "../../types/index.js";
-import { log } from "../logger/log.js";
+import { log } from "../logger/index.js";
 import { AsymmetricAlgorithm } from "../../types/crypto.js";
 
 export default async function validateJwt(

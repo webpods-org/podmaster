@@ -1,5 +1,5 @@
 import { ACCESS_DENIED, UNKNOWN_ERROR } from "../errors/codes.js";
-import { logException } from "../lib/logger/log.js";
+import { logException } from "../lib/logger/index.js";
 import { ErrResult, OkResult, Result } from "../types/api.js";
 import { IKoaAppContext } from "../types/koa.js";
 

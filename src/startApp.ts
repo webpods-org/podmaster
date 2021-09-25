@@ -1,6 +1,6 @@
 import { init as libJwtInit } from "./lib/jwt/getJwtValidationParams.js";
 import * as db from "./db/index.js";
-import { init as loggerInit } from "./lib/logger/log.js";
+import { init as loggerInit } from "./lib/logger/index.js";
 import * as config from "./config/index.js";
 import { AppConfig } from "./types/index.js";
 import { createHttpServer } from "./lib/servers/http.js";
