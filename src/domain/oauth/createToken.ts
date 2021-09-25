@@ -21,10 +21,10 @@ export type CreateAuthTokenResult = {
 export default async function createAuthToken(
   grantType: string,
   assertion: string,
-  audience: string
+  aud: string
 ): Promise<Result<CreateAuthTokenResult>> {
-  if (grantType === "webpods-jwt-bearer") {
-    if (audience) {
+  if (grantType === "jwt-bearer-exchange") {
+    if (aud) {
       const appConfig = config.get();
       const assertionClaimsResult = getClaimsFromAssertion(assertion);
       if (assertionClaimsResult.ok) {
@@ -55,7 +55,7 @@ export default async function createAuthToken(
               const keyid = config.getPodmasterJWK().kid;
               const subject = `${authenticator.name}/${claimsInAssertion.sub}`;
               const signOptions: SignOptions = {
-                audience: audience,
+                audience: aud,
                 algorithm: "RS256",
                 expiresIn,
                 issuer,
@@ -109,7 +109,7 @@ export default async function createAuthToken(
     return {
       ok: false,
       code: OAUTH_UNSUPPORTED_GRANT_TYPE,
-      error: "The grant_type parameter must be 'webpods-jwt-bearer'.",
+      error: "The grant_type parameter must be 'jwt-bearer-exchange'.",
     };
   }
 }

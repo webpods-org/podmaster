@@ -25,7 +25,7 @@ export default async function createAPI(ctx: IKoaAppContext): Promise<void> {
         createAuthToken(
           ctx.request.body.grant_type,
           ctx.request.body.assertion,
-          ctx.request.body.audience
+          ctx.request.body.aud
         ),
       (result) => {
         const body: CreateAuthTokenAPIResult = {

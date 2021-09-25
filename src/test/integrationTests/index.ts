@@ -93,9 +93,9 @@ export default function run(configDir: string, configFilePath: string) {
       const response = await request(app)
         .post(`/oauth/token`)
         .send({
-          grant_type: "webpods-jwt-bearer",
+          grant_type: "jwt-bearer-exchange",
           assertion: alicePodmasterJwt,
-          audience: podHostname,
+          aud: podHostname,
         })
         .set("Host", podmasterHostname);
 
