@@ -3,7 +3,7 @@ import * as config from "../../config/index.js";
 import mapper from "../../mappers/pod.js";
 import { Result } from "../../types/api.js";
 import { getPodDataDir } from "../../storage/index.js";
-import { JwtClaims } from "../../types/types.js";
+import { JwtClaims } from "../../types/index.js";
 import { ACCESS_DENIED } from "../../errors/codes.js";
 
 export type GetPodsResult = {

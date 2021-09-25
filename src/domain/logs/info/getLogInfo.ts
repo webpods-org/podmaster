@@ -5,7 +5,7 @@ import { EntriesRow } from "../../../types/db.js";
 import { ACCESS_DENIED } from "../../../errors/codes.js";
 import getLogPermissionForJwt from "../util/getLogPermissionForJwt.js";
 import { getPodDataDir } from "../../../storage/index.js";
-import { JwtClaims } from "../../../types/types.js";
+import { JwtClaims } from "../../../types/index.js";
 
 export type GetInfoResult = {
   id: number;

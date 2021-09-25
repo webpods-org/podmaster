@@ -6,7 +6,7 @@ import { ACCESS_DENIED, NOT_FOUND } from "../../../errors/codes.js";
 import getLogPermissionForJwt from "../util/getLogPermissionForJwt.js";
 import isFilenameValid from "../../../lib/validation/checkFilename.js";
 import { getDirNumber, getPodDataDir } from "../../../storage/index.js";
-import { JwtClaims } from "../../../types/types.js";
+import { JwtClaims } from "../../../types/index.js";
 
 export type GetFileResult = {
   relativeFilePath: string;

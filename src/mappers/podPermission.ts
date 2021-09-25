@@ -1,4 +1,4 @@
-import { PodPermission } from "../types/types.js";
+import { PodPermission } from "../types/index.js";
 import { PodPermissionsRow } from "../types/db.js";
 
 export default function map(row: PodPermissionsRow): PodPermission {

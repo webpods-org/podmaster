@@ -4,7 +4,7 @@ import {
   JwtClaims,
   LogAccess,
   PodAccess,
-} from "../../types/types.js";
+} from "../../types/index.js";
 import { Result } from "../../types/api.js";
 import ensurePod from "../pods/util/ensurePod.js";
 import { ACCESS_DENIED } from "../../errors/codes.js";

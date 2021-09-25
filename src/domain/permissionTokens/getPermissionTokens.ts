@@ -1,5 +1,5 @@
 import * as db from "../../db/index.js";
-import { JwtClaims, PermissionToken } from "../../types/types.js";
+import { JwtClaims, PermissionToken } from "../../types/index.js";
 import { Result } from "../../types/api.js";
 import permissionTokenMapper from "../../mappers/permissionToken.js";
 import ensurePod from "../pods/util/ensurePod.js";

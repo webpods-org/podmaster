@@ -1,6 +1,6 @@
 import Sqlite3 from "better-sqlite3";
 
-import { JwtClaims } from "../../../types/types.js";
+import { JwtClaims } from "../../../types/index.js";
 import permissionMapper from "../../../mappers/podPermission.js";
 import hasScope from "../../../lib/jwt/hasScope.js";
 

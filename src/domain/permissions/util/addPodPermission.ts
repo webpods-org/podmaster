@@ -1,6 +1,6 @@
 import Sqlite3 from "better-sqlite3";
 
-import { Identity, PodAccess } from "../../../types/types.js";
+import { Identity, PodAccess } from "../../../types/index.js";
 import { PodAccessRow, PodPermissionsRow } from "../../../types/db.js";
 import {
   generateInsertStatement,

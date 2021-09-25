@@ -1,4 +1,4 @@
-import { AppConfig, JWK } from "../types/types.js";
+import { AppConfig, JWK } from "../types/index.js";
 import jose, { JWK as JoseJWK } from "node-jose";
 
 let config: AppConfig;

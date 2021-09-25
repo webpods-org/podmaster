@@ -1,4 +1,4 @@
-import { Authenticator, JwtClaims } from "../../types/types.js";
+import { Authenticator, JwtClaims } from "../../types/index.js";
 import * as config from "../../config/index.js";
 import {
   ACCESS_DENIED,

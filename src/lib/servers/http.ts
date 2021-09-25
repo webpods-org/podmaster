@@ -1,7 +1,7 @@
 import { IncomingMessage, ServerResponse } from "http";
 import { createServer as httpCreateServer } from "http";
 import { createServer as httpsCreateServer } from "https";
-import { AppConfig } from "../../types/types.js";
+import { AppConfig } from "../../types/index.js";
 
 type RequestHandler = (req: IncomingMessage, res: ServerResponse) => void;
 

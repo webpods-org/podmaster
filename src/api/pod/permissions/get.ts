@@ -1,6 +1,6 @@
 import handleResult from "../../handleResult.js";
 import getPermissions from "../../../domain/permissions/getPermissions.js";
-import { IdentityPermission } from "../../../types/types.js";
+import { IdentityPermission } from "../../../types/index.js";
 import { IKoaAppContext } from "../../../types/koa.js";
 import { ACCESS_DENIED } from "../../../errors/codes.js";
 import { ensureJwt } from "../../utils/ensureJwt.js";

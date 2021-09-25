@@ -1,7 +1,7 @@
 import pathModule from "path";
 import fsModule from "fs";
 
-import { AppConfig } from "../types/types.js";
+import { AppConfig } from "../types/index.js";
 
 const fs = fsModule;
 const path = pathModule;

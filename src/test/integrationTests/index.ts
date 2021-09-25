@@ -12,7 +12,7 @@ import { GetPodsAPIResult } from "../../api/podmaster/pods/get.js";
 import { CreatePodAPIResult } from "../../api/podmaster/pods/create.js";
 import { GetLogsAPIResult } from "../../api/pod/logs/get.js";
 import { AddLogEntriesAPIResult } from "../../api/pod/logs/entries/add.js";
-import { AppConfig, Identity, LogEntry } from "../../types/types.js";
+import { AppConfig, Identity, LogEntry } from "../../types/index.js";
 import { GetLogInfoAPIResult } from "../../api/pod/logs/info/get.js";
 import promiseSignal from "../../lib/promiseSignal.js";
 import { ErrResult } from "../../types/api.js";

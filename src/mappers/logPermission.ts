@@ -1,4 +1,4 @@
-import { LogPermission } from "../types/types.js";
+import { LogPermission } from "../types/index.js";
 import { LogPermissionsRow } from "../types/db.js";
 
 export default function map(row: LogPermissionsRow): LogPermission {

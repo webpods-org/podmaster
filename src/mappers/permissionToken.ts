@@ -1,4 +1,4 @@
-import { LogAccess, PermissionToken, PodPermission } from "../types/types.js";
+import { LogAccess, PermissionToken, PodPermission } from "../types/index.js";
 import { PermissionTokensRow, PodPermissionsRow } from "../types/db.js";
 
 export default function map(row: PermissionTokensRow): PermissionToken {

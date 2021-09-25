@@ -1,7 +1,7 @@
 import { join } from "path";
 
 import integrationTests from "./integrationTests/index.js";
-import { AppConfig } from "../types/types.js";
+import { AppConfig } from "../types/index.js";
 
 if (process.env.NODE_ENV !== "development") {
   throw new Error("Tests can only be run with NODE_ENV=development.");

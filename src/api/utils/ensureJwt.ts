@@ -1,4 +1,4 @@
-import { JwtClaims } from "../../types/types.js";
+import { JwtClaims } from "../../types/index.js";
 
 export function ensureJwt(
   jwt: { claims: Record<string, any> } | undefined

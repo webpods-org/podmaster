@@ -1,7 +1,7 @@
 import handleResult from "../../handleResult.js";
 import {
   PermissionToken,
-} from "../../../types/types.js";
+} from "../../../types/index.js";
 import { IKoaAppContext } from "../../../types/koa.js";
 import { ACCESS_DENIED } from "../../../errors/codes.js";
 import { ensureJwt } from "../../utils/ensureJwt.js";

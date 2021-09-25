@@ -1,4 +1,4 @@
-import { UncheckedJwtClaims } from "../../types/types.js";
+import { UncheckedJwtClaims } from "../../types/index.js";
 
 /*
   If exp is missing, assume it's valid for iat + 300 seconds.

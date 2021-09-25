@@ -1,6 +1,6 @@
 import Sqlite3 from "better-sqlite3";
 
-import { Identity, LogAccess, LogPermission } from "../../../types/types.js";
+import { Identity, LogAccess, LogPermission } from "../../../types/index.js";
 import { LogAccessRow, LogPermissionsRow } from "../../../types/db.js";
 import {
   generateInsertStatement,

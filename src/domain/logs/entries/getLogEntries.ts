@@ -3,7 +3,7 @@ import { Result } from "../../../types/api.js";
 import ensurePod from "../../pods/util/ensurePod.js";
 import { EntriesRow } from "../../../types/db.js";
 import mapper from "../../../mappers/entry.js";
-import { JwtClaims, LogEntry } from "../../../types/types.js";
+import { JwtClaims, LogEntry } from "../../../types/index.js";
 import { ACCESS_DENIED } from "../../../errors/codes.js";
 import getLogPermissionForJwt from "../util/getLogPermissionForJwt.js";
 import { getPodDataDir } from "../../../storage/index.js";

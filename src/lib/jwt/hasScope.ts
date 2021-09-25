@@ -1,4 +1,4 @@
-import { PodScope } from "../../types/types.js";
+import { PodScope } from "../../types/index.js";
 
 export default function hasScope(
   scope: string | undefined,

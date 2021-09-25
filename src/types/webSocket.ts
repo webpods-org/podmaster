@@ -1,5 +1,5 @@
 import WebSocket from "ws";
-import { JwtClaims } from "./types.js";
+import { JwtClaims } from "./index.js";
 
 export type TrackedWebSocket = WebSocket & {
   isAlive?: boolean;

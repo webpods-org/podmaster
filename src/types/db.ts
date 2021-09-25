@@ -1,4 +1,4 @@
-import { EntryContentTypes } from "./types.js";
+import { EntryContentTypes } from "./index.js";
 
 export type SqliteBoolean = 1 | 0;
 

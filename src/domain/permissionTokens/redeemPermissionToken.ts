@@ -1,5 +1,5 @@
 import * as db from "../../db/index.js";
-import { JwtClaims } from "../../types/types.js";
+import { JwtClaims } from "../../types/index.js";
 import { Result } from "../../types/api.js";
 import ensurePod from "../pods/util/ensurePod.js";
 import { INVALID_JWT, INVALID_OR_EXPIRED_TOKEN } from "../../errors/codes.js";

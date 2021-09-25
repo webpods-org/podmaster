@@ -1,4 +1,4 @@
-import { LogInfo } from "../types/types.js";
+import { LogInfo } from "../types/index.js";
 import { LogsRow } from "../types/db.js";
 
 export default function map(row: LogsRow): LogInfo {

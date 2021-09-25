@@ -1,5 +1,5 @@
 import { IRouterContext } from "koa-router";
-import { JwtClaims } from "./types.js";
+import { JwtClaims } from "./index.js";
 
 export interface IKoaAppContext extends IRouterContext {
   state: {

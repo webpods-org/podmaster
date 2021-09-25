@@ -1,4 +1,4 @@
-import { LogEntry } from "../types/types.js";
+import { LogEntry } from "../types/index.js";
 import { EntriesRow } from "../types/db.js";
 
 export default function map(row: EntriesRow): LogEntry {

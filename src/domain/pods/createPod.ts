@@ -1,6 +1,6 @@
 import mkdirp from "mkdirp";
 
-import { JwtClaims } from "../../types/types.js";
+import { JwtClaims } from "../../types/index.js";
 import * as config from "../../config/index.js";
 import {
   ACCESS_DENIED,

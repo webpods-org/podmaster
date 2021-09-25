@@ -15,7 +15,7 @@ import { ACCESS_DENIED, INVALID_FILENAME } from "../../../errors/codes.js";
 import isFilenameValid from "../../../lib/validation/checkFilename.js";
 import { generateInsertStatement } from "../../../lib/sqlite.js";
 import { getPodDataDir } from "../../../storage/index.js";
-import { JwtClaims } from "../../../types/types.js";
+import { JwtClaims } from "../../../types/index.js";
 
 const moveFile = promisify(mv);
 

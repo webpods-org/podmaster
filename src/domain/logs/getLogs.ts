@@ -4,7 +4,7 @@ import { Result } from "../../types/api.js";
 import ensurePod from "../pods/util/ensurePod.js";
 import { ACCESS_DENIED } from "../../errors/codes.js";
 import { getPodDataDir } from "../../storage/index.js";
-import { JwtClaims } from "../../types/types.js";
+import { JwtClaims } from "../../types/index.js";
 import getPodPermissionForJwt from "../pods/util/getPodPermissionForJwt.js";
 
 export type GetLogsResult = {

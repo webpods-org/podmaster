@@ -2,7 +2,7 @@ import Sqlite3 from "better-sqlite3";
 
 import permissionMapper from "../../../mappers/logPermission.js";
 import logMapper from "../../../mappers/log.js";
-import { JwtClaims } from "../../../types/types.js";
+import { JwtClaims } from "../../../types/index.js";
 import hasScope from "../../../lib/jwt/hasScope.js";
 
 const noAccess = {

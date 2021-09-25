@@ -1,5 +1,5 @@
 import * as db from "../../db/index.js";
-import { Identity, JwtClaims } from "../../types/types.js";
+import { Identity, JwtClaims } from "../../types/index.js";
 import { Result } from "../../types/api.js";
 import ensurePod from "../pods/util/ensurePod.js";
 import { ACCESS_DENIED, CANNOT_DELETE_SELF } from "../../errors/codes.js";

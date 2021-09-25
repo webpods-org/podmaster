@@ -14,7 +14,7 @@ import { LogsRow } from "../../types/db.js";
 import { generateInsertStatement } from "../../lib/sqlite.js";
 import { getPodDataDir } from "../../storage/index.js";
 import getLogs from "./getLogs.js";
-import { JwtClaims } from "../../types/types.js";
+import { JwtClaims } from "../../types/index.js";
 import getPodPermissionForJwt from "../pods/util/getPodPermissionForJwt.js";
 import { isAlphanumeric } from "../../api/utils/isAlphanumeric.js";
 import addLogPermission from "../permissions/util/addLogPermission.js";

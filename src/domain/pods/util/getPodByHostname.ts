@@ -1,7 +1,7 @@
 import * as config from "../../../config/index.js";
 import * as db from "../../../db/index.js";
 import mapper from "../../../mappers/pod.js";
-import { PodInfo } from "../../../types/types.js";
+import { PodInfo } from "../../../types/index.js";
 
 export default async function getPodByHostname(
   hostname: string

@@ -1,4 +1,4 @@
-import { JwtClaims } from "../../types/types.js";
+import { JwtClaims } from "../../types/index.js";
 
 export default function validateClaims(
   claims: Record<string, any> | string
