@@ -1,6 +1,6 @@
 import { ParameterizedContext, Next } from "koa";
 
-import { INVALID_JWT } from "../../errors/codes.js";
+import errors from "../../errors/codes.js";
 import jsonwebtoken from "jsonwebtoken";
 import { Result } from "../../types/api.js";
 import { log, logException } from "../logger/index.js";
@@ -82,7 +82,7 @@ async function getJwtParametersFromContext(
     return {
       ok: false,
       error: "Authentication error. Missing JWT.",
-      code: INVALID_JWT,
+      code: errors.Jwt.INVALID_JWT,
     };
   }
 

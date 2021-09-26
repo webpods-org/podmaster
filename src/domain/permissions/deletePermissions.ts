@@ -2,7 +2,7 @@ import * as db from "../../db/index.js";
 import { Identity, JwtClaims } from "../../types/index.js";
 import { Result } from "../../types/api.js";
 import ensurePod from "../pods/util/ensurePod.js";
-import { ACCESS_DENIED, CANNOT_DELETE_SELF } from "../../errors/codes.js";
+import errors from "../../errors/codes.js";
 import { getPodDataDir } from "../../storage/index.js";
 import getPodPermissionForJwt from "../pods/util/getPodPermissionForJwt.js";
 
@@ -18,7 +18,7 @@ export default async function deletePermissions(
       return {
         ok: false,
         error: "Cannot delete permissions for self.",
-        code: CANNOT_DELETE_SELF,
+        code: errors.Permissions.CANNOT_DELETE_SELF,
       };
     } else {
       // Let's see if the log already exists.
@@ -53,7 +53,7 @@ export default async function deletePermissions(
       } else {
         return {
           ok: false,
-          code: ACCESS_DENIED,
+          code: errors.ACCESS_DENIED,
           error: "Access denied.",
         };
       }

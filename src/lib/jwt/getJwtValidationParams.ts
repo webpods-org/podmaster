@@ -2,11 +2,7 @@ import jsonwebtoken from "jsonwebtoken";
 import jwksClient from "jwks-rsa";
 
 import * as config from "../../config/index.js";
-import {
-  ACCESS_DENIED,
-  INVALID_JWT,
-  JWT_INVALID_ALGORITHM,
-} from "../../errors/codes.js";
+import errors from "../../errors/codes.js";
 import { AsymmetricAlgorithm, KeyTypes } from "../../types/crypto.js";
 import { LRUMap } from "../lruCache/lru.js";
 import { Result } from "../../types/api.js";
@@ -51,7 +47,7 @@ export default async function getJwtValidationParams(
     return {
       ok: false,
       error: "Authentication error. Missing JWT.",
-      code: INVALID_JWT,
+      code: errors.Jwt.MISSING_JWT,
     };
   }
 
@@ -66,13 +62,13 @@ export default async function getJwtValidationParams(
 
   const { alg, kid } = header;
   const { iss } = payload;
-  
+
   //
   if (!asymmetricAlgorithms.includes(alg.toUpperCase())) {
     return {
       ok: false,
       error: `Authentication error. Unsupported algorithm ${alg}.`,
-      code: JWT_INVALID_ALGORITHM,
+      code: errors.Jwt.INVALID_ALGORITHM,
     };
   }
 
@@ -93,7 +89,7 @@ export default async function getJwtValidationParams(
           return {
             ok: false,
             error: "Authentication Error. Issuer not in allowList.",
-            code: ACCESS_DENIED,
+            code: errors.ACCESS_DENIED,
           };
         }
       }
@@ -106,7 +102,7 @@ export default async function getJwtValidationParams(
           return {
             ok: false,
             error: "Authentication Error. Issuer is in denyList.",
-            code: ACCESS_DENIED,
+            code: errors.ACCESS_DENIED,
           };
         }
       }
@@ -154,7 +150,7 @@ export default async function getJwtValidationParams(
           return {
             ok: false,
             error: "Authentication error. Invalid JWT.",
-            code: INVALID_JWT,
+            code: errors.Jwt.INVALID_JWT,
           };
         }
       } else {
@@ -200,7 +196,7 @@ export default async function getJwtValidationParams(
           return {
             ok: false,
             error: `Authentication error. Unsupported algorithm ${key.alg}.`,
-            code: JWT_INVALID_ALGORITHM,
+            code: errors.Jwt.INVALID_ALGORITHM,
           };
         }
       }
@@ -208,14 +204,14 @@ export default async function getJwtValidationParams(
       return {
         ok: false,
         error: "Authentication error. Invalid JWT.",
-        code: INVALID_JWT,
+        code: errors.Jwt.INVALID_JWT,
       };
     }
   } else {
     return {
       ok: false,
       error: "Authentication error. Invalid JWT.",
-      code: INVALID_JWT,
+      code: errors.Jwt.INVALID_JWT,
     };
   }
 }

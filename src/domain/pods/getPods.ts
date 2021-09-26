@@ -4,7 +4,7 @@ import mapper from "../../mappers/pod.js";
 import { Result } from "../../types/api.js";
 import { getPodDataDir } from "../../storage/index.js";
 import { JwtClaims } from "../../types/index.js";
-import { ACCESS_DENIED } from "../../errors/codes.js";
+import errors from "../../errors/codes.js";
 
 export type GetPodsResult = {
   pods: {
@@ -54,7 +54,7 @@ export async function getPods(
   } else {
     return {
       ok: false,
-      code: ACCESS_DENIED,
+      code: errors.ACCESS_DENIED,
       error: "Access denied.",
     };
   }

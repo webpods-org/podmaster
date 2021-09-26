@@ -6,7 +6,7 @@ import { AppConfig } from "../../types/index.js";
 import { TrackedWebSocket } from "../../types/webSocket.js";
 import { handleMessage } from "../../domain/pubsub/handleMessage.js";
 import { handleClose } from "../../domain/pubsub/handleClose.js";
-import { INACTIVE, SERVER_BUSY } from "../../errors/codes.js";
+import { WS } from "../../errors/codes.js";
 
 const { WebSocketServer }: { WebSocketServer: typeof WebSocket.Server } =
   (await import("ws")) as any;
@@ -37,7 +37,7 @@ export function attachWebSocketServer(
       ws.send(
         JSON.stringify({
           error: "Inactive for too long.",
-          code: INACTIVE,
+          code: WS.INACTIVE,
         })
       );
       ws.terminate();
@@ -49,7 +49,7 @@ export function attachWebSocketServer(
         ws.send(
           JSON.stringify({
             error: "Inactive for too long.",
-            code: INACTIVE,
+            code: WS.INACTIVE,
           })
         );
         ws.terminate();
@@ -71,7 +71,7 @@ export function attachWebSocketServer(
       trackedWS.send(
         JSON.stringify({
           error: "Server is too busy.",
-          code: SERVER_BUSY,
+          code: WS.SERVER_BUSY,
         })
       );
       trackedWS.terminate();

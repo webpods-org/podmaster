@@ -18,12 +18,7 @@ import validateClaims from "../../lib/jwt/validateClaims.js";
 import getPodByHostname from "../pods/util/getPodByHostname.js";
 import * as db from "../../db/index.js";
 import getLogPermissionForJwt from "../logs/util/getLogPermissionForJwt.js";
-import {
-  ACCESS_DENIED,
-  INVALID_JWT,
-  MISSING_POD,
-  UNKNOWN_ERROR,
-} from "../../errors/codes.js";
+import errors from "../../errors/codes.js";
 import { getPodDataDir } from "../../storage/index.js";
 
 export function handleMessage(
@@ -62,7 +57,7 @@ export function handleMessage(
           ws.send(
             JSON.stringify({
               error: "Invalid JWT.",
-              code: INVALID_JWT,
+              code: errors.Jwt.INVALID_JWT,
             })
           );
           ws.terminate();
@@ -71,7 +66,7 @@ export function handleMessage(
         ws.send(
           JSON.stringify({
             error: "Unknown Error.",
-            code: UNKNOWN_ERROR,
+            code: errors.INTERNAL_ERROR,
           })
         );
         ws.terminate();
@@ -121,7 +116,7 @@ export function handleMessage(
               ws.send(
                 JSON.stringify({
                   error: `Cannot access channel for log ${channel}.`,
-                  code: ACCESS_DENIED,
+                  code: errors.ACCESS_DENIED,
                 })
               );
             }
@@ -129,7 +124,7 @@ export function handleMessage(
             ws.send(
               JSON.stringify({
                 error: `Pod ${hostname} not found.`,
-                code: MISSING_POD,
+                code: errors.Pods.NOT_FOUND,
               })
             );
             ws.terminate();

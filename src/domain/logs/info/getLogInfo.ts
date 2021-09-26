@@ -2,7 +2,7 @@ import * as db from "../../../db/index.js";
 import { Result } from "../../../types/api.js";
 import ensurePod from "../../pods/util/ensurePod.js";
 import { EntriesRow } from "../../../types/db.js";
-import { ACCESS_DENIED } from "../../../errors/codes.js";
+import errors from "../../../errors/codes.js";
 import getLogPermissionForJwt from "../util/getLogPermissionForJwt.js";
 import { getPodDataDir } from "../../../storage/index.js";
 import { JwtClaims } from "../../../types/index.js";
@@ -48,7 +48,7 @@ export default async function getInfo(
     } else {
       return {
         ok: false,
-        code: ACCESS_DENIED,
+        code: errors.ACCESS_DENIED,
         error: "Access denied.",
       };
     }

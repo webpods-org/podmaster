@@ -1,11 +1,6 @@
-import { Authenticator, JwtClaims } from "../../types/index.js";
+import { Authenticator } from "../../types/index.js";
 import * as config from "../../config/index.js";
-import {
-  ACCESS_DENIED,
-  INVALID_JWT,
-  MISSING_FIELD,
-  OAUTH_UNSUPPORTED_GRANT_TYPE,
-} from "../../errors/codes.js";
+import errors from "../../errors/codes.js";
 import matchObject from "../../utils/matchObject.js";
 import { Result } from "../../types/api.js";
 import jsonwebtoken, { SignOptions } from "jsonwebtoken";
@@ -81,14 +76,14 @@ export default async function createAuthToken(
             } else {
               return {
                 ok: false,
-                code: INVALID_JWT,
+                code: errors.Jwt.INVALID_JWT,
                 error: "The assertion could not be validated.",
               };
             }
           } else {
             return {
               ok: false,
-              code: INVALID_JWT,
+              code: errors.Jwt.INVALID_JWT,
               error: "Invalid JWT.",
             };
           }
@@ -101,14 +96,14 @@ export default async function createAuthToken(
     } else {
       return {
         ok: false,
-        code: MISSING_FIELD,
+        code: errors.Validations.MISSING_FIELDS,
         error: "The aud field is required.",
       };
     }
   } else {
     return {
       ok: false,
-      code: OAUTH_UNSUPPORTED_GRANT_TYPE,
+      code: errors.OAuth.UNSUPPORTED_GRANT_TYPE,
       error: "The grant_type parameter must be 'jwt-bearer-exchange'.",
     };
   }
@@ -128,7 +123,7 @@ function getClaimsFromAssertion(token: string): Result<AssertionClaims> {
     return {
       ok: false,
       error: "The assertion field must be a valid JWT.",
-      code: INVALID_JWT,
+      code: errors.Jwt.INVALID_JWT,
     };
   }
 
@@ -145,7 +140,7 @@ function getClaimsFromAssertion(token: string): Result<AssertionClaims> {
     return {
       ok: false,
       error: "The sub field is missing in the assertion.",
-      code: INVALID_JWT,
+      code: errors.Jwt.INVALID_JWT,
     };
   }
 }
@@ -162,6 +157,6 @@ function getAuthenticator(payload: AssertionClaims): Result<Authenticator> {
     : {
         ok: false,
         error: "The issuer in the JWT is not recognized.",
-        code: INVALID_JWT,
+        code: errors.Jwt.INVALID_JWT,
       };
 }

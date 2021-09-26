@@ -1,5 +1,5 @@
 import * as config from "../../../config/index.js";
-import { ACCESS_DENIED, NOT_FOUND } from "../../../errors/codes.js";
+import errors from "../../../errors/codes.js";
 import { getPods } from "../../../domain/pods/getPods.js";
 import handleResult from "../../handleResult.js";
 import { IKoaAppContext } from "../../../types/koa.js";
@@ -22,7 +22,7 @@ export default async function getAPI(ctx: IKoaAppContext): Promise<void> {
         : Promise.resolve({
             ok: false,
             error: "Access Denied.",
-            code: ACCESS_DENIED,
+            code: errors.ACCESS_DENIED,
           }),
     (result) => {
       const body: GetPodsAPIResult = {

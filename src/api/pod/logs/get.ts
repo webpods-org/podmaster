@@ -1,7 +1,7 @@
 import getLogs from "../../../domain/logs/getLogs.js";
 import handleResult from "../../handleResult.js";
 import { IKoaAppContext } from "../../../types/koa.js";
-import { ACCESS_DENIED } from "../../../errors/codes.js";
+import errors from "../../../errors/codes.js";
 import { ensureJwt } from "../../utils/ensureJwt.js";
 
 export type GetLogsAPIResult = {
@@ -23,7 +23,7 @@ export default async function getAPI(ctx: IKoaAppContext): Promise<void> {
         : Promise.resolve({
             ok: false,
             error: "Access Denied.",
-            code: ACCESS_DENIED,
+            code: errors.ACCESS_DENIED,
           }),
     (result) => {
       const body: GetLogsAPIResult = {

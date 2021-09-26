@@ -1,13 +1,7 @@
 import handleResult from "../../../handleResult.js";
 import { IKoaAppContext } from "../../../../types/koa.js";
-import {
-  ACCESS_DENIED,
-  NOT_FOUND,
-  OAUTH_UNSUPPORTED_GRANT_TYPE,
-} from "../../../../errors/codes.js";
-import { ensureJwt } from "../../../utils/ensureJwt.js";
+import errors from "../../../../errors/codes.js";
 import createAuthToken from "../../../../domain/oauth/createToken.js";
-import * as config from "../../../../config/index.js";
 
 export type CreateAuthTokenAPIResult = {
   access_token: string;
@@ -33,12 +27,12 @@ export default async function createAPI(ctx: IKoaAppContext): Promise<void> {
       ctx.body = body;
     },
     (err) => {
-      if (err.code === OAUTH_UNSUPPORTED_GRANT_TYPE) {
+      if (err.code === errors.OAuth.UNSUPPORTED_GRANT_TYPE) {
         ctx.status = 400;
         ctx.body = {
           error:
             "Incorrect grant_type. Supported value is 'urn:ietf:params:oauth:grant-type:jwt-bearer'.",
-          code: OAUTH_UNSUPPORTED_GRANT_TYPE,
+          code: errors.OAuth.UNSUPPORTED_GRANT_TYPE,
         };
         return { handled: true };
       } else {

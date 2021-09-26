@@ -7,7 +7,7 @@ import {
 } from "../../types/index.js";
 import { Result } from "../../types/api.js";
 import ensurePod from "../pods/util/ensurePod.js";
-import { ACCESS_DENIED } from "../../errors/codes.js";
+import errors from "../../errors/codes.js";
 import { getPodDataDir } from "../../storage/index.js";
 import getPodPermissionForJwt from "../pods/util/getPodPermissionForJwt.js";
 import addLogPermission from "./util/addLogPermission.js";
@@ -65,7 +65,7 @@ export default async function addPermissions(
     } else {
       return {
         ok: false,
-        code: ACCESS_DENIED,
+        code: errors.ACCESS_DENIED,
         error: "Access denied.",
       };
     }

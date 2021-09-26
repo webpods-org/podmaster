@@ -2,7 +2,7 @@ import addLog from "../../../domain/logs/createLog.js";
 import handleResult from "../../handleResult.js";
 import transformQuery from "../../utils/transformQuery.js";
 import { IKoaAppContext } from "../../../types/koa.js";
-import { ACCESS_DENIED } from "../../../errors/codes.js";
+import errors from "../../../errors/codes.js";
 import { ensureJwt } from "../../utils/ensureJwt.js";
 
 export type CreateLogAPIResult = {};
@@ -25,7 +25,7 @@ export default async function addAPI(ctx: IKoaAppContext): Promise<void> {
         : Promise.resolve({
             ok: false,
             error: "Access Denied.",
-            code: ACCESS_DENIED,
+            code: errors.ACCESS_DENIED,
           }),
     (result) => {
       const body: CreateLogAPIResult = {};

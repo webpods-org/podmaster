@@ -2,7 +2,7 @@ import * as db from "../../db/index.js";
 import { JwtClaims } from "../../types/index.js";
 import { Result } from "../../types/api.js";
 import ensurePod from "../pods/util/ensurePod.js";
-import { INVALID_JWT, INVALID_OR_EXPIRED_TOKEN } from "../../errors/codes.js";
+import errors from "../../errors/codes.js";
 import { PermissionTokensRow } from "../../types/db.js";
 import { generateUpdateStatement } from "../../lib/sqlite.js";
 import { getPodDataDir } from "../../storage/index.js";
@@ -69,7 +69,7 @@ export default async function redeemPermissionToken(
         return {
           ok: false,
           error: "Token is invalid or expired.",
-          code: INVALID_OR_EXPIRED_TOKEN,
+          code: errors.Permissions.INVALID_OR_EXPIRED_TOKEN,
         };
       }
     });
@@ -77,7 +77,7 @@ export default async function redeemPermissionToken(
     return {
       ok: false,
       error: "The sub claim is invalid.",
-      code: INVALID_JWT,
+      code: errors.Jwt.INVALID_JWT,
     };
   }
 }

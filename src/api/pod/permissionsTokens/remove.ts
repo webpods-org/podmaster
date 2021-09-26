@@ -1,6 +1,6 @@
 import handleResult from "../../handleResult.js";
 import { IKoaAppContext } from "../../../types/koa.js";
-import { ACCESS_DENIED, MISSING_PARAMETERS } from "../../../errors/codes.js";
+import errors from "../../../errors/codes.js";
 import { ensureJwt } from "../../utils/ensureJwt.js";
 import getQuery from "../../utils/getParam.js";
 import deletePermissionTokens from "../../../domain/permissionTokens/deletePermissionTokens.js";
@@ -21,7 +21,7 @@ export default async function removeAPI(ctx: IKoaAppContext): Promise<void> {
         : Promise.resolve({
             ok: false,
             error: "Access Denied.",
-            code: ACCESS_DENIED,
+            code: errors.ACCESS_DENIED,
           }),
     (result) => {
       const body: DeletePermissionTokenAPIResult = {};

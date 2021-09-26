@@ -1,4 +1,4 @@
-import { ACCESS_DENIED, UNKNOWN_ERROR } from "../errors/codes.js";
+import errors from "../errors/codes.js";
 import { logException } from "../lib/logger/index.js";
 import { ErrResult, OkResult, Result } from "../types/api.js";
 import { IKoaAppContext } from "../types/koa.js";
@@ -26,16 +26,16 @@ export default async function handleResult<T>(
   } catch (ex: any) {
     logException(ex);
     ctx.status = 500;
-    ctx.body = { error: "Internal server error.", code: UNKNOWN_ERROR };
+    ctx.body = { error: "Internal server error.", code: errors.INTERNAL_ERROR };
   }
 }
 
 function genericErrorHandler(ctx: IKoaAppContext, result: ErrResult): void {
-  if (result.code === ACCESS_DENIED) {
+  if (result.code === errors.ACCESS_DENIED) {
     ctx.status = 401;
     ctx.body = {
       error: "Access denied.",
-      code: ACCESS_DENIED,
+      code: errors.ACCESS_DENIED,
     };
   } else {
     ctx.status = 500;

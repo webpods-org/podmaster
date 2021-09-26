@@ -4,12 +4,7 @@ import { join } from "path";
 import * as db from "../../db/index.js";
 import { ErrResult, Result } from "../../types/api.js";
 import ensurePod from "../pods/util/ensurePod.js";
-import {
-  ACCESS_DENIED,
-  INVALID_LOG_NAME,
-  LOG_EXISTS,
-  MISSING_FIELD,
-} from "../../errors/codes.js";
+import errors from "../../errors/codes.js";
 import { LogsRow } from "../../types/db.js";
 import { generateInsertStatement } from "../../lib/sqlite.js";
 import { getPodDataDir } from "../../storage/index.js";
@@ -90,7 +85,7 @@ export default async function createLog(
           } else {
             return {
               ok: false,
-              code: LOG_EXISTS,
+              code: errors.Logs.LOG_EXISTS,
               error: `The log ${logId} already exists.`,
             };
           }
@@ -100,7 +95,7 @@ export default async function createLog(
       } else {
         return {
           ok: false,
-          code: ACCESS_DENIED,
+          code: errors.ACCESS_DENIED,
           error: "Access denied.",
         };
       }
@@ -115,7 +110,7 @@ function validateInput(input: { logId: string }): ErrResult | undefined {
     return {
       ok: false,
       error: "Missing fields in input.",
-      code: MISSING_FIELD,
+      code: errors.Validations.MISSING_FIELDS,
       data: {
         fields: ["id"],
       },
@@ -123,8 +118,8 @@ function validateInput(input: { logId: string }): ErrResult | undefined {
   } else if (!isAlphanumeric(input.logId)) {
     return {
       ok: false,
-      error: "Log id can only contains letters, numbers and hyphens.",
-      code: INVALID_LOG_NAME,
+      error: "Log name can only contains letters, numbers and hyphens.",
+      code: errors.Logs.INVALID_LOG_ID,
     };
   }
 }

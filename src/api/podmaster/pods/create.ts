@@ -1,6 +1,6 @@
 import createPod from "../../../domain/pods/createPod.js";
 import * as config from "../../../config/index.js";
-import { ACCESS_DENIED, NOT_FOUND, POD_EXISTS } from "../../../errors/codes.js";
+import errors from "../../../errors/codes.js";
 import handleResult from "../../handleResult.js";
 import { ensureJwt as ensureJwt } from "../../utils/ensureJwt.js";
 import { IKoaAppContext } from "../../../types/koa.js";
@@ -24,7 +24,7 @@ export default async function createAPI(ctx: IKoaAppContext): Promise<void> {
         : Promise.resolve({
             ok: false,
             error: "Access Denied.",
-            code: ACCESS_DENIED,
+            code: errors.ACCESS_DENIED,
           }),
     (result) => {
       const body: CreatePodAPIResult = {
@@ -33,7 +33,7 @@ export default async function createAPI(ctx: IKoaAppContext): Promise<void> {
       ctx.body = body;
     },
     (errorResult) => {
-      if (errorResult.code === POD_EXISTS) {
+      if (errorResult.code === errors.Pods.POD_EXISTS) {
         ctx.status = 403;
         ctx.body = {
           error: errorResult.error,

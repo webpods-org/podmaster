@@ -2,7 +2,7 @@ import { join } from "path";
 import * as db from "../../../db/index.js";
 import { Result } from "../../../types/api.js";
 import ensurePod from "../../pods/util/ensurePod.js";
-import { ACCESS_DENIED, NOT_FOUND } from "../../../errors/codes.js";
+import errors from "../../../errors/codes.js";
 import getLogPermissionForJwt from "../util/getLogPermissionForJwt.js";
 import isFilenameValid from "../../../lib/validation/checkFilename.js";
 import { getDirNumber, getPodDataDir } from "../../../storage/index.js";
@@ -53,14 +53,14 @@ export default async function getFile(
       } else {
         return {
           ok: false,
-          code: NOT_FOUND,
+          code: errors.NOT_FOUND,
           error: "The requested url was not found on this server.",
         };
       }
     } else {
       return {
         ok: false,
-        code: ACCESS_DENIED,
+        code: errors.ACCESS_DENIED,
         error: "Access denied.",
       };
     }

@@ -1,4 +1,4 @@
-import { MISSING_POD } from "../../../errors/codes.js";
+import errors from "../../../errors/codes.js";
 import getPodByHostname from "./getPodByHostname.js";
 import { PodInfo } from "../../../types/index.js";
 import { ErrResult, OkResult } from "../../../types/api.js";
@@ -14,7 +14,7 @@ export default async function ensurePod<T>(
   } else {
     return {
       ok: false,
-      code: MISSING_POD,
+      code: errors.Pods.NOT_FOUND,
       error: `Pod ${hostname} not found.`,
     };
   }

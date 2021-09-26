@@ -1,7 +1,7 @@
 import addPermissions from "../../../domain/permissions/addPermissions.js";
 import handleResult from "../../handleResult.js";
 import { IKoaAppContext } from "../../../types/koa.js";
-import { ACCESS_DENIED } from "../../../errors/codes.js";
+import errors from "../../../errors/codes.js";
 import { ensureJwt } from "../../utils/ensureJwt.js";
 
 export type AddPermissionsAPIResult = {};
@@ -19,7 +19,7 @@ export default async function addAPI(
         : Promise.resolve({
             ok: false,
             error: "Access Denied.",
-            code: ACCESS_DENIED,
+            code: errors.ACCESS_DENIED,
           }),
     (result) => {
       const body: AddPermissionsAPIResult = {};

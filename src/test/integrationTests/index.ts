@@ -120,7 +120,7 @@ export default function run(configDir: string, configFilePath: string) {
 
       response.status.should.equal(403);
       const apiResult: ErrResult = JSON.parse(response.text);
-      apiResult.code.should.equal("POD_EXISTS");
+      apiResult.code.should.equal("PODS/POD_EXISTS");
     });
 
     it("gets all pods", async () => {

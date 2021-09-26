@@ -3,7 +3,7 @@ import { JwtClaims, PermissionToken } from "../../types/index.js";
 import { Result } from "../../types/api.js";
 import permissionTokenMapper from "../../mappers/permissionToken.js";
 import ensurePod from "../pods/util/ensurePod.js";
-import { ACCESS_DENIED } from "../../errors/codes.js";
+import errors from "../../errors/codes.js";
 import { getPodDataDir } from "../../storage/index.js";
 import getPodPermissionForJwt from "../pods/util/getPodPermissionForJwt.js";
 
@@ -37,7 +37,7 @@ export default async function getPermissionTokens(
     } else {
       return {
         ok: false,
-        code: ACCESS_DENIED,
+        code: errors.ACCESS_DENIED,
         error: "Access denied.",
       };
     }

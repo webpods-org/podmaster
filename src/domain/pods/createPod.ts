@@ -2,14 +2,7 @@ import mkdirp from "mkdirp";
 
 import { JwtClaims } from "../../types/index.js";
 import * as config from "../../config/index.js";
-import {
-  ACCESS_DENIED,
-  INVALID_APP_ID,
-  INVALID_POD_NAME,
-  MISSING_FIELD,
-  POD_EXISTS,
-  QUOTA_EXCEEDED,
-} from "../../errors/codes.js";
+import errors from "../../errors/codes.js";
 import matchObject from "../../utils/matchObject.js";
 import * as db from "../../db/index.js";
 import { ErrResult, Result } from "../../types/api.js";
@@ -17,7 +10,6 @@ import { PodPermissionsRow, PodsRow } from "../../types/db.js";
 import { generateInsertStatement } from "../../lib/sqlite.js";
 import { getPodDataDir } from "../../storage/index.js";
 import { getPods } from "./getPods.js";
-import getPodByHostname from "./util/getPodByHostname.js";
 import { isAlphanumeric } from "../../api/utils/isAlphanumeric.js";
 import getPodByHostnameOrApp from "./util/getPodByHostnameOrApp.js";
 
@@ -126,14 +118,14 @@ export default async function createPod(
             } else {
               return {
                 ok: false,
-                code: POD_EXISTS,
+                code: errors.Pods.POD_EXISTS,
                 error: `A pod with ${podHostname} connected to app ${app} already exists.`,
               };
             }
           } else {
             return {
               ok: false,
-              code: QUOTA_EXCEEDED,
+              code: errors.QUOTA_EXCEEDED,
               error: "Quota exceeded.",
             };
           }
@@ -143,14 +135,14 @@ export default async function createPod(
       } else {
         return {
           ok: false,
-          code: ACCESS_DENIED,
+          code: errors.ACCESS_DENIED,
           error: "Access denied.",
         };
       }
     } else {
       return {
         ok: false,
-        code: ACCESS_DENIED,
+        code: errors.ACCESS_DENIED,
         error: "Access denied.",
       };
     }
@@ -167,7 +159,7 @@ function validateInput(input: {
     return {
       ok: false,
       error: "Missing fields in input.",
-      code: MISSING_FIELD,
+      code: errors.Validations.MISSING_FIELDS,
       data: {
         fields: ["id"],
       },
@@ -176,14 +168,14 @@ function validateInput(input: {
     return {
       ok: false,
       error: "Pod name can only contains letters, numbers and hyphens.",
-      code: INVALID_POD_NAME,
+      code: errors.Pods.INVALID_POD_NAME,
     };
   } else if (input.app && input.app.length > 32) {
     return {
       ok: false,
       error:
         "App id must be a non-empty string which is at most 32 characters long.",
-      code: INVALID_APP_ID,
+      code: errors.Pods.INVALID_APP_ID,
     };
   }
   return null;
