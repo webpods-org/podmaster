@@ -16,44 +16,34 @@ export type CreateAuthTokenAPIResult = {
 };
 
 export default async function createAPI(ctx: IKoaAppContext): Promise<void> {
-  const appConfig = config.get();
-  const hostname = ctx.URL.hostname;
-  if (hostname === appConfig.hostname) {
-    await handleResult(
-      ctx,
-      () =>
-        createAuthToken(
-          ctx.request.body.grant_type,
-          ctx.request.body.assertion,
-          ctx.request.body.aud
-        ),
-      (result) => {
-        const body: CreateAuthTokenAPIResult = {
-          access_token: result.value.access_token,
-          token_type: result.value.token_type,
-          expires_in: result.value.expires_in,
+  await handleResult(
+    ctx,
+    () =>
+      createAuthToken(
+        ctx.request.body.grant_type,
+        ctx.request.body.assertion,
+        ctx.request.body.aud
+      ),
+    (result) => {
+      const body: CreateAuthTokenAPIResult = {
+        access_token: result.value.access_token,
+        token_type: result.value.token_type,
+        expires_in: result.value.expires_in,
+      };
+      ctx.body = body;
+    },
+    (err) => {
+      if (err.code === OAUTH_UNSUPPORTED_GRANT_TYPE) {
+        ctx.status = 400;
+        ctx.body = {
+          error:
+            "Incorrect grant_type. Supported value is 'urn:ietf:params:oauth:grant-type:jwt-bearer'.",
+          code: OAUTH_UNSUPPORTED_GRANT_TYPE,
         };
-        ctx.body = body;
-      },
-      (err) => {
-        if (err.code === OAUTH_UNSUPPORTED_GRANT_TYPE) {
-          ctx.status = 400;
-          ctx.body = {
-            error:
-              "Incorrect grant_type. Supported value is 'urn:ietf:params:oauth:grant-type:jwt-bearer'.",
-            code: OAUTH_UNSUPPORTED_GRANT_TYPE,
-          };
-          return { handled: true };
-        } else {
-          return { handled: false };
-        }
+        return { handled: true };
+      } else {
+        return { handled: false };
       }
-    );
-  } else {
-    ctx.status = 404;
-    ctx.body = {
-      error: "Not found.",
-      code: NOT_FOUND,
-    };
-  }
+    }
+  );
 }

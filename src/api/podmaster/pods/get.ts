@@ -14,36 +14,25 @@ export type GetPodsAPIResult = {
 };
 
 export default async function getAPI(ctx: IKoaAppContext): Promise<void> {
-  const appConfig = config.get();
-  const hostname = ctx.URL.hostname;
-
-  if (hostname === appConfig.hostname) {
-    await handleResult(
-      ctx,
-      () =>
-        ensureJwt(ctx.state.jwt)
-          ? getPods(ctx.state.jwt.claims)
-          : Promise.resolve({
-              ok: false,
-              error: "Access Denied.",
-              code: ACCESS_DENIED,
-            }),
-      (result) => {
-        const body: GetPodsAPIResult = {
-          pods: result.value.pods.map((x) => ({
-            hostname: x.hostname,
-            name: x.name,
-            description: x.description,
-          })),
-        };
-        ctx.body = body;
-      }
-    );
-  } else {
-    ctx.status = 404;
-    ctx.body = {
-      error: "Not found.",
-      code: NOT_FOUND,
-    };
-  }
+  await handleResult(
+    ctx,
+    () =>
+      ensureJwt(ctx.state.jwt)
+        ? getPods(ctx.state.jwt.claims)
+        : Promise.resolve({
+            ok: false,
+            error: "Access Denied.",
+            code: ACCESS_DENIED,
+          }),
+    (result) => {
+      const body: GetPodsAPIResult = {
+        pods: result.value.pods.map((x) => ({
+          hostname: x.hostname,
+          name: x.name,
+          description: x.description,
+        })),
+      };
+      ctx.body = body;
+    }
+  );
 }

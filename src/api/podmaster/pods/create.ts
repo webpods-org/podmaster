@@ -10,49 +10,39 @@ export type CreatePodAPIResult = {
 };
 
 export default async function createAPI(ctx: IKoaAppContext): Promise<void> {
-  const appConfig = config.get();
-  const hostname = ctx.URL.hostname;
-  if (hostname === appConfig.hostname) {
-    await handleResult(
-      ctx,
-      () =>
-        ensureJwt(ctx.state.jwt)
-          ? createPod(
-              ctx.request.body.id,
-              ctx.request.body.name,
-              ctx.request.body.app,
-              ctx.request.body.description || "",
-              ctx.state.jwt.claims
-            )
-          : Promise.resolve({
-              ok: false,
-              error: "Access Denied.",
-              code: ACCESS_DENIED,
-            }),
-      (result) => {
-        const body: CreatePodAPIResult = {
-          hostname: result.value.hostname,
+  await handleResult(
+    ctx,
+    () =>
+      ensureJwt(ctx.state.jwt)
+        ? createPod(
+            ctx.request.body.id,
+            ctx.request.body.name,
+            ctx.request.body.app,
+            ctx.request.body.description || "",
+            ctx.state.jwt.claims
+          )
+        : Promise.resolve({
+            ok: false,
+            error: "Access Denied.",
+            code: ACCESS_DENIED,
+          }),
+    (result) => {
+      const body: CreatePodAPIResult = {
+        hostname: result.value.hostname,
+      };
+      ctx.body = body;
+    },
+    (errorResult) => {
+      if (errorResult.code === POD_EXISTS) {
+        ctx.status = 403;
+        ctx.body = {
+          error: errorResult.error,
+          code: errorResult.code,
         };
-        ctx.body = body;
-      },
-      (errorResult) => {
-        if (errorResult.code === POD_EXISTS) {
-          ctx.status = 403;
-          ctx.body = {
-            error: errorResult.error,
-            code: errorResult.code,
-          };
-          return { handled: true };
-        } else {
-          return { handled: false };
-        }
+        return { handled: true };
+      } else {
+        return { handled: false };
       }
-    );
-  } else {
-    ctx.status = 404;
-    ctx.body = {
-      error: "Not found.",
-      code: NOT_FOUND,
-    };
-  }
+    }
+  );
 }

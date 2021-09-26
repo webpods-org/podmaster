@@ -25,7 +25,7 @@ export default async function startApp(configFile: string) {
     res: ServerResponse | Http2ServerResponse
   ) {
     const hostname = req.headers.host?.split(":")[0];
-    if (hostname === appConfig.hostname) {
+    if (hostname?.toLowerCase() === appConfig.hostname.toLowerCase()) {
       podmasterCallback(req, res);
     } else {
       podCallback(req, res);
