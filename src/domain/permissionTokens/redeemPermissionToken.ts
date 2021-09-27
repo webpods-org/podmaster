@@ -1,13 +1,13 @@
 import * as db from "../../db/index.js";
 import { JwtClaims } from "../../types/index.js";
 import { Result } from "../../types/api.js";
-import ensurePod from "../pods/util/ensurePod.js";
+import ensurePod from "../pods/internal/ensurePod.js";
 import errors from "../../errors/codes.js";
 import { PermissionTokensRow } from "../../types/db.js";
 import { generateUpdateStatement } from "../../lib/sqlite.js";
 import { getPodDataDir } from "../../storage/index.js";
 import permissionTokenMapper from "../../mappers/permissionToken.js";
-import addLogPermission from "../permissions/util/addLogPermission.js";
+import addLogPermission from "../permissions/internal/addLogPermission.js";
 
 export type RedeemPermissionTokenResult = {};
 

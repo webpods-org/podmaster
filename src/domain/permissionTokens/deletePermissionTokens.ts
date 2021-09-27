@@ -1,10 +1,10 @@
 import * as db from "../../db/index.js";
 import { JwtClaims } from "../../types/index.js";
 import { Result } from "../../types/api.js";
-import ensurePod from "../pods/util/ensurePod.js";
+import ensurePod from "../pods/internal/ensurePod.js";
 import errors from "../../errors/codes.js";
 import { getPodDataDir } from "../../storage/index.js";
-import getPodPermissionForJwt from "../pods/util/getPodPermissionForJwt.js";
+import getPodPermissionForJwt from "../pods/internal/getPodPermissionForJwt.js";
 
 export type DeletePermissionTokensResult = {};
 

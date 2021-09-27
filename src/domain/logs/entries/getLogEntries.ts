@@ -1,11 +1,11 @@
 import * as db from "../../../db/index.js";
 import { Result } from "../../../types/api.js";
-import ensurePod from "../../pods/util/ensurePod.js";
+import ensurePod from "../../pods/internal/ensurePod.js";
 import { EntriesRow } from "../../../types/db.js";
 import mapper from "../../../mappers/entry.js";
 import { JwtClaims, LogEntry } from "../../../types/index.js";
 import errors from "../../../errors/codes.js";
-import getLogPermissionForJwt from "../util/getLogPermissionForJwt.js";
+import getLogPermissionForJwt from "../internal/getLogPermissionForJwt.js";
 import { getPodDataDir } from "../../../storage/index.js";
 import * as config from "../../../config/index.js";
 

@@ -15,9 +15,9 @@ import {
   removeSubscription,
 } from "./subscriptions.js";
 import validateClaims from "../../lib/jwt/validateClaims.js";
-import getPodByHostname from "../pods/util/getPodByHostname.js";
+import getPodByHostname from "../pods/internal/getPodByHostname.js";
 import * as db from "../../db/index.js";
-import getLogPermissionForJwt from "../logs/util/getLogPermissionForJwt.js";
+import getLogPermissionForJwt from "../logs/internal/getLogPermissionForJwt.js";
 import errors from "../../errors/codes.js";
 import { getPodDataDir } from "../../storage/index.js";
 

@@ -11,7 +11,7 @@ import { generateInsertStatement } from "../../lib/sqlite.js";
 import { getPodDataDir } from "../../storage/index.js";
 import { getPods } from "./getPods.js";
 import { isAlphanumeric } from "../../api/utils/isAlphanumeric.js";
-import getPodByHostnameOrApp from "./util/getPodByHostnameOrApp.js";
+import getPodByHostnameOrApp from "./internal/getPodByHostnameOrApp.js";
 
 export type CreatePodResult = { hostname: string };
 

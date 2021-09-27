@@ -6,12 +6,12 @@ import {
   PodAccess,
 } from "../../types/index.js";
 import { Result } from "../../types/api.js";
-import ensurePod from "../pods/util/ensurePod.js";
+import ensurePod from "../pods/internal/ensurePod.js";
 import errors from "../../errors/codes.js";
 import { getPodDataDir } from "../../storage/index.js";
-import getPodPermissionForJwt from "../pods/util/getPodPermissionForJwt.js";
-import addLogPermission from "./util/addLogPermission.js";
-import addPodPermission from "./util/addPodPermission.js";
+import getPodPermissionForJwt from "../pods/internal/getPodPermissionForJwt.js";
+import addLogPermission from "./internal/addLogPermission.js";
+import addPodPermission from "./internal/addPodPermission.js";
 
 export type AddPermissionsResult = {};
 

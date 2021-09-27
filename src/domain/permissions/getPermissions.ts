@@ -3,10 +3,10 @@ import { IdentityPermission, JwtClaims } from "../../types/index.js";
 import { Result } from "../../types/api.js";
 import podPermissionMapper from "../../mappers/podPermission.js";
 import logPermissionMapper from "../../mappers/logPermission.js";
-import ensurePod from "../pods/util/ensurePod.js";
+import ensurePod from "../pods/internal/ensurePod.js";
 import errors from "../../errors/codes.js";
 import { getPodDataDir } from "../../storage/index.js";
-import getPodPermissionForJwt from "../pods/util/getPodPermissionForJwt.js";
+import getPodPermissionForJwt from "../pods/internal/getPodPermissionForJwt.js";
 
 export type GetPermissionsResult = {
   permissions: IdentityPermission[];

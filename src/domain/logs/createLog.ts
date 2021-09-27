@@ -3,16 +3,16 @@ import { join } from "path";
 
 import * as db from "../../db/index.js";
 import { ErrResult, Result } from "../../types/api.js";
-import ensurePod from "../pods/util/ensurePod.js";
+import ensurePod from "../pods/internal/ensurePod.js";
 import errors from "../../errors/codes.js";
 import { LogsRow } from "../../types/db.js";
 import { generateInsertStatement } from "../../lib/sqlite.js";
 import { getPodDataDir } from "../../storage/index.js";
 import getLogs from "./getLogs.js";
 import { JwtClaims } from "../../types/index.js";
-import getPodPermissionForJwt from "../pods/util/getPodPermissionForJwt.js";
+import getPodPermissionForJwt from "../pods/internal/getPodPermissionForJwt.js";
 import { isAlphanumeric } from "../../api/utils/isAlphanumeric.js";
-import addLogPermission from "../permissions/util/addLogPermission.js";
+import addLogPermission from "../permissions/internal/addLogPermission.js";
 
 export type CreateLogResult = {};
 
