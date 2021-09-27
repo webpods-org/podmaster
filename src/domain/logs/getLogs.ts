@@ -32,11 +32,13 @@ export default async function getLogs(
 
     const result = await getLogsImpl(pod, podPermission);
 
-    return result instanceof ValidResult
-      ? result
-      : new InvalidResult({
-          error: "Access denied.",
-          status: StatusCodes.UNAUTHORIZED,
-        });
+    if (result instanceof InvalidResult) {
+      return new InvalidResult({
+        error: "Access denied.",
+        status: StatusCodes.UNAUTHORIZED,
+      });
+    }
+
+    return result;
   });
 }

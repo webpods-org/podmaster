@@ -1,4 +1,3 @@
-import errors from "../errors/codes.js";
 import { logException } from "../lib/logger/index.js";
 import { IKoaAppContext } from "../types/koa.js";
 import { StatusCodes } from "http-status-codes";
@@ -31,7 +30,7 @@ export async function handleResult<T>(
   } catch (ex: any) {
     logException(ex);
     ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
-    ctx.body = { error: "Internal server error.", code: errors.INTERNAL_ERROR };
+    ctx.body = { error: "Internal server error." };
   }
 }
 

@@ -6,7 +6,6 @@ import { AppConfig } from "../../types/index.js";
 import { TrackedWebSocket } from "../../types/webSocket.js";
 import { handleMessage } from "../../domain/pubsub/handleMessage.js";
 import { handleClose } from "../../domain/pubsub/handleClose.js";
-import { WS } from "../../errors/codes.js";
 
 const { WebSocketServer }: { WebSocketServer: typeof WebSocket.Server } =
   (await import("ws")) as any;
@@ -37,19 +36,20 @@ export function attachWebSocketServer(
       ws.send(
         JSON.stringify({
           error: "Inactive for too long.",
-          code: WS.INACTIVE,
+          code: "WEBSOCKET_INACTIVE",
         })
       );
       ws.terminate();
     } else {
       ws.isAlive = false;
       ws.ping(function noop() {});
+      
       // Client has not asked for any connection yet. Terminate.
       if (ws.webpodsTracking.status === "WAITING_TO_CONNECT") {
         ws.send(
           JSON.stringify({
             error: "Inactive for too long.",
-            code: WS.INACTIVE,
+            code: "WEBSOCKET_INACTIVE",
           })
         );
         ws.terminate();
@@ -71,7 +71,7 @@ export function attachWebSocketServer(
       trackedWS.send(
         JSON.stringify({
           error: "Server is too busy.",
-          code: WS.SERVER_BUSY,
+          code: "SERVER_BUSY",
         })
       );
       trackedWS.terminate();

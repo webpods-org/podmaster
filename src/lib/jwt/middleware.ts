@@ -1,5 +1,4 @@
 import { ParameterizedContext, Next } from "koa";
-
 import jsonwebtoken from "jsonwebtoken";
 import { log, logException } from "../logger/index.js";
 import { IKoaAppContext } from "../../types/koa.js";
@@ -7,7 +6,6 @@ import getJwtValidationParams, { JWKInfo } from "./getJwtValidationParams.js";
 import validateClaims from "./validateClaims.js";
 import { checkAud, checkExp, checkNbf } from "./validations.js";
 import * as config from "../../config/index.js";
-import { HttpError } from "../../utils/http.js";
 import { InvalidResult, ValidResult } from "../../Result.js";
 import { StatusCodes } from "http-status-codes";
 

@@ -18,9 +18,7 @@ import validateClaims from "../../lib/jwt/validateClaims.js";
 import getPodByHostname from "../pods/internal/getPodByHostname.js";
 import * as db from "../../db/index.js";
 import getLogPermissionForJwt from "../logs/internal/getLogPermissionForJwt.js";
-import errors from "../../errors/codes.js";
 import { getPodDataDir } from "../../storage/index.js";
-import { StatusCodes } from "http-status-codes";
 import { ValidResult } from "../../Result.js";
 
 export function handleMessage(
@@ -59,7 +57,7 @@ export function handleMessage(
           ws.send(
             JSON.stringify({
               error: "Invalid JWT.",
-              code: errors.Jwt.INVALID_JWT,
+              code: "INVALID_JWT",
             })
           );
           ws.terminate();
@@ -68,7 +66,7 @@ export function handleMessage(
         ws.send(
           JSON.stringify({
             error: "Unknown Error.",
-            code: errors.INTERNAL_ERROR,
+            code: "INTERNAL_SERVER_ERROR",
           })
         );
         ws.terminate();
@@ -93,7 +91,6 @@ export function handleMessage(
             const podDb = db.getPodDb(podDataDir);
             const logPermission = await getLogPermissionForJwt(
               pod.app,
-              hostname,
               log,
               podDb,
               ws.webpodsTracking.jwtClaims
@@ -118,7 +115,7 @@ export function handleMessage(
               ws.send(
                 JSON.stringify({
                   error: `Cannot access channel for log ${channel}.`,
-                  code: errors.ACCESS_DENIED,
+                  code: "ACCESS_DENIED",
                 })
               );
             }
@@ -126,7 +123,7 @@ export function handleMessage(
             ws.send(
               JSON.stringify({
                 error: `Pod ${hostname} not found.`,
-                code: errors.Pods.NOT_FOUND,
+                code: "NOT_FOUND",
               })
             );
             ws.terminate();
@@ -162,7 +159,6 @@ export function handleMessage(
             const podDb = db.getPodDb(podDataDir);
             const logPermission = await getLogPermissionForJwt(
               pod.app,
-              hostname,
               log,
               podDb,
               ws.webpodsTracking.jwtClaims

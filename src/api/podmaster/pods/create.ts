@@ -1,8 +1,6 @@
 import createPod from "../../../domain/pods/createPod.js";
 import { handleResultWithJwt } from "../../handleResult.js";
 import { IKoaAppContext } from "../../../types/koa.js";
-import errors from "../../../errors/codes.js";
-import { StatusCodes } from "http-status-codes";
 
 export type CreatePodAPIResult = {
   hostname: string;

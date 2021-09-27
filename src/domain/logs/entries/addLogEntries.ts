@@ -71,171 +71,169 @@ export default async function addEntries(
 
     const logPermission = await getLogPermissionForJwt(
       pod.app,
-      hostname,
       log,
       podDb,
       userClaims
     );
 
-    if (logPermission.write) {
-      // First move the files into the the log directory.
-      const movedFiles: {
-        [key: string]: {
-          filename: string;
-          newPath: string;
-          hash: string;
-        };
-      } = {};
-
-      if (files) {
-        for (const field in files) {
-          const fileOrFiles = files[field];
-
-          /*
-              Move the file...
-              First, we'll try to use the incoming file name.
-              But have to check if it already exists.
-            */
-          const file = Array.isArray(fileOrFiles)
-            ? fileOrFiles[0]
-            : fileOrFiles;
-
-          if (file.name && !isFilenameValid(file.name)) {
-            return new InvalidResult({
-              error: "Invalid filename.",
-              status: StatusCodes.BAD_REQUEST,
-            });
-          }
-
-          const newPath = file.name
-            ? getFilePathBasedOnOriginalName(file.name)
-            : getRandomFilePath(file.name);
-
-          await moveFile(file.path, newPath);
-
-          const fileBuffer = readFileSync(newPath);
-          const hashSum = createHash("sha256");
-          hashSum.update(fileBuffer);
-          const hash = hashSum.digest("hex");
-
-          movedFiles[file.path] = {
-            filename: file.name || random(12),
-            newPath,
-            hash,
-          };
-        }
-      }
-
-      const insertEntriesTx = podDb.transaction(function insertEntries(
-        entries: LogEntry[] | undefined,
-        files: Files | undefined
-      ) {
-        // Get the last item
-        const lastItemStmt = podDb.prepare(
-          `SELECT "id", "commit" FROM "entries" ORDER BY id DESC LIMIT 1`
-        );
-
-        let { id: lastId, commit: lastCommit } = (lastItemStmt.get() as
-          | EntriesRow
-          | undefined) || {
-          id: 0,
-          commit: "",
-        };
-
-        if (entries) {
-          for (const entry of entries) {
-            const contentHash = createHash("sha256")
-              .update(entry.data)
-              .digest("hex");
-
-            const lastCommitAndContentHash = `${lastCommit};${contentHash}`;
-
-            const newCommit = createHash("sha256")
-              .update(lastCommitAndContentHash)
-              .digest("hex");
-
-            const entriesRow = {
-              content_hash: contentHash,
-              commit: newCommit,
-              previous_commit: lastCommit,
-              log_id: log,
-              data: entry.data,
-              type: "data" as "data",
-              created_at: Date.now(),
-              iss: userClaims.iss,
-              sub: userClaims.sub,
-            };
-
-            const insertEntryStmt = podDb.prepare(
-              generateInsertStatement<EntriesRow>("entries", entriesRow)
-            );
-
-            insertEntryStmt.run(entriesRow);
-
-            savedEntryIds.push({
-              id: lastId + 1,
-              commit: newCommit,
-            });
-
-            lastId++;
-            lastCommit = newCommit;
-          }
-        }
-
-        if (files) {
-          for (const field in files) {
-            const fileOrFiles = files[field];
-
-            // Move the file...
-            const file = Array.isArray(fileOrFiles)
-              ? fileOrFiles[0]
-              : fileOrFiles;
-
-            const movedFile = movedFiles[file.path];
-
-            const lastCommitAndContentHash = `${lastCommit};${movedFile.hash}`;
-
-            const newCommit = createHash("sha256")
-              .update(lastCommitAndContentHash)
-              .digest("hex");
-
-            const entryRow = {
-              commit: newCommit,
-              content_hash: movedFile.hash,
-              log_id: log,
-              data: movedFile.filename,
-              type: "file" as "file",
-              previous_commit: lastCommit,
-              created_at: Date.now(),
-              iss: userClaims.iss,
-              sub: userClaims.sub,
-            };
-
-            const insertEntryStmt = podDb.prepare(
-              generateInsertStatement<EntriesRow>("entries", entryRow)
-            );
-
-            insertEntryStmt.run(entryRow);
-
-            savedEntryIds.push({
-              id: lastId + 1,
-              commit: newCommit,
-            });
-
-            lastId++;
-            lastCommit = newCommit;
-          }
-        }
-      });
-
-      insertEntriesTx.immediate(entries, files);
-
-      return new ValidResult({ entries: savedEntryIds });
-    } else {
+    if (!logPermission.write) {
       return new InvalidResult({
         error: "Access denied.",
         status: StatusCodes.UNAUTHORIZED,
       });
     }
+    
+    // First move the files into the the log directory.
+    const movedFiles: {
+      [key: string]: {
+        filename: string;
+        newPath: string;
+        hash: string;
+      };
+    } = {};
+
+    if (files) {
+      for (const field in files) {
+        const fileOrFiles = files[field];
+
+        /*
+              Move the file...
+              First, we'll try to use the incoming file name.
+              But have to check if it already exists.
+            */
+        const file = Array.isArray(fileOrFiles) ? fileOrFiles[0] : fileOrFiles;
+
+        if (file.name && !isFilenameValid(file.name)) {
+          return new InvalidResult({
+            error: "Invalid filename.",
+            status: StatusCodes.BAD_REQUEST,
+          });
+        }
+
+        const newPath = file.name
+          ? getFilePathBasedOnOriginalName(file.name)
+          : getRandomFilePath(file.name);
+
+        await moveFile(file.path, newPath);
+
+        const fileBuffer = readFileSync(newPath);
+        const hashSum = createHash("sha256");
+        hashSum.update(fileBuffer);
+        const hash = hashSum.digest("hex");
+
+        movedFiles[file.path] = {
+          filename: file.name || random(12),
+          newPath,
+          hash,
+        };
+      }
+    }
+
+    const insertEntriesTx = podDb.transaction(function insertEntries(
+      entries: LogEntry[] | undefined,
+      files: Files | undefined
+    ) {
+      // Get the last item
+      const lastItemStmt = podDb.prepare(
+        `SELECT "id", "commit" FROM "entries" ORDER BY id DESC LIMIT 1`
+      );
+
+      let { id: lastId, commit: lastCommit } = (lastItemStmt.get() as
+        | EntriesRow
+        | undefined) || {
+        id: 0,
+        commit: "",
+      };
+
+      if (entries) {
+        for (const entry of entries) {
+          const contentHash = createHash("sha256")
+            .update(entry.data)
+            .digest("hex");
+
+          const lastCommitAndContentHash = `${lastCommit};${contentHash}`;
+
+          const newCommit = createHash("sha256")
+            .update(lastCommitAndContentHash)
+            .digest("hex");
+
+          const entriesRow = {
+            content_hash: contentHash,
+            commit: newCommit,
+            previous_commit: lastCommit,
+            log_id: log,
+            data: entry.data,
+            type: "data" as "data",
+            created_at: Date.now(),
+            iss: userClaims.iss,
+            sub: userClaims.sub,
+          };
+
+          const insertEntryStmt = podDb.prepare(
+            generateInsertStatement<EntriesRow>("entries", entriesRow)
+          );
+
+          insertEntryStmt.run(entriesRow);
+
+          savedEntryIds.push({
+            id: lastId + 1,
+            commit: newCommit,
+          });
+
+          lastId++;
+          lastCommit = newCommit;
+        }
+      }
+
+      if (files) {
+        for (const field in files) {
+          const fileOrFiles = files[field];
+
+          // Move the file...
+          const file = Array.isArray(fileOrFiles)
+            ? fileOrFiles[0]
+            : fileOrFiles;
+
+          const movedFile = movedFiles[file.path];
+
+          const lastCommitAndContentHash = `${lastCommit};${movedFile.hash}`;
+
+          const newCommit = createHash("sha256")
+            .update(lastCommitAndContentHash)
+            .digest("hex");
+
+          const entryRow = {
+            commit: newCommit,
+            content_hash: movedFile.hash,
+            log_id: log,
+            data: movedFile.filename,
+            type: "file" as "file",
+            previous_commit: lastCommit,
+            created_at: Date.now(),
+            iss: userClaims.iss,
+            sub: userClaims.sub,
+          };
+
+          const insertEntryStmt = podDb.prepare(
+            generateInsertStatement<EntriesRow>("entries", entryRow)
+          );
+
+          insertEntryStmt.run(entryRow);
+
+          savedEntryIds.push({
+            id: lastId + 1,
+            commit: newCommit,
+          });
+
+          lastId++;
+          lastCommit = newCommit;
+        }
+      }
+    });
+
+    insertEntriesTx.immediate(entries, files);
+
+    const result: AddLogEntriesResult = { entries: savedEntryIds };
+    return new ValidResult(result);
   });
 }

@@ -52,47 +52,48 @@ export default async function createLog(
       });
     }
 
-    if (!existingLogs.value.logs.some((x) => x.id === logId)) {
-      const logsRow: LogsRow = {
-        id: logId,
-        name: logName,
-        description: logDescription || "",
-        created_at: Date.now(),
-        public: publik ? 1 : 0,
-      };
-
-      const insertLogStmt = podDb.prepare(
-        generateInsertStatement<LogsRow>("logs", logsRow)
-      );
-
-      insertLogStmt.run(logsRow);
-
-      // Creator gets full permissions.
-      await addLogPermission(
-        logId,
-        {
-          iss: userClaims.iss,
-          sub: userClaims.sub,
-        },
-        {
-          read: true,
-          write: true,
-          publish: true,
-          subscribe: true,
-        },
-        false,
-        podDb
-      );
-
-      await mkdirp(logDir);
-
-      return new ValidResult({});
-    } else {
+    if (existingLogs.value.logs.some((x) => x.id === logId)) {
       return new InvalidResult({
         error: `The log ${logId} already exists.`,
         status: StatusCodes.CONFLICT,
       });
     }
+
+    const logsRow: LogsRow = {
+      id: logId,
+      name: logName,
+      description: logDescription || "",
+      created_at: Date.now(),
+      public: publik ? 1 : 0,
+    };
+
+    const insertLogStmt = podDb.prepare(
+      generateInsertStatement<LogsRow>("logs", logsRow)
+    );
+
+    insertLogStmt.run(logsRow);
+
+    // Creator gets full permissions.
+    await addLogPermission(
+      logId,
+      {
+        iss: userClaims.iss,
+        sub: userClaims.sub,
+      },
+      {
+        read: true,
+        write: true,
+        publish: true,
+        subscribe: true,
+      },
+      false,
+      podDb
+    );
+
+    await mkdirp(logDir);
+
+    const result: CreateLogResult = {};
+    return new ValidResult(result);
   });
 }
 

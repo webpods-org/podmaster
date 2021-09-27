@@ -8,6 +8,7 @@ import getPodPermissionForJwt from "../pods/internal/getPodPermissionForJwt.js";
 import random from "../../utils/random.js";
 import { StatusCodes } from "http-status-codes";
 import { InvalidResult, ValidResult } from "../../Result.js";
+import { HttpError } from "../../utils/http.js";
 
 export type CreatePermissionTokenResult = {
   id: string;
@@ -24,7 +25,9 @@ export default async function createPermissionTokens(
   maxRedemptions: number,
   expiry: number,
   userClaims: JwtClaims
-) {
+): Promise<
+  ValidResult<CreatePermissionTokenResult> | InvalidResult<HttpError>
+> {
   return ensurePod(hostname, async (pod) => {
     // Let's see if the log already exists.
     const podDataDir = getPodDataDir(pod.id);
@@ -36,34 +39,35 @@ export default async function createPermissionTokens(
       userClaims
     );
 
-    if (podPermission.write) {
-      const id = random();
-      const permissionsJson = JSON.stringify(permissions);
-
-      const permissionTokensRow: PermissionTokensRow = {
-        id,
-        permissions_json: permissionsJson,
-        max_redemptions: maxRedemptions,
-        redemptions: 0,
-        expiry: expiry,
-        created_at: Date.now(),
-      };
-
-      const insertStmt = podDb.prepare(
-        generateInsertStatement<PermissionTokensRow>(
-          "permission_tokens",
-          permissionTokensRow
-        )
-      );
-
-      insertStmt.run(permissionTokensRow);
-
-      return new ValidResult({ id });
-    } else {
+    if (!podPermission.write) {
       return new InvalidResult({
         error: "Access denied.",
         status: StatusCodes.UNAUTHORIZED,
       });
     }
+    
+    const id = random();
+    const permissionsJson = JSON.stringify(permissions);
+
+    const permissionTokensRow: PermissionTokensRow = {
+      id,
+      permissions_json: permissionsJson,
+      max_redemptions: maxRedemptions,
+      redemptions: 0,
+      expiry: expiry,
+      created_at: Date.now(),
+    };
+
+    const insertStmt = podDb.prepare(
+      generateInsertStatement<PermissionTokensRow>(
+        "permission_tokens",
+        permissionTokensRow
+      )
+    );
+
+    insertStmt.run(permissionTokensRow);
+
+    const result: CreatePermissionTokenResult = { id };
+    return new ValidResult(result);
   });
 }

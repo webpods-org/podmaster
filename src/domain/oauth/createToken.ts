@@ -4,12 +4,7 @@ import matchObject from "../../utils/matchObject.js";
 import jsonwebtoken, { SignOptions } from "jsonwebtoken";
 import getJwtValidationParams from "../../lib/jwt/getJwtValidationParams.js";
 import validateJwt from "../../lib/jwt/validateJwt.js";
-import {
-  InvalidResult,
-  unwrap,
-  unwrapAsync,
-  ValidResult,
-} from "../../Result.js";
+import { InvalidResult, ValidResult } from "../../Result.js";
 import { HttpError } from "../../utils/http.js";
 import { StatusCodes } from "http-status-codes";
 
@@ -24,79 +19,87 @@ export default async function createAuthToken(
   assertion: string,
   aud: string
 ): Promise<ValidResult<CreateAuthTokenResult> | InvalidResult<HttpError>> {
-  if (grantType === "jwt-bearer-exchange") {
-    if (aud) {
-      const appConfig = config.get();
-
-      const claims = getClaimsFromAssertion(assertion);
-
-      const result = await unwrapAsync(claims, async (claims) => {
-        const authenticator = getAuthenticator(claims);
-
-        return await unwrapAsync(authenticator, async (authenticator) => {
-          const jwtParams = await getJwtValidationParams(assertion);
-
-          const validatedClaims = await unwrapAsync(jwtParams, (jwtParams) =>
-            validateJwt(
-              appConfig.hostname,
-              assertion,
-              jwtParams.publicKey,
-              jwtParams.alg
-            )
-          );
-
-          return unwrap(validatedClaims, () => {
-            const issuer = `https://${appConfig.hostname}/`;
-
-            const expiresIn = claims.exp
-              ? claims.exp - Math.floor(Date.now() / 1000)
-              : appConfig.auth.defaultExpiry || 300;
-
-            const keyid = config.getPodmasterJWK().kid;
-            const subject = `${authenticator.name}/${claims.sub}`;
-            const signOptions: SignOptions = {
-              audience: aud,
-              algorithm: "RS256",
-              expiresIn,
-              issuer,
-              keyid,
-              subject,
-            };
-            const jwt = jsonwebtoken.sign(
-              {
-                scope: claims.scope,
-              },
-              appConfig.auth.keys.privateKey,
-              signOptions
-            );
-
-            return new ValidResult({
-              access_token: jwt,
-              token_type: "bearer" as "bearer",
-              expires_in: expiresIn,
-            });
-          });
-        });
-      });
-
-      return result instanceof ValidResult
-        ? result
-        : new InvalidResult({
-            error: "The assertion is not valid.",
-            status: StatusCodes.BAD_REQUEST,
-          });
-    } else {
-      return new InvalidResult({
-        error: "The aud field is required.",
-        status: StatusCodes.BAD_REQUEST,
-      });
-    }
-  } else {
+  if (grantType !== "jwt-bearer-exchange") {
     return new InvalidResult({
       error: "The grant_type parameter must be 'jwt-bearer-exchange'.",
       status: StatusCodes.BAD_REQUEST,
     });
   }
+
+  if (!aud) {
+    return new InvalidResult({
+      error: "The aud field is required.",
+      status: StatusCodes.BAD_REQUEST,
+    });
+  }
+
+  const appConfig = config.get();
+
+  const claims = getClaimsFromAssertion(assertion);
+
+  if (claims instanceof InvalidResult) {
+    return claims;
+  }
+
+  const authenticator = getAuthenticator(claims.value);
+
+  if (authenticator instanceof InvalidResult) {
+    return authenticator;
+  }
+
+  const jwtParams = await getJwtValidationParams(assertion);
+
+  if (jwtParams instanceof InvalidResult) {
+    return new InvalidResult({
+      error: "The assertion is not valid.",
+      status: StatusCodes.BAD_REQUEST,
+    });
+  }
+
+  const validatedClaims = await validateJwt(
+    appConfig.hostname,
+    assertion,
+    jwtParams.value.publicKey,
+    jwtParams.value.alg
+  );
+
+  if (validatedClaims instanceof InvalidResult) {
+    return new InvalidResult({
+      error: "The assertion is not valid.",
+      status: StatusCodes.BAD_REQUEST,
+    });
+  }
+
+  const issuer = `https://${appConfig.hostname}/`;
+
+  const expiresIn = claims.value.exp
+    ? claims.value.exp - Math.floor(Date.now() / 1000)
+    : appConfig.auth.defaultExpiry || 300;
+
+  const keyid = config.getPodmasterJWK().kid;
+  const subject = `${authenticator.value.name}/${claims.value.sub}`;
+  const signOptions: SignOptions = {
+    audience: aud,
+    algorithm: "RS256",
+    expiresIn,
+    issuer,
+    keyid,
+    subject,
+  };
+
+  const jwt = jsonwebtoken.sign(
+    {
+      scope: claims.value.scope,
+    },
+    appConfig.auth.keys.privateKey,
+    signOptions
+  );
+
+  return new ValidResult({
+    access_token: jwt,
+    token_type: "bearer" as "bearer",
+    expires_in: expiresIn,
+  });
 }
 
 type AssertionClaims = {
@@ -121,18 +124,18 @@ function getClaimsFromAssertion(
   const { payload } = decodeResult;
 
   if (
-    payload.iss &&
-    payload.sub &&
-    typeof payload.iss === "string" &&
-    typeof payload.sub === "string"
+    !payload.iss ||
+    !payload.sub ||
+    typeof payload.iss !== "string" ||
+    typeof payload.sub !== "string"
   ) {
-    return new ValidResult(payload as AssertionClaims);
-  } else {
     return new InvalidResult({
       error: "The sub field is missing in the assertion.",
       status: StatusCodes.BAD_REQUEST,
     });
   }
+
+  return new ValidResult(payload as AssertionClaims);
 }
 
 function getAuthenticator(
@@ -144,10 +147,12 @@ function getAuthenticator(
     matchObject({ aud: appConfig.hostname, ...authenticator.claims }, payload)
   );
 
-  return authenticator
-    ? new ValidResult(authenticator)
-    : new InvalidResult({
-        error: "The issuer in the JWT is not recognized.",
-        status: StatusCodes.BAD_REQUEST,
-      });
+  if (!authenticator) {
+    return new InvalidResult({
+      error: "The issuer in the JWT is not recognized.",
+      status: StatusCodes.BAD_REQUEST,
+    });
+  }
+
+  return new ValidResult(authenticator);
 }

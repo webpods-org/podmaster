@@ -25,32 +25,32 @@ export default async function getInfo(
 
     const logPermission = await getLogPermissionForJwt(
       pod.app,
-      hostname,
       logId,
       podDb,
       userClaims
     );
 
-    if (logPermission.read) {
-      // Get the last item
-      const lastItemStmt = podDb.prepare(
-        `SELECT "id", "commit" FROM "entries" ORDER BY id DESC LIMIT 1`
-      );
-
-      const { id, commit } = (lastItemStmt.get() as EntriesRow | undefined) || {
-        id: 0,
-        commit: "",
-      };
-
-      return new ValidResult({
-        id,
-        commit,
-      });
-    } else {
+    if (!logPermission.read) {
       return new InvalidResult({
         error: "Access denied.",
         status: StatusCodes.UNAUTHORIZED,
       });
     }
+    
+    // Get the last item
+    const lastItemStmt = podDb.prepare(
+      `SELECT "id", "commit" FROM "entries" ORDER BY id DESC LIMIT 1`
+    );
+
+    const { id, commit } = (lastItemStmt.get() as EntriesRow | undefined) || {
+      id: 0,
+      commit: "",
+    };
+
+    const result: GetInfoResult = {
+      id,
+      commit,
+    };
+    return new ValidResult(result);
   });
 }

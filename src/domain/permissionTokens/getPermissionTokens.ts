@@ -6,6 +6,7 @@ import { getPodDataDir } from "../../storage/index.js";
 import getPodPermissionForJwt from "../pods/internal/getPodPermissionForJwt.js";
 import { StatusCodes } from "http-status-codes";
 import { InvalidResult, ValidResult } from "../../Result.js";
+import { HttpError } from "../../utils/http.js";
 
 export type GetPermissionsTokensResult = {
   permissionTokens: PermissionToken[];
@@ -14,7 +15,7 @@ export type GetPermissionsTokensResult = {
 export default async function getPermissionTokens(
   hostname: string,
   userClaims: JwtClaims
-) {
+): Promise<ValidResult<GetPermissionsTokensResult> | InvalidResult<HttpError>> {
   return ensurePod(hostname, async (pod) => {
     const podDataDir = getPodDataDir(pod.id);
     const podDb = db.getPodDb(podDataDir);
@@ -25,23 +26,25 @@ export default async function getPermissionTokens(
       userClaims
     );
 
-    if (podPermission.write) {
-      // Get pod permissions
-      const permissionTokensStmt = podDb.prepare(
-        `SELECT * FROM "permission_tokens" WHERE "expiry" > @expiry AND "max_redemptions" > "redemptions"`
-      );
-      const permissionTokens = permissionTokensStmt
-        .all({ expiry: Date.now() })
-        .map(permissionTokenMapper);
-
-      return new ValidResult({
-        permissionTokens,
-      });
-    } else {
+    if (!podPermission.write) {
       return new InvalidResult({
         error: "Access denied.",
         status: StatusCodes.UNAUTHORIZED,
       });
     }
+
+    // Get pod permissions
+    const permissionTokensStmt = podDb.prepare(
+      `SELECT * FROM "permission_tokens" WHERE "expiry" > @expiry AND "max_redemptions" > "redemptions"`
+    );
+    const permissionTokens = permissionTokensStmt
+      .all({ expiry: Date.now() })
+      .map(permissionTokenMapper);
+
+    const result: GetPermissionsTokensResult = {
+      permissionTokens,
+    };
+    
+    return new ValidResult(result);
   });
 }

@@ -39,21 +39,26 @@ export async function getPods(userClaims: JwtClaims) {
       .map(mapper);
   }
 
-  if (appConfig.authenticators.some((x) => x.claims.iss === userClaims.iss)) {
-    const pods = getPodsFromConfig(userClaims)
-      .concat(getPodsFromDb(userClaims))
-      .map((x) => ({
-        hostname: x.hostname,
-        name: x.name,
-        description: x.description,
-        dataDir: getPodDataDir(x.id),
-      }));
+  const hasAuthenticators = appConfig.authenticators.some(
+    (x) => x.claims.iss === userClaims.iss
+  );
 
-    return new ValidResult({ pods });
-  } else {
+  if (!hasAuthenticators) {
     return new InvalidResult({
       error: "Access denied.",
       status: StatusCodes.UNAUTHORIZED,
     });
   }
+
+  const pods = getPodsFromConfig(userClaims)
+    .concat(getPodsFromDb(userClaims))
+    .map((x) => ({
+      hostname: x.hostname,
+      name: x.name,
+      description: x.description,
+      dataDir: getPodDataDir(x.id),
+    }));
+
+  const result = { pods };
+  return new ValidResult(result);
 }

@@ -10,9 +10,7 @@ export default async function validateJwt(
   token: string,
   publicKey: string,
   alg: AsymmetricAlgorithm
-): Promise<
-  ValidResult<JwtClaims> | InvalidResult<{ error: string; code: string }>
-> {
+): Promise<ValidResult<JwtClaims> | InvalidResult<"INVALID_CLAIMS">> {
   const claims = jsonwebtoken.verify(token, publicKey, {
     algorithms: [alg],
   });
@@ -27,9 +25,6 @@ export default async function validateJwt(
     // Additional checks for exp, nbf and aud
     return new ValidResult(claims);
   } else {
-    return new InvalidResult({
-      error: "Invalid claims.",
-      code: "INVALID_CLAIMS",
-    });
+    return new InvalidResult("INVALID_CLAIMS");
   }
 }

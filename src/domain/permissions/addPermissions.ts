@@ -12,6 +12,7 @@ import addLogPermission from "./internal/addLogPermission.js";
 import addPodPermission from "./internal/addPodPermission.js";
 import { StatusCodes } from "http-status-codes";
 import { InvalidResult, ValidResult } from "../../Result.js";
+import { HttpError } from "../../utils/http.js";
 
 export type AddPermissionsResult = {};
 
@@ -28,7 +29,7 @@ export default async function addPermissions(
     }[];
   },
   userClaims: JwtClaims
-) {
+): Promise<ValidResult<AddPermissionsResult> | InvalidResult<HttpError>> {
   return ensurePod(hostname, async (pod) => {
     // Let's see if the log already exists.
     const podDataDir = getPodDataDir(pod.id);
@@ -40,34 +41,35 @@ export default async function addPermissions(
       userClaims
     );
 
-    if (podPermission.write) {
-      if (permissions.pod) {
-        await addPodPermission(
-          permissions.identity,
-          permissions.pod.access,
-          false,
-          podDb
-        );
-      }
-
-      if (permissions.logs) {
-        for (const logPermission of permissions.logs) {
-          await addLogPermission(
-            logPermission.log,
-            permissions.identity,
-            logPermission.access,
-            false,
-            podDb
-          );
-        }
-      }
-
-      return new ValidResult({});
-    } else {
+    if (!podPermission.write) {
       return new InvalidResult({
         error: "Access denied.",
         status: StatusCodes.UNAUTHORIZED,
       });
     }
+    
+    if (permissions.pod) {
+      await addPodPermission(
+        permissions.identity,
+        permissions.pod.access,
+        false,
+        podDb
+      );
+    }
+
+    if (permissions.logs) {
+      for (const logPermission of permissions.logs) {
+        await addLogPermission(
+          logPermission.log,
+          permissions.identity,
+          logPermission.access,
+          false,
+          podDb
+        );
+      }
+    }
+
+    const result: AddPermissionsResult = {};
+    return new ValidResult(result);
   });
 }

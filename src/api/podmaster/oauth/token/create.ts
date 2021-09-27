@@ -1,8 +1,6 @@
 import { handleResult } from "../../../handleResult.js";
 import { IKoaAppContext } from "../../../../types/koa.js";
-import errors from "../../../../errors/codes.js";
 import createAuthToken from "../../../../domain/oauth/createToken.js";
-import { StatusCodes } from "http-status-codes";
 
 export type CreateAuthTokenAPIResult = {
   access_token: string;

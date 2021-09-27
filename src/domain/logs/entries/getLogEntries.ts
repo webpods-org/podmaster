@@ -117,40 +117,41 @@ export default async function getEntries(
 
     const logPermission = await getLogPermissionForJwt(
       pod.app,
-      hostname,
       logId,
       podDb,
       userClaims
     );
 
-    if (logPermission.read) {
-      const dbEntries = sinceId
-        ? getEntriesFromId(sinceId)
-        : sinceCommit
-        ? getEntriesAfterCommit(sinceCommit)
-        : commitIds
-        ? getEntriesByCommits(commitIds)
-        : offset !== undefined
-        ? getEntriesFrom(offset, order?.toLowerCase() !== "desc")
-        : getEntriesFromId(0);
-
-      if (dbEntries) {
-        const entries = dbEntries.map(mapper).map((entry) => ({
-          ...entry,
-          data:
-            entry.type === "file"
-              ? `/logs/${logId}/files/${entry.data}`
-              : entry.data,
-        }));
-        return new ValidResult({ entries });
-      } else {
-        return new ValidResult({ entries: [] });
-      }
-    } else {
+    if (!logPermission.read) {
       return new InvalidResult({
         error: "Access denied.",
         status: StatusCodes.UNAUTHORIZED,
       });
+    }
+    
+    const dbEntries = sinceId
+      ? getEntriesFromId(sinceId)
+      : sinceCommit
+      ? getEntriesAfterCommit(sinceCommit)
+      : commitIds
+      ? getEntriesByCommits(commitIds)
+      : offset !== undefined
+      ? getEntriesFrom(offset, order?.toLowerCase() !== "desc")
+      : getEntriesFromId(0);
+
+    if (dbEntries) {
+      const entries = dbEntries.map(mapper).map((entry) => ({
+        ...entry,
+        data:
+          entry.type === "file"
+            ? `/logs/${logId}/files/${entry.data}`
+            : entry.data,
+      }));
+      const result: GetEntriesResult = { entries };
+      return new ValidResult(result);
+    } else {
+      const result: GetEntriesResult = { entries: [] };
+      return new ValidResult(result);
     }
   });
 }

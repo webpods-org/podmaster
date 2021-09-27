@@ -1,8 +1,6 @@
 import jsonwebtoken from "jsonwebtoken";
 import jwksClient from "jwks-rsa";
-
 import * as config from "../../config/index.js";
-import errors from "../../errors/codes.js";
 import { AsymmetricAlgorithm, KeyTypes } from "../../types/crypto.js";
 import { LRUMap } from "../lruCache/lru.js";
 import { asymmetricAlgorithms, getKeyType } from "./crypto.js";
@@ -36,13 +34,26 @@ function getItemFromCache(key: string): CacheItem | undefined {
   return cache.find(key);
 }
 
-export default async function getJwtValidationParams(token: string) {
+export default async function getJwtValidationParams(
+  token: string
+): Promise<
+  | ValidResult<JWKInfo>
+  | InvalidResult<
+      | "INVALID_JWT"
+      | "INVALID_ALGORITHM"
+      | "INVALID_PAYLOAD"
+      | "MISSING_ISS"
+      | "MISSING_KID"
+      | "UNKNOWN_ISSUER"
+      | "BLOCKED_ISSUER"
+    >
+> {
   const decodeResult = jsonwebtoken.decode(token, {
     complete: true,
   });
 
   if (decodeResult === null) {
-    return new InvalidResult({ code: "INVALID_JWT" });
+    return new InvalidResult("INVALID_JWT");
   }
 
   const { header, payload, signature } = decodeResult as {
@@ -59,27 +70,21 @@ export default async function getJwtValidationParams(token: string) {
 
   //
   if (!asymmetricAlgorithms.includes(alg.toUpperCase())) {
-    return new InvalidResult({ code: "INVALID_ALGORITHM" });
+    return new InvalidResult("INVALID_ALGORITHM");
   }
 
   const appConfig = config.get();
 
   if (!payload) {
-    return new InvalidResult({
-      code: "INVALID_PAYLOAD",
-    });
+    return new InvalidResult("INVALID_PAYLOAD");
   }
 
   if (!iss) {
-    return new InvalidResult({
-      code: "MISSING_ISS",
-    });
+    return new InvalidResult("MISSING_ISS");
   }
 
   if (!kid) {
-    return new InvalidResult({
-      code: "MISSING_KID",
-    });
+    return new InvalidResult("MISSING_KID");
   }
 
   const issuerIsUrl = iss.startsWith("http://") || iss.startsWith("https://");
@@ -92,7 +97,7 @@ export default async function getJwtValidationParams(token: string) {
         appConfig.externalAuthServers.allowList?.includes(x)
       )
     ) {
-      return new InvalidResult({ code: "UNKNOWN_ISSUER" });
+      return new InvalidResult("UNKNOWN_ISSUER");
     }
   }
   if (appConfig.externalAuthServers.denyList) {
@@ -101,7 +106,7 @@ export default async function getJwtValidationParams(token: string) {
         appConfig.externalAuthServers.denyList?.includes(x)
       )
     ) {
-      return new InvalidResult({ code: "BLOCKED_ISSUER" });
+      return new InvalidResult("BLOCKED_ISSUER");
     }
   }
 
@@ -146,7 +151,7 @@ export default async function getJwtValidationParams(token: string) {
         signature,
       });
     } else {
-      return new InvalidResult({ code: "INVALID_ALGORITHM" });
+      return new InvalidResult("INVALID_ALGORITHM");
     }
   } else {
     // First check if we have JWKS endpoint override.
@@ -185,7 +190,7 @@ export default async function getJwtValidationParams(token: string) {
         signature,
       });
     } else {
-      return new InvalidResult({ code: "INVALID_ALGORITHM" });
+      return new InvalidResult("INVALID_ALGORITHM");
     }
   }
 }

@@ -26,121 +26,121 @@ export default async function createPod(
   // Check fields
   const validationErrors = validateInput({ podId, app });
 
-  if (validationErrors === null) {
-    const appConfig = config.get();
-    const systemDb = db.getSystemDb();
+  if (validationErrors) {
+    return validationErrors;
+  }
+  
+  const appConfig = config.get();
+  const systemDb = db.getSystemDb();
 
-    const podHostname = userClaims.webpods?.domain
-      ? `${podId}.${userClaims.webpods.domain}.${appConfig.hostname}`
-      : `${podId}.${appConfig.hostname}`;
+  const podHostname = userClaims.webpods?.domain
+    ? `${podId}.${userClaims.webpods.domain}.${appConfig.hostname}`
+    : `${podId}.${appConfig.hostname}`;
 
-    // First check if we have a valid issuer and audience.
-    // Audience defaults to hostname of podmaster, but can be overridden.
-    const authenticator = appConfig.authenticators.find((issuer) =>
-      matchObject({ aud: appConfig.hostname, ...issuer.claims }, userClaims)
-    );
+  // First check if we have a valid issuer and audience.
+  // Audience defaults to hostname of podmaster, but can be overridden.
+  const authenticator = appConfig.authenticators.find((issuer) =>
+    matchObject({ aud: appConfig.hostname, ...issuer.claims }, userClaims)
+  );
 
-    if (authenticator) {
-      const matchingTier = appConfig.tiers.find((tier) =>
-        matchObject(tier.claims, userClaims)
-      );
+  if (!authenticator) {
+    return new InvalidResult({
+      error: "Access denied.",
+      status: StatusCodes.UNAUTHORIZED,
+    });
+  }
 
-      /*
+  const matchingTier = appConfig.tiers.find((tier) =>
+    matchObject(tier.claims, userClaims)
+  );
+
+  /*
         Verify the claims and create the pod.
         The rules are:
           1. If webpods.hostname and webpods.pod exists in the jwt,
           create ${webpods.pod}.${webpods.hostname}.
           2. Check maxPodsPerUser
       */
-      if (matchingTier) {
-        const existingPodsResult = await getPods(userClaims);
-
-        if (existingPodsResult instanceof ValidResult) {
-          if (
-            !matchingTier.maxPodsPerUser ||
-            matchingTier.maxPodsPerUser > existingPodsResult.value.pods.length
-          ) {
-            // Check if the pod name is available.
-
-            const existingPod = await getPodByHostnameOrApp(podHostname, app);
-
-            if (!existingPod) {
-              // Gotta make a directory.
-              const podDataDir = getPodDataDir(podId);
-
-              const podsRow: PodsRow = {
-                iss: userClaims.iss,
-                sub: userClaims.sub,
-                id: podId,
-                name: podTitle,
-                app: app,
-                hostname: podHostname,
-                hostname_alias: null,
-                created_at: Date.now(),
-                tier: "free",
-                description,
-              };
-
-              const insertPodStmt = systemDb.prepare(
-                generateInsertStatement<PodsRow>("pods", podsRow)
-              );
-
-              insertPodStmt.run(podsRow);
-
-              await mkdirp(podDataDir);
-
-              // Create the Pod DB
-              const podDb = db.getPodDb(podDataDir);
-              await db.initPodDb(podDb);
-
-              // Insert write permissions.
-              const podPermissionsRow: PodPermissionsRow = {
-                iss: `https://${appConfig.hostname}/`,
-                sub: `${authenticator.name}/${userClaims.sub}`,
-                read: 1,
-                write: 1,
-                created_at: Date.now(),
-              };
-              const insertPodPermissionStmt = podDb.prepare(
-                generateInsertStatement<PodPermissionsRow>(
-                  "pod_permissions",
-                  podPermissionsRow
-                )
-              );
-
-              insertPodPermissionStmt.run(podPermissionsRow);
-
-              return new ValidResult({ hostname: podHostname });
-            } else {
-              return new InvalidResult({
-                error: `A pod named ${podHostname} connected to app ${app} already exists.`,
-                status: StatusCodes.CONFLICT,
-              });
-            }
-          } else {
-            return new InvalidResult({
-              error: "Quota exceeded.",
-              status: StatusCodes.INSUFFICIENT_SPACE_ON_RESOURCE,
-            });
-          }
-        } else {
-          return existingPodsResult;
-        }
-      } else {
-        return new InvalidResult({
-          error: "Access denied.",
-          status: StatusCodes.UNAUTHORIZED,
-        });
-      }
-    } else {
-      return new InvalidResult({
-        error: "Access denied.",
-        status: StatusCodes.UNAUTHORIZED,
-      });
-    }
-  } else {
-    return validationErrors;
+  if (!matchingTier) {
+    return new InvalidResult({
+      error: "Access denied.",
+      status: StatusCodes.UNAUTHORIZED,
+    });
   }
+
+  const existingPodsResult = await getPods(userClaims);
+
+  if (existingPodsResult instanceof InvalidResult) {
+    return existingPodsResult;
+  }
+
+  if (
+    matchingTier.maxPodsPerUser &&
+    existingPodsResult.value.pods.length >= matchingTier.maxPodsPerUser
+  ) {
+    return new InvalidResult({
+      error: "Quota exceeded.",
+      status: StatusCodes.INSUFFICIENT_SPACE_ON_RESOURCE,
+    });
+  }
+
+  // Check if the pod name is available.
+  const existingPod = await getPodByHostnameOrApp(podHostname, app);
+
+  if (existingPod) {
+    return new InvalidResult({
+      error: `A pod named ${podHostname} connected to app ${app} already exists.`,
+      status: StatusCodes.CONFLICT,
+    });
+  }
+
+  // Gotta make a directory.
+  const podDataDir = getPodDataDir(podId);
+
+  const podsRow: PodsRow = {
+    iss: userClaims.iss,
+    sub: userClaims.sub,
+    id: podId,
+    name: podTitle,
+    app: app,
+    hostname: podHostname,
+    hostname_alias: null,
+    created_at: Date.now(),
+    tier: "free",
+    description,
+  };
+
+  const insertPodStmt = systemDb.prepare(
+    generateInsertStatement<PodsRow>("pods", podsRow)
+  );
+
+  insertPodStmt.run(podsRow);
+
+  await mkdirp(podDataDir);
+
+  // Create the Pod DB
+  const podDb = db.getPodDb(podDataDir);
+  await db.initPodDb(podDb);
+
+  // Insert write permissions.
+  const podPermissionsRow: PodPermissionsRow = {
+    iss: `https://${appConfig.hostname}/`,
+    sub: `${authenticator.name}/${userClaims.sub}`,
+    read: 1,
+    write: 1,
+    created_at: Date.now(),
+  };
+  const insertPodPermissionStmt = podDb.prepare(
+    generateInsertStatement<PodPermissionsRow>(
+      "pod_permissions",
+      podPermissionsRow
+    )
+  );
+
+  insertPodPermissionStmt.run(podPermissionsRow);
+
+  const result: CreatePodResult = { hostname: podHostname };
+  return new ValidResult(result);
 }
 
 function validateInput(input: {
