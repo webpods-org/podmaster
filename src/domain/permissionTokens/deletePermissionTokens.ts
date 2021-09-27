@@ -1,10 +1,10 @@
 import * as db from "../../db/index.js";
 import { JwtClaims } from "../../types/index.js";
-import { Result } from "../../types/api.js";
 import ensurePod from "../pods/internal/ensurePod.js";
-import errors from "../../errors/codes.js";
 import { getPodDataDir } from "../../storage/index.js";
 import getPodPermissionForJwt from "../pods/internal/getPodPermissionForJwt.js";
+import { StatusCodes } from "http-status-codes";
+import { InvalidResult, ValidResult } from "../../Result.js";
 
 export type DeletePermissionTokensResult = {};
 
@@ -12,13 +12,17 @@ export default async function deletePermissionTokens(
   hostname: string,
   id: string,
   userClaims: JwtClaims
-): Promise<Result<DeletePermissionTokensResult>> {
+) {
   return ensurePod(hostname, async (pod) => {
     // Let's see if the log already exists.
     const podDataDir = getPodDataDir(pod.id);
     const podDb = db.getPodDb(podDataDir);
 
-    const podPermission = await getPodPermissionForJwt(pod.app, podDb, userClaims);
+    const podPermission = await getPodPermissionForJwt(
+      pod.app,
+      podDb,
+      userClaims
+    );
 
     if (podPermission.write) {
       const deleteTokensStmt = podDb.prepare(
@@ -27,16 +31,12 @@ export default async function deletePermissionTokens(
 
       deleteTokensStmt.run({ id });
 
-      return {
-        ok: true,
-        value: {},
-      };
+      return new ValidResult({});
     } else {
-      return {
-        ok: false,
-        code: errors.ACCESS_DENIED,
+      return new InvalidResult({
         error: "Access denied.",
-      };
+        status: StatusCodes.UNAUTHORIZED,
+      });
     }
   });
 }

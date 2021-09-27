@@ -1,13 +1,13 @@
 import * as db from "../../db/index.js";
 import { JwtClaims } from "../../types/index.js";
-import { Result } from "../../types/api.js";
 import ensurePod from "../pods/internal/ensurePod.js";
-import errors from "../../errors/codes.js";
 import { PermissionTokensRow } from "../../types/db.js";
 import { generateUpdateStatement } from "../../lib/sqlite.js";
 import { getPodDataDir } from "../../storage/index.js";
 import permissionTokenMapper from "../../mappers/permissionToken.js";
 import addLogPermission from "../permissions/internal/addLogPermission.js";
+import { StatusCodes } from "http-status-codes";
+import { InvalidResult, ValidResult } from "../../Result.js";
 
 export type RedeemPermissionTokenResult = {};
 
@@ -15,7 +15,7 @@ export default async function redeemPermissionToken(
   hostname: string,
   token: string,
   userClaims: JwtClaims
-): Promise<Result<RedeemPermissionTokenResult>> {
+) {
   if (userClaims.sub !== "*") {
     return ensurePod(hostname, async (pod) => {
       // Explicity check if sub === *, since that has special meaning in permissions.
@@ -61,23 +61,18 @@ export default async function redeemPermissionToken(
 
         updatePermStmt.run({ ...updateParams, id: token.id });
 
-        return {
-          ok: true,
-          value: {},
-        };
+        return new ValidResult({});
       } else {
-        return {
-          ok: false,
+        return new InvalidResult({
           error: "Token is invalid or expired.",
-          code: errors.Permissions.INVALID_OR_EXPIRED_TOKEN,
-        };
+          status: StatusCodes.UNAUTHORIZED,
+        });
       }
     });
   } else {
-    return {
-      ok: false,
+    return new InvalidResult({
       error: "The sub claim is invalid.",
-      code: errors.Jwt.INVALID_JWT,
-    };
+      status: StatusCodes.BAD_REQUEST,
+    });
   }
 }

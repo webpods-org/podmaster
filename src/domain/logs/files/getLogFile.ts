@@ -1,12 +1,13 @@
 import { join } from "path";
 import * as db from "../../../db/index.js";
-import { Result } from "../../../types/api.js";
 import ensurePod from "../../pods/internal/ensurePod.js";
-import errors from "../../../errors/codes.js";
 import getLogPermissionForJwt from "../internal/getLogPermissionForJwt.js";
 import isFilenameValid from "../../../lib/validation/checkFilename.js";
 import { getDirNumber, getPodDataDir } from "../../../storage/index.js";
 import { JwtClaims } from "../../../types/index.js";
+import { StatusCodes } from "http-status-codes";
+import { InvalidResult, ValidResult } from "../../../Result.js";
+import { HttpError } from "../../../utils/http.js";
 
 export type GetFileResult = {
   relativeFilePath: string;
@@ -17,7 +18,7 @@ export default async function getFile(
   logId: string,
   urlPath: string,
   userClaims: JwtClaims | undefined
-): Promise<Result<GetFileResult>> {
+): Promise<ValidResult<GetFileResult> | InvalidResult<HttpError>> {
   return ensurePod(hostname, async (pod) => {
     // Let's see if the log already exists.
     const podDataDir = getPodDataDir(pod.id);
@@ -46,23 +47,20 @@ export default async function getFile(
           logId,
           fileName
         );
-        return {
-          ok: true,
-          value: { relativeFilePath },
-        };
+        return new ValidResult({
+          relativeFilePath,
+        });
       } else {
-        return {
-          ok: false,
-          code: errors.NOT_FOUND,
+        return new InvalidResult({
           error: "The requested url was not found on this server.",
-        };
+          status: StatusCodes.NOT_FOUND,
+        });
       }
     } else {
-      return {
-        ok: false,
-        code: errors.ACCESS_DENIED,
+      return new InvalidResult({
         error: "Access denied.",
-      };
+        status: StatusCodes.UNAUTHORIZED,
+      });
     }
   });
 }

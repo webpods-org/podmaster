@@ -1,19 +1,22 @@
 import errors from "../errors/codes.js";
 import { logException } from "../lib/logger/index.js";
-import { ErrResult, OkResult, Result } from "../types/api.js";
 import { IKoaAppContext } from "../types/koa.js";
 import { StatusCodes } from "http-status-codes";
 import { JwtClaims } from "../types/index.js";
+import { InvalidResult, ValidResult } from "../Result.js";
+import { HttpError } from "../utils/http.js";
 
 export async function handleResult<T>(
   ctx: IKoaAppContext,
-  fn: () => Promise<Result<T>>,
-  then: (x: OkResult<T>) => void,
-  errorHandler?: (x: ErrResult) => { handled: boolean } | undefined
+  fn: () => Promise<ValidResult<T> | InvalidResult<HttpError>>,
+  then: (x: ValidResult<T>) => void,
+  errorHandler?: (
+    x: InvalidResult<HttpError>
+  ) => { handled: boolean } | undefined
 ): Promise<void> {
   try {
     const result = await fn();
-    if (result.ok) {
+    if (result instanceof ValidResult) {
       return then(result);
     } else {
       if (errorHandler) {
@@ -42,9 +45,11 @@ export async function handleResultWithJwt<T>(
   ctx: IKoaAppContext,
   fn: (
     ctx: IKoaAppContext & { state: { jwt: JwtClaims } }
-  ) => Promise<Result<T>>,
-  then: (x: OkResult<T>) => void,
-  errorHandler?: (x: ErrResult) => { handled: boolean } | undefined
+  ) => Promise<ValidResult<T> | InvalidResult<HttpError>>,
+  then: (x: ValidResult<T>) => void,
+  errorHandler?: (
+    x: InvalidResult<HttpError>
+  ) => { handled: boolean } | undefined
 ): Promise<void> {
   if (ensureJwt(ctx.state.jwt)) {
     return await handleResult(
@@ -61,15 +66,12 @@ export async function handleResultWithJwt<T>(
   }
 }
 
-function genericErrorHandler(ctx: IKoaAppContext, result: ErrResult): void {
-  if (result.code === errors.ACCESS_DENIED) {
-    ctx.status = StatusCodes.UNAUTHORIZED;
-    ctx.body = {
-      error: "Access denied.",
-      code: errors.ACCESS_DENIED,
-    };
-  } else {
-    ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
-    ctx.body = { error: result.error, code: result.code };
-  }
+function genericErrorHandler(
+  ctx: IKoaAppContext,
+  result: InvalidResult<HttpError>
+): void {
+  ctx.status = result.error.status;
+  ctx.body = {
+    error: result.error.error,
+  };
 }

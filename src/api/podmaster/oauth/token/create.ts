@@ -26,19 +26,6 @@ export default async function createAPI(ctx: IKoaAppContext): Promise<void> {
         expires_in: result.value.expires_in,
       };
       ctx.body = body;
-    },
-    (err) => {
-      if (err.code === errors.OAuth.UNSUPPORTED_GRANT_TYPE) {
-        ctx.status = StatusCodes.BAD_REQUEST;
-        ctx.body = {
-          error:
-            "Incorrect grant_type. Supported value is 'urn:ietf:params:oauth:grant-type:jwt-bearer'.",
-          code: errors.OAuth.UNSUPPORTED_GRANT_TYPE,
-        };
-        return { handled: true };
-      } else {
-        return { handled: false };
-      }
     }
   );
 }

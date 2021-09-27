@@ -1,13 +1,13 @@
 import * as db from "../../db/index.js";
 import { JwtClaims, LogAccess } from "../../types/index.js";
-import { Result } from "../../types/api.js";
 import ensurePod from "../pods/internal/ensurePod.js";
-import errors from "../../errors/codes.js";
 import { PermissionTokensRow } from "../../types/db.js";
 import { generateInsertStatement } from "../../lib/sqlite.js";
 import { getPodDataDir } from "../../storage/index.js";
 import getPodPermissionForJwt from "../pods/internal/getPodPermissionForJwt.js";
 import random from "../../utils/random.js";
+import { StatusCodes } from "http-status-codes";
+import { InvalidResult, ValidResult } from "../../Result.js";
 
 export type CreatePermissionTokenResult = {
   id: string;
@@ -24,13 +24,17 @@ export default async function createPermissionTokens(
   maxRedemptions: number,
   expiry: number,
   userClaims: JwtClaims
-): Promise<Result<CreatePermissionTokenResult>> {
+) {
   return ensurePod(hostname, async (pod) => {
     // Let's see if the log already exists.
     const podDataDir = getPodDataDir(pod.id);
     const podDb = db.getPodDb(podDataDir);
 
-    const podPermission = await getPodPermissionForJwt(pod.app, podDb, userClaims);
+    const podPermission = await getPodPermissionForJwt(
+      pod.app,
+      podDb,
+      userClaims
+    );
 
     if (podPermission.write) {
       const id = random();
@@ -54,16 +58,12 @@ export default async function createPermissionTokens(
 
       insertStmt.run(permissionTokensRow);
 
-      return {
-        ok: true,
-        value: { id },
-      };
+      return new ValidResult({ id });
     } else {
-      return {
-        ok: false,
-        code: errors.ACCESS_DENIED,
+      return new InvalidResult({
         error: "Access denied.",
-      };
+        status: StatusCodes.UNAUTHORIZED,
+      });
     }
   });
 }

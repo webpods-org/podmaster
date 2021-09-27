@@ -1,10 +1,10 @@
 import * as db from "../../db/index.js";
 import * as config from "../../config/index.js";
 import mapper from "../../mappers/pod.js";
-import { Result } from "../../types/api.js";
 import { getPodDataDir } from "../../storage/index.js";
 import { JwtClaims } from "../../types/index.js";
-import errors from "../../errors/codes.js";
+import { StatusCodes } from "http-status-codes";
+import { InvalidResult, ValidResult } from "../../Result.js";
 
 export type GetPodsResult = {
   pods: {
@@ -15,9 +15,7 @@ export type GetPodsResult = {
   }[];
 };
 
-export async function getPods(
-  userClaims: JwtClaims
-): Promise<Result<GetPodsResult>> {
+export async function getPods(userClaims: JwtClaims) {
   const appConfig = config.get();
   const systemDb = db.getSystemDb();
   // See if it's already in predefined.
@@ -25,7 +23,8 @@ export async function getPods(
     return appConfig.pods
       ? appConfig.pods.filter(
           (x) =>
-            x.createdBy.iss === userClaims.iss && x.createdBy.sub === userClaims.sub
+            x.createdBy.iss === userClaims.iss &&
+            x.createdBy.sub === userClaims.sub
         )
       : [];
   }
@@ -50,12 +49,11 @@ export async function getPods(
         dataDir: getPodDataDir(x.id),
       }));
 
-    return { ok: true, value: { pods } };
+    return new ValidResult({ pods });
   } else {
-    return {
-      ok: false,
-      code: errors.ACCESS_DENIED,
+    return new InvalidResult({
       error: "Access denied.",
-    };
+      status: StatusCodes.UNAUTHORIZED,
+    });
   }
 }

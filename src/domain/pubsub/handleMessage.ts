@@ -20,6 +20,8 @@ import * as db from "../../db/index.js";
 import getLogPermissionForJwt from "../logs/internal/getLogPermissionForJwt.js";
 import errors from "../../errors/codes.js";
 import { getPodDataDir } from "../../storage/index.js";
+import { StatusCodes } from "http-status-codes";
+import { ValidResult } from "../../Result.js";
 
 export function handleMessage(
   hostname: string,
@@ -32,7 +34,7 @@ export function handleMessage(
       try {
         const authMessage: WebSocketAuthMessage = JSON.parse(message);
         const jwtResult = await getJwtValidationParams(authMessage.token);
-        if (jwtResult.ok) {
+        if (jwtResult instanceof ValidResult) {
           const jwtClaims = jsonwebtoken.verify(
             jwtResult.value.token,
             jwtResult.value.publicKey,

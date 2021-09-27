@@ -24,18 +24,6 @@ export default async function createAPI(ctx: IKoaAppContext): Promise<void> {
         hostname: result.value.hostname,
       };
       ctx.body = body;
-    },
-    (errorResult) => {
-      if (errorResult.code === errors.Pods.POD_EXISTS) {
-        ctx.status = StatusCodes.CONFLICT;
-        ctx.body = {
-          error: errorResult.error,
-          code: errorResult.code,
-        };
-        return { handled: true };
-      } else {
-        return { handled: false };
-      }
     }
   );
 }

@@ -2,16 +2,17 @@ import mkdirp from "mkdirp";
 
 import { JwtClaims } from "../../types/index.js";
 import * as config from "../../config/index.js";
-import errors from "../../errors/codes.js";
 import matchObject from "../../utils/matchObject.js";
 import * as db from "../../db/index.js";
-import { ErrResult, Result } from "../../types/api.js";
 import { PodPermissionsRow, PodsRow } from "../../types/db.js";
 import { generateInsertStatement } from "../../lib/sqlite.js";
 import { getPodDataDir } from "../../storage/index.js";
 import { getPods } from "./getPods.js";
 import { isAlphanumeric } from "../../api/utils/isAlphanumeric.js";
 import getPodByHostnameOrApp from "./internal/getPodByHostnameOrApp.js";
+import { StatusCodes } from "http-status-codes";
+import { InvalidResult, ValidResult } from "../../Result.js";
+import { HttpError } from "../../utils/http.js";
 
 export type CreatePodResult = { hostname: string };
 
@@ -21,7 +22,7 @@ export default async function createPod(
   app: string,
   description: string,
   userClaims: JwtClaims
-): Promise<Result<CreatePodResult>> {
+): Promise<ValidResult<CreatePodResult> | InvalidResult<HttpError>> {
   // Check fields
   const validationErrors = validateInput({ podId, app });
 
@@ -54,12 +55,10 @@ export default async function createPod(
       if (matchingTier) {
         const existingPodsResult = await getPods(userClaims);
 
-        if (existingPodsResult.ok) {
+        if (existingPodsResult instanceof ValidResult) {
           if (
             !matchingTier.maxPodsPerUser ||
-            (existingPodsResult.ok &&
-              matchingTier.maxPodsPerUser >
-                existingPodsResult.value.pods.length)
+            matchingTier.maxPodsPerUser > existingPodsResult.value.pods.length
           ) {
             // Check if the pod name is available.
 
@@ -111,40 +110,33 @@ export default async function createPod(
 
               insertPodPermissionStmt.run(podPermissionsRow);
 
-              return {
-                ok: true,
-                value: { hostname: podHostname },
-              };
+              return new ValidResult({ hostname: podHostname });
             } else {
-              return {
-                ok: false,
-                code: errors.Pods.POD_EXISTS,
-                error: `A pod with ${podHostname} connected to app ${app} already exists.`,
-              };
+              return new InvalidResult({
+                error: `A pod named ${podHostname} connected to app ${app} already exists.`,
+                status: StatusCodes.CONFLICT,
+              });
             }
           } else {
-            return {
-              ok: false,
-              code: errors.QUOTA_EXCEEDED,
+            return new InvalidResult({
               error: "Quota exceeded.",
-            };
+              status: StatusCodes.INSUFFICIENT_SPACE_ON_RESOURCE,
+            });
           }
         } else {
           return existingPodsResult;
         }
       } else {
-        return {
-          ok: false,
-          code: errors.ACCESS_DENIED,
+        return new InvalidResult({
           error: "Access denied.",
-        };
+          status: StatusCodes.UNAUTHORIZED,
+        });
       }
     } else {
-      return {
-        ok: false,
-        code: errors.ACCESS_DENIED,
+      return new InvalidResult({
         error: "Access denied.",
-      };
+        status: StatusCodes.UNAUTHORIZED,
+      });
     }
   } else {
     return validationErrors;
@@ -154,29 +146,23 @@ export default async function createPod(
 function validateInput(input: {
   podId: string;
   app: string;
-}): ErrResult | null {
+}): InvalidResult<HttpError> | null {
   if (!input.podId) {
-    return {
-      ok: false,
+    return new InvalidResult({
       error: "Missing fields in input.",
-      code: errors.Validations.MISSING_FIELDS,
-      data: {
-        fields: ["id"],
-      },
-    };
+      status: StatusCodes.BAD_REQUEST,
+    });
   } else if (!isAlphanumeric(input.podId)) {
-    return {
-      ok: false,
+    return new InvalidResult({
       error: "Pod name can only contains letters, numbers and hyphens.",
-      code: errors.Pods.INVALID_POD_NAME,
-    };
+      status: StatusCodes.BAD_REQUEST,
+    });
   } else if (input.app && input.app.length > 32) {
-    return {
-      ok: false,
+    return new InvalidResult({
       error:
         "App id must be a non-empty string which is at most 32 characters long.",
-      code: errors.Pods.INVALID_APP_ID,
-    };
+      status: StatusCodes.BAD_REQUEST,
+    });
   }
   return null;
 }

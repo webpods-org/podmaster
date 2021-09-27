@@ -1,13 +1,14 @@
 import * as db from "../../../db/index.js";
-import { Result } from "../../../types/api.js";
 import ensurePod from "../../pods/internal/ensurePod.js";
 import { EntriesRow } from "../../../types/db.js";
 import mapper from "../../../mappers/entry.js";
 import { JwtClaims, LogEntry } from "../../../types/index.js";
-import errors from "../../../errors/codes.js";
 import getLogPermissionForJwt from "../internal/getLogPermissionForJwt.js";
 import { getPodDataDir } from "../../../storage/index.js";
 import * as config from "../../../config/index.js";
+import { StatusCodes } from "http-status-codes";
+import { InvalidResult, ValidResult } from "../../../Result.js";
+import { HttpError } from "../../../utils/http.js";
 
 export type GetEntriesResult = {
   entries: LogEntry[];
@@ -34,7 +35,7 @@ export default async function getEntries(
     limit: maxResults,
   }: GetEntriesOptions,
   userClaims: JwtClaims | undefined
-): Promise<Result<GetEntriesResult>> {
+): Promise<ValidResult<GetEntriesResult> | InvalidResult<HttpError>> {
   const appConfig = config.get();
 
   const limit = maxResults || appConfig.queries?.maxResults || 100;
@@ -141,16 +142,15 @@ export default async function getEntries(
               ? `/logs/${logId}/files/${entry.data}`
               : entry.data,
         }));
-        return { ok: true, value: { entries } };
+        return new ValidResult({ entries });
       } else {
-        return { ok: true, value: { entries: [] } };
+        return new ValidResult({ entries: [] });
       }
     } else {
-      return {
-        ok: false,
-        code: errors.ACCESS_DENIED,
+      return new InvalidResult({
         error: "Access denied.",
-      };
+        status: StatusCodes.UNAUTHORIZED,
+      });
     }
   });
 }

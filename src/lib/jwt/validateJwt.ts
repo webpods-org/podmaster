@@ -1,18 +1,19 @@
 import validateClaims from "./validateClaims.js";
 import { checkAud, checkExp, checkNbf } from "./validations.js";
 import jsonwebtoken from "jsonwebtoken";
-import { JWKInfo } from "./getJwtValidationParams.js";
 import { JwtClaims } from "../../types/index.js";
-import { log } from "../logger/index.js";
 import { AsymmetricAlgorithm } from "../../types/crypto.js";
+import { InvalidResult, ValidResult } from "../../Result.js";
 
 export default async function validateJwt(
   hostname: string,
   token: string,
   publicKey: string,
   alg: AsymmetricAlgorithm
-): Promise<JwtClaims | null> {
-  const claims =  jsonwebtoken.verify(token, publicKey, {
+): Promise<
+  ValidResult<JwtClaims> | InvalidResult<{ error: string; code: string }>
+> {
+  const claims = jsonwebtoken.verify(token, publicKey, {
     algorithms: [alg],
   });
 
@@ -24,8 +25,11 @@ export default async function validateJwt(
     checkAud(claims, [hostname])
   ) {
     // Additional checks for exp, nbf and aud
-    return claims;
+    return new ValidResult(claims);
   } else {
-    return null;
+    return new InvalidResult({
+      error: "Invalid claims.",
+      code: "INVALID_CLAIMS",
+    });
   }
 }

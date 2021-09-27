@@ -1,11 +1,12 @@
 import * as db from "../../../db/index.js";
-import { Result } from "../../../types/api.js";
 import ensurePod from "../../pods/internal/ensurePod.js";
 import { EntriesRow } from "../../../types/db.js";
-import errors from "../../../errors/codes.js";
 import getLogPermissionForJwt from "../internal/getLogPermissionForJwt.js";
 import { getPodDataDir } from "../../../storage/index.js";
 import { JwtClaims } from "../../../types/index.js";
+import { StatusCodes } from "http-status-codes";
+import { InvalidResult, ValidResult } from "../../../Result.js";
+import { HttpError } from "../../../utils/http.js";
 
 export type GetInfoResult = {
   id: number;
@@ -16,7 +17,7 @@ export default async function getInfo(
   hostname: string,
   logId: string,
   userClaims: JwtClaims | undefined
-): Promise<Result<GetInfoResult>> {
+): Promise<ValidResult<GetInfoResult> | InvalidResult<HttpError>> {
   return ensurePod(hostname, async (pod) => {
     // Let's see if the log already exists.
     const podDataDir = getPodDataDir(pod.id);
@@ -41,16 +42,15 @@ export default async function getInfo(
         commit: "",
       };
 
-      return {
-        ok: true,
-        value: { id, commit },
-      };
+      return new ValidResult({
+        id,
+        commit,
+      });
     } else {
-      return {
-        ok: false,
-        code: errors.ACCESS_DENIED,
+      return new InvalidResult({
         error: "Access denied.",
-      };
+        status: StatusCodes.UNAUTHORIZED,
+      });
     }
   });
 }

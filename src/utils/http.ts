@@ -1,3 +1,5 @@
+import { StatusCodes } from "http-status-codes";
+
 export function getFieldValue(
   value: string | string[] | undefined
 ): string | undefined {
@@ -7,3 +9,8 @@ export function getFieldValue(
       : value
     : undefined;
 }
+
+export type HttpError = {
+  error: string;
+  status: StatusCodes;
+};

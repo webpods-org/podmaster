@@ -6,15 +6,16 @@ import random from "../../../utils/random.js";
 import { promisify } from "util";
 import { existsSync, readFileSync } from "fs";
 import * as db from "../../../db/index.js";
-import { ErrResult, Result } from "../../../types/api.js";
 import { EntriesRow } from "../../../types/db.js";
 import ensurePod from "../../pods/internal/ensurePod.js";
 import getLogPermissionForJwt from "../internal/getLogPermissionForJwt.js";
-import errors from "../../../errors/codes.js";
 import isFilenameValid from "../../../lib/validation/checkFilename.js";
 import { generateInsertStatement } from "../../../lib/sqlite.js";
 import { getPodDataDir } from "../../../storage/index.js";
 import { JwtClaims } from "../../../types/index.js";
+import { InvalidResult, ValidResult } from "../../../Result.js";
+import { HttpError } from "../../../utils/http.js";
+import { StatusCodes } from "http-status-codes";
 
 const moveFile = promisify(mv);
 
@@ -37,7 +38,7 @@ export default async function addEntries(
   entries: LogEntry[] | undefined,
   files: Files | undefined,
   userClaims: JwtClaims
-): Promise<Result<AddLogEntriesResult>> {
+): Promise<ValidResult<AddLogEntriesResult> | InvalidResult<HttpError>> {
   return ensurePod(hostname, async (pod) => {
     function getFilePathBasedOnOriginalName(filename: string) {
       const podDataDir = getPodDataDir(pod.id);
@@ -100,12 +101,10 @@ export default async function addEntries(
             : fileOrFiles;
 
           if (file.name && !isFilenameValid(file.name)) {
-            const fileError: ErrResult = {
-              ok: false,
-              code: errors.Validations.INVALID_FILENAME,
+            return new InvalidResult({
               error: "Invalid filename.",
-            };
-            return fileError;
+              status: StatusCodes.BAD_REQUEST,
+            });
           }
 
           const newPath = file.name
@@ -231,16 +230,12 @@ export default async function addEntries(
 
       insertEntriesTx.immediate(entries, files);
 
-      return {
-        ok: true,
-        value: { entries: savedEntryIds },
-      };
+      return new ValidResult({ entries: savedEntryIds });
     } else {
-      return {
-        ok: false,
-        code: errors.ACCESS_DENIED,
+      return new InvalidResult({
         error: "Access denied.",
-      };
+        status: StatusCodes.UNAUTHORIZED,
+      });
     }
   });
 }

@@ -2,17 +2,18 @@ import mkdirp from "mkdirp";
 import { join } from "path";
 
 import * as db from "../../db/index.js";
-import { ErrResult, Result } from "../../types/api.js";
 import ensurePod from "../pods/internal/ensurePod.js";
-import errors from "../../errors/codes.js";
 import { LogsRow } from "../../types/db.js";
 import { generateInsertStatement } from "../../lib/sqlite.js";
 import { getPodDataDir } from "../../storage/index.js";
-import getLogs from "./getLogs.js";
 import { JwtClaims } from "../../types/index.js";
 import getPodPermissionForJwt from "../pods/internal/getPodPermissionForJwt.js";
 import { isAlphanumeric } from "../../api/utils/isAlphanumeric.js";
 import addLogPermission from "../permissions/internal/addLogPermission.js";
+import { StatusCodes } from "http-status-codes";
+import { InvalidResult, ValidResult } from "../../Result.js";
+import { HttpError } from "../../utils/http.js";
+import { default as getLogs } from "./internal/getLogs.js";
 
 export type CreateLogResult = {};
 
@@ -23,103 +24,91 @@ export default async function createLog(
   logDescription: string,
   publik: boolean | undefined,
   userClaims: JwtClaims
-): Promise<Result<CreateLogResult>> {
+): Promise<ValidResult<CreateLogResult> | InvalidResult<HttpError>> {
   return ensurePod(hostname, async (pod) => {
     // Check fields
     const validationErrors = validateInput({ logId });
 
-    if (!validationErrors) {
-      const podDataDir = getPodDataDir(pod.id);
-      const logDir = join(podDataDir, logId);
-      const podDb = db.getPodDb(podDataDir);
+    if (validationErrors instanceof InvalidResult) {
+      return validationErrors;
+    }
 
-      const podPermission = await getPodPermissionForJwt(
-        pod.app,
-        podDb,
-        userClaims
+    const podDataDir = getPodDataDir(pod.id);
+    const logDir = join(podDataDir, logId);
+    const podDb = db.getPodDb(podDataDir);
+
+    const podPermission = await getPodPermissionForJwt(
+      pod.app,
+      podDb,
+      userClaims
+    );
+
+    const existingLogs = await getLogs(pod, podPermission);
+
+    if (existingLogs instanceof InvalidResult) {
+      return new InvalidResult({
+        error: "Access denied.",
+        status: StatusCodes.UNAUTHORIZED,
+      });
+    }
+
+    if (!existingLogs.value.logs.some((x) => x.id === logId)) {
+      const logsRow: LogsRow = {
+        id: logId,
+        name: logName,
+        description: logDescription || "",
+        created_at: Date.now(),
+        public: publik ? 1 : 0,
+      };
+
+      const insertLogStmt = podDb.prepare(
+        generateInsertStatement<LogsRow>("logs", logsRow)
       );
 
-      if (podPermission.write) {
-        // Let's see if the log already exists.
-        const existingLogsResult = await getLogs(hostname, userClaims);
+      insertLogStmt.run(logsRow);
 
-        if (existingLogsResult.ok) {
-          if (!existingLogsResult.value.logs.some((x) => x.id === logId)) {
-            const logsRow: LogsRow = {
-              id: logId,
-              name: logName,
-              description: logDescription || "",
-              created_at: Date.now(),
-              public: publik ? 1 : 0,
-            };
+      // Creator gets full permissions.
+      await addLogPermission(
+        logId,
+        {
+          iss: userClaims.iss,
+          sub: userClaims.sub,
+        },
+        {
+          read: true,
+          write: true,
+          publish: true,
+          subscribe: true,
+        },
+        false,
+        podDb
+      );
 
-            const insertLogStmt = podDb.prepare(
-              generateInsertStatement<LogsRow>("logs", logsRow)
-            );
+      await mkdirp(logDir);
 
-            insertLogStmt.run(logsRow);
-
-            // Creator gets full permissions.
-            await addLogPermission(
-              logId,
-              {
-                iss: userClaims.iss,
-                sub: userClaims.sub,
-              },
-              {
-                read: true,
-                write: true,
-                publish: true,
-                subscribe: true,
-              },
-              false,
-              podDb
-            );
-
-            await mkdirp(logDir);
-
-            return {
-              ok: true,
-              value: {},
-            };
-          } else {
-            return {
-              ok: false,
-              code: errors.Logs.LOG_EXISTS,
-              error: `The log ${logId} already exists.`,
-            };
-          }
-        } else {
-          return existingLogsResult;
-        }
-      } else {
-        return {
-          ok: false,
-          code: errors.ACCESS_DENIED,
-          error: "Access denied.",
-        };
-      }
+      return new ValidResult({});
     } else {
-      return validationErrors;
+      return new InvalidResult({
+        error: `The log ${logId} already exists.`,
+        status: StatusCodes.CONFLICT,
+      });
     }
   });
 }
 
-function validateInput(input: { logId: string }): ErrResult | undefined {
+function validateInput(input: {
+  logId: string;
+}): InvalidResult<HttpError> | null {
   if (!input.logId) {
-    return {
-      ok: false,
+    return new InvalidResult({
       error: "Missing fields in input.",
-      code: errors.Validations.MISSING_FIELDS,
-      data: {
-        fields: ["id"],
-      },
-    };
+      status: StatusCodes.BAD_REQUEST,
+    });
   } else if (!isAlphanumeric(input.logId)) {
-    return {
-      ok: false,
+    return new InvalidResult({
       error: "Log name can only contains letters, numbers and hyphens.",
-      code: errors.Logs.INVALID_LOG_ID,
-    };
+      status: StatusCodes.BAD_REQUEST,
+    });
   }
+  return null;
 }

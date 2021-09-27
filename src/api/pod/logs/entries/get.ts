@@ -9,9 +9,7 @@ export type GetLogEntriesAPIResult = {
   entries: LogEntry[];
 };
 
-export default async function getEntriesAPI(
-  ctx: IKoaAppContext
-): Promise<void> {
+export default async function getEntriesAPI(ctx: IKoaAppContext) {
   const hostname = ctx.URL.hostname;
 
   await handleResult(

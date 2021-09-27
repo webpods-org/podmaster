@@ -15,13 +15,13 @@ import { AddLogEntriesAPIResult } from "../../api/pod/logs/entries/add.js";
 import { AppConfig, Identity, LogEntry } from "../../types/index.js";
 import { GetLogInfoAPIResult } from "../../api/pod/logs/info/get.js";
 import promiseSignal from "../../lib/promiseSignal.js";
-import { ErrResult } from "../../types/api.js";
 import { GetJwksAPIResult } from "../../api/podmaster/wellKnown/jwks/get.js";
 import { GetPermissionsAPIResult } from "../../api/pod/permissions/get.js";
 import { GetLogEntriesAPIResult } from "../../api/pod/logs/entries/get.js";
 import { CreatePermissionTokenAPIResult } from "../../api/pod/permissionsTokens/create.js";
 import { RedeemPermissionTokenAPIResult } from "../../api/pod/permissionsTokens/redeem.js";
 import { CreateAuthTokenAPIResult } from "../../api/podmaster/oauth/token/create.js";
+import { InvalidResult } from "../../Result.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -119,8 +119,10 @@ export default function run(configDir: string, configFilePath: string) {
         .set("Authorization", `Bearer ${alicePodmasterJwt}`);
 
       response.status.should.equal(409);
-      const apiResult: ErrResult = JSON.parse(response.text);
-      apiResult.code.should.equal("PODS/POD_EXISTS");
+      const apiResult: { error: string } = JSON.parse(response.text);
+      apiResult.error.should.equal(
+        "A pod named myweblog.pod1.local.disks.app connected to app myweblog.example.com already exists."
+      );
     });
 
     it("gets all pods", async () => {

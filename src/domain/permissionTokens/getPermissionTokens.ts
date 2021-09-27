@@ -1,11 +1,11 @@
 import * as db from "../../db/index.js";
 import { JwtClaims, PermissionToken } from "../../types/index.js";
-import { Result } from "../../types/api.js";
 import permissionTokenMapper from "../../mappers/permissionToken.js";
 import ensurePod from "../pods/internal/ensurePod.js";
-import errors from "../../errors/codes.js";
 import { getPodDataDir } from "../../storage/index.js";
 import getPodPermissionForJwt from "../pods/internal/getPodPermissionForJwt.js";
+import { StatusCodes } from "http-status-codes";
+import { InvalidResult, ValidResult } from "../../Result.js";
 
 export type GetPermissionsTokensResult = {
   permissionTokens: PermissionToken[];
@@ -14,12 +14,16 @@ export type GetPermissionsTokensResult = {
 export default async function getPermissionTokens(
   hostname: string,
   userClaims: JwtClaims
-): Promise<Result<GetPermissionsTokensResult>> {
+) {
   return ensurePod(hostname, async (pod) => {
     const podDataDir = getPodDataDir(pod.id);
     const podDb = db.getPodDb(podDataDir);
 
-    const podPermission = await getPodPermissionForJwt(pod.app, podDb, userClaims);
+    const podPermission = await getPodPermissionForJwt(
+      pod.app,
+      podDb,
+      userClaims
+    );
 
     if (podPermission.write) {
       // Get pod permissions
@@ -30,16 +34,14 @@ export default async function getPermissionTokens(
         .all({ expiry: Date.now() })
         .map(permissionTokenMapper);
 
-      return {
-        ok: true,
-        value: { permissionTokens },
-      };
+      return new ValidResult({
+        permissionTokens,
+      });
     } else {
-      return {
-        ok: false,
-        code: errors.ACCESS_DENIED,
+      return new InvalidResult({
         error: "Access denied.",
-      };
+        status: StatusCodes.UNAUTHORIZED,
+      });
     }
   });
 }

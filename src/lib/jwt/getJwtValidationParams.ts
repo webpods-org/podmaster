@@ -5,8 +5,8 @@ import * as config from "../../config/index.js";
 import errors from "../../errors/codes.js";
 import { AsymmetricAlgorithm, KeyTypes } from "../../types/crypto.js";
 import { LRUMap } from "../lruCache/lru.js";
-import { Result } from "../../types/api.js";
 import { asymmetricAlgorithms, getKeyType } from "./crypto.js";
+import { InvalidResult, ValidResult } from "../../Result.js";
 
 type CacheItem = {
   kid: string;
@@ -36,19 +36,13 @@ function getItemFromCache(key: string): CacheItem | undefined {
   return cache.find(key);
 }
 
-export default async function getJwtValidationParams(
-  token: string
-): Promise<Result<JWKInfo>> {
+export default async function getJwtValidationParams(token: string) {
   const decodeResult = jsonwebtoken.decode(token, {
     complete: true,
   });
 
   if (decodeResult === null) {
-    return {
-      ok: false,
-      error: "Authentication error. Missing JWT.",
-      code: errors.Jwt.MISSING_JWT,
-    };
+    return new InvalidResult({ code: "INVALID_JWT" });
   }
 
   const { header, payload, signature } = decodeResult as {
@@ -65,153 +59,133 @@ export default async function getJwtValidationParams(
 
   //
   if (!asymmetricAlgorithms.includes(alg.toUpperCase())) {
-    return {
-      ok: false,
-      error: `Authentication error. Unsupported algorithm ${alg}.`,
-      code: errors.Jwt.INVALID_ALGORITHM,
-    };
+    return new InvalidResult({ code: "INVALID_ALGORITHM" });
   }
 
   const appConfig = config.get();
 
-  if (payload && iss && kid) {
-    const issuerIsUrl = iss.startsWith("http://") || iss.startsWith("https://");
-    const issuerHostname = issuerIsUrl ? new URL(iss).hostname : iss;
+  if (!payload) {
+    return new InvalidResult({
+      code: "INVALID_PAYLOAD",
+    });
+  }
 
-    if (iss) {
-      // Check if in allowList/denyList.
-      if (appConfig.externalAuthServers.allowList) {
-        if (
-          ![iss, issuerHostname].some((x) =>
-            appConfig.externalAuthServers.allowList?.includes(x)
-          )
-        ) {
-          return {
-            ok: false,
-            error: "Authentication Error. Issuer not in allowList.",
-            code: errors.ACCESS_DENIED,
-          };
-        }
-      }
-      if (appConfig.externalAuthServers.denyList) {
-        if (
-          [iss, issuerHostname].some((x) =>
-            appConfig.externalAuthServers.denyList?.includes(x)
-          )
-        ) {
-          return {
-            ok: false,
-            error: "Authentication Error. Issuer is in denyList.",
-            code: errors.ACCESS_DENIED,
-          };
-        }
-      }
+  if (!iss) {
+    return new InvalidResult({
+      code: "MISSING_ISS",
+    });
+  }
 
-      // First check if:
-      // a) this was issued by a pod, OR
-      // b) if the key is statically defined in appConfig
-      const issuerIsPod = issuerHostname === appConfig.hostname;
-      if (issuerIsPod && kid === appConfig.auth.keys.kid) {
-        return {
-          ok: true,
-          value: {
-            kid: appConfig.auth.keys.kid,
-            kty: appConfig.auth.keys.kty,
-            alg: appConfig.auth.keys.alg,
-            publicKey: appConfig.auth.keys.publicKey,
-            token,
-            payload,
-            signature,
-          },
-        };
-      } else if (appConfig.localJwtKeys) {
-        const signingKey = appConfig.localJwtKeys.find(
-          (x) => x.iss === iss && x.kid === kid && x.alg === alg
-        );
+  if (!kid) {
+    return new InvalidResult({
+      code: "MISSING_KID",
+    });
+  }
 
-        if (signingKey) {
-          return {
-            ok: true,
-            value: { ...signingKey, token, payload, signature },
-          };
-        }
-      }
+  const issuerIsUrl = iss.startsWith("http://") || iss.startsWith("https://");
+  const issuerHostname = issuerIsUrl ? new URL(iss).hostname : iss;
 
-      const cacheKey = `${iss}::${kid}`;
-      const cacheEntry = getItemFromCache(cacheKey);
+  // Check if in allowList/denyList.
+  if (appConfig.externalAuthServers.allowList) {
+    if (
+      ![iss, issuerHostname].some((x) =>
+        appConfig.externalAuthServers.allowList?.includes(x)
+      )
+    ) {
+      return new InvalidResult({ code: "UNKNOWN_ISSUER" });
+    }
+  }
+  if (appConfig.externalAuthServers.denyList) {
+    if (
+      [iss, issuerHostname].some((x) =>
+        appConfig.externalAuthServers.denyList?.includes(x)
+      )
+    ) {
+      return new InvalidResult({ code: "BLOCKED_ISSUER" });
+    }
+  }
 
-      if (cacheEntry) {
-        if (alg === cacheEntry.alg) {
-          return {
-            ok: true,
-            value: { ...cacheEntry, token, payload, signature },
-          };
-        } else {
-          return {
-            ok: false,
-            error: "Authentication error. Invalid JWT.",
-            code: errors.Jwt.INVALID_JWT,
-          };
-        }
-      } else {
-        // First check if we have JWKS endpoint override.
-        const overriddenEndpoint = appConfig.jwksEndpoints?.find(
-          (x) => x.iss === iss
-        );
+  // First check if:
+  // a) this was issued by a pod, OR
+  // b) if the key is statically defined in appConfig
+  const issuerIsPod = issuerHostname === appConfig.hostname;
+  if (issuerIsPod && kid === appConfig.auth.keys.kid) {
+    return new ValidResult({
+      kid: appConfig.auth.keys.kid,
+      kty: appConfig.auth.keys.kty,
+      alg: appConfig.auth.keys.alg,
+      publicKey: appConfig.auth.keys.publicKey,
+      token,
+      payload,
+      signature,
+    });
+  } else if (appConfig.localJwtKeys) {
+    const signingKey = appConfig.localJwtKeys.find(
+      (x) => x.iss === iss && x.kid === kid && x.alg === alg
+    );
 
-        const jwksUri = overriddenEndpoint
-          ? overriddenEndpoint.url
-          : `https://${new URL(iss).hostname}/.well-known/jwks.json`;
+    if (signingKey) {
+      return new ValidResult({
+        ...signingKey,
+        token,
+        payload,
+        signature,
+      });
+    }
+  }
 
-        const client = jwksClient({
-          jwksUri,
-          requestHeaders: {}, // Optional
-          timeout: 30000, // Defaults to 30s
-          cache: false,
-        });
+  const cacheKey = `${iss}::${kid}`;
+  const cacheEntry = getItemFromCache(cacheKey);
 
-        const key = await client.getSigningKey(kid);
-
-        if (asymmetricAlgorithms.includes(key.alg.toUpperCase())) {
-          const publicKey = key.getPublicKey();
-          cache.set(cacheKey, {
-            kid: key.kid,
-            kty: getKeyType(key.alg),
-            alg: key.alg as AsymmetricAlgorithm,
-            publicKey,
-          });
-          return {
-            ok: true,
-            value: {
-              token,
-              kid: key.kid,
-              kty: getKeyType(key.alg),
-              alg: key.alg as AsymmetricAlgorithm,
-              publicKey,
-              payload,
-              signature,
-            },
-          };
-        } else {
-          return {
-            ok: false,
-            error: `Authentication error. Unsupported algorithm ${key.alg}.`,
-            code: errors.Jwt.INVALID_ALGORITHM,
-          };
-        }
-      }
+  if (cacheEntry) {
+    if (alg === cacheEntry.alg) {
+      return new ValidResult({
+        ...cacheEntry,
+        token,
+        payload,
+        signature,
+      });
     } else {
-      return {
-        ok: false,
-        error: "Authentication error. Invalid JWT.",
-        code: errors.Jwt.INVALID_JWT,
-      };
+      return new InvalidResult({ code: "INVALID_ALGORITHM" });
     }
   } else {
-    return {
-      ok: false,
-      error: "Authentication error. Invalid JWT.",
-      code: errors.Jwt.INVALID_JWT,
-    };
+    // First check if we have JWKS endpoint override.
+    const overriddenEndpoint = appConfig.jwksEndpoints?.find(
+      (x) => x.iss === iss
+    );
+
+    const jwksUri = overriddenEndpoint
+      ? overriddenEndpoint.url
+      : `https://${new URL(iss).hostname}/.well-known/jwks.json`;
+
+    const client = jwksClient({
+      jwksUri,
+      requestHeaders: {}, // Optional
+      timeout: 30000, // Defaults to 30s
+      cache: false,
+    });
+
+    const key = await client.getSigningKey(kid);
+
+    if (asymmetricAlgorithms.includes(key.alg.toUpperCase())) {
+      const publicKey = key.getPublicKey();
+      cache.set(cacheKey, {
+        kid: key.kid,
+        kty: getKeyType(key.alg),
+        alg: key.alg as AsymmetricAlgorithm,
+        publicKey,
+      });
+      return new ValidResult({
+        token,
+        kid: key.kid,
+        kty: getKeyType(key.alg),
+        alg: key.alg as AsymmetricAlgorithm,
+        publicKey,
+        payload,
+        signature,
+      });
+    } else {
+      return new InvalidResult({ code: "INVALID_ALGORITHM" });
+    }
   }
 }

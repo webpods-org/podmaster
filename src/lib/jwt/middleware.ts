@@ -1,14 +1,15 @@
 import { ParameterizedContext, Next } from "koa";
 
-import errors from "../../errors/codes.js";
 import jsonwebtoken from "jsonwebtoken";
-import { Result } from "../../types/api.js";
 import { log, logException } from "../logger/index.js";
 import { IKoaAppContext } from "../../types/koa.js";
 import getJwtValidationParams, { JWKInfo } from "./getJwtValidationParams.js";
 import validateClaims from "./validateClaims.js";
 import { checkAud, checkExp, checkNbf } from "./validations.js";
 import * as config from "../../config/index.js";
+import { HttpError } from "../../utils/http.js";
+import { InvalidResult, ValidResult } from "../../Result.js";
+import { StatusCodes } from "http-status-codes";
 
 export class AuthenticationError extends Error {
   code: string;
@@ -33,7 +34,7 @@ export default function jwtMiddleware(options: { exclude: RegExp[] }) {
       try {
         const jwtParams = await getJwtParametersFromContext(ctx);
 
-        if (jwtParams.ok) {
+        if (jwtParams instanceof ValidResult) {
           const claims = await jsonwebtoken.verify(
             jwtParams.value.token,
             jwtParams.value.publicKey,
@@ -73,20 +74,17 @@ export default function jwtMiddleware(options: { exclude: RegExp[] }) {
   };
 }
 
-async function getJwtParametersFromContext(
-  ctx: ParameterizedContext
-): Promise<Result<JWKInfo>> {
+async function getJwtParametersFromContext(ctx: ParameterizedContext) {
   const token = resolveAuthorizationHeader(ctx);
 
   if (token === null) {
-    return {
-      ok: false,
-      error: "Authentication error. Missing JWT.",
-      code: errors.Jwt.INVALID_JWT,
-    };
+    return new InvalidResult({
+      error: "Missing JWT.",
+      status: StatusCodes.UNAUTHORIZED,
+    });
   }
 
-  return getJwtValidationParams(token);
+  return await getJwtValidationParams(token);
 }
 
 function resolveAuthorizationHeader(ctx: ParameterizedContext): string | null {

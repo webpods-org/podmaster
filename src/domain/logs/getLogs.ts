@@ -1,11 +1,12 @@
 import * as db from "../../db/index.js";
-import { LogsRow } from "../../types/db.js";
-import { Result } from "../../types/api.js";
 import ensurePod from "../pods/internal/ensurePod.js";
-import errors from "../../errors/codes.js";
 import { getPodDataDir } from "../../storage/index.js";
 import { JwtClaims } from "../../types/index.js";
 import getPodPermissionForJwt from "../pods/internal/getPodPermissionForJwt.js";
+import { StatusCodes } from "http-status-codes";
+import { InvalidResult, ValidResult } from "../../Result.js";
+import { HttpError } from "../../utils/http.js";
+import { default as getLogsImpl } from "./internal/getLogs.js";
 
 export type GetLogsResult = {
   logs: {
@@ -18,7 +19,7 @@ export type GetLogsResult = {
 export default async function getLogs(
   hostname: string,
   userClaims: JwtClaims
-): Promise<Result<GetLogsResult>> {
+): Promise<ValidResult<GetLogsResult> | InvalidResult<HttpError>> {
   return ensurePod(hostname, async (pod) => {
     const podDataDir = getPodDataDir(pod.id);
     const podDb = db.getPodDb(podDataDir);
@@ -28,21 +29,14 @@ export default async function getLogs(
       podDb,
       userClaims
     );
-    if (podPermission.read) {
-      const getLogsStmt = podDb.prepare(`SELECT * FROM "logs"`);
 
-      const logs = getLogsStmt.all().map((x: LogsRow) => ({
-        id: x.id,
-        name: x.name,
-        description: x.description,
-      }));
-      return { ok: true, value: { logs } };
-    } else {
-      return {
-        ok: false,
-        code: errors.ACCESS_DENIED,
-        error: "Access denied.",
-      };
-    }
+    const result = await getLogsImpl(pod, podPermission);
+
+    return result instanceof ValidResult
+      ? result
+      : new InvalidResult({
+          error: "Access denied.",
+          status: StatusCodes.UNAUTHORIZED,
+        });
   });
 }
