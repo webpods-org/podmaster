@@ -2,6 +2,7 @@ import createPod from "../../../domain/pods/createPod.js";
 import { handleResultWithJwt } from "../../handleResult.js";
 import { IKoaAppContext } from "../../../types/koa.js";
 import errors from "../../../errors/codes.js";
+import { StatusCodes } from "http-status-codes";
 
 export type CreatePodAPIResult = {
   hostname: string;
@@ -26,7 +27,7 @@ export default async function createAPI(ctx: IKoaAppContext): Promise<void> {
     },
     (errorResult) => {
       if (errorResult.code === errors.Pods.POD_EXISTS) {
-        ctx.status = 403;
+        ctx.status = StatusCodes.CONFLICT;
         ctx.body = {
           error: errorResult.error,
           code: errorResult.code,

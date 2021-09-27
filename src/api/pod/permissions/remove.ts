@@ -3,6 +3,7 @@ import { IKoaAppContext } from "../../../types/koa.js";
 import errors from "../../../errors/codes.js";
 import deletePermissions from "../../../domain/permissions/deletePermissions.js";
 import getQuery from "../../utils/getParam.js";
+import { StatusCodes } from "http-status-codes";
 
 export type RemovePermissionsAPIResult = {};
 
@@ -27,7 +28,7 @@ export default async function removeAPI(ctx: IKoaAppContext): Promise<void> {
       }
     );
   } else {
-    ctx.status = 400;
+    ctx.status = StatusCodes.BAD_REQUEST;
     ctx.body = {
       ok: false,
       error: "The iss and sub query parameters are mandatory.",

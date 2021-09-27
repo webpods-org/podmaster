@@ -27,7 +27,7 @@ export async function handleResult<T>(
     }
   } catch (ex: any) {
     logException(ex);
-    ctx.status = 500;
+    ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
     ctx.body = { error: "Internal server error.", code: errors.INTERNAL_ERROR };
   }
 }
@@ -63,13 +63,13 @@ export async function handleResultWithJwt<T>(
 
 function genericErrorHandler(ctx: IKoaAppContext, result: ErrResult): void {
   if (result.code === errors.ACCESS_DENIED) {
-    ctx.status = 401;
+    ctx.status = StatusCodes.UNAUTHORIZED;
     ctx.body = {
       error: "Access denied.",
       code: errors.ACCESS_DENIED,
     };
   } else {
-    ctx.status = 500;
+    ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;
     ctx.body = { error: result.error, code: result.code };
   }
 }

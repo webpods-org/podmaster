@@ -118,7 +118,7 @@ export default function run(configDir: string, configFilePath: string) {
         .set("Host", podmasterHostname)
         .set("Authorization", `Bearer ${alicePodmasterJwt}`);
 
-      response.status.should.equal(403);
+      response.status.should.equal(409);
       const apiResult: ErrResult = JSON.parse(response.text);
       apiResult.code.should.equal("PODS/POD_EXISTS");
     });
