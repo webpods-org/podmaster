@@ -1,6 +1,6 @@
 import getLogEntries from "../../../../domain/logs/entries/getLogEntries.js";
 import transformQuery from "../../../utils/transformQuery.js";
-import handleResult from "../../../handleResult.js";
+import { handleResult } from "../../../handleResult.js";
 import getQuery from "../../../utils/getParam.js";
 import { LogEntry } from "../../../../types/index.js";
 import { IKoaAppContext } from "../../../../types/koa.js";

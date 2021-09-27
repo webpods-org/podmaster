@@ -1,9 +1,6 @@
-import * as config from "../../../config/index.js";
-import errors from "../../../errors/codes.js";
 import { getPods } from "../../../domain/pods/getPods.js";
-import handleResult from "../../handleResult.js";
+import { handleResultWithJwt } from "../../handleResult.js";
 import { IKoaAppContext } from "../../../types/koa.js";
-import { ensureJwt } from "../../utils/ensureJwt.js";
 
 export type GetPodsAPIResult = {
   pods: {
@@ -14,16 +11,10 @@ export type GetPodsAPIResult = {
 };
 
 export default async function getAPI(ctx: IKoaAppContext): Promise<void> {
-  await handleResult(
+  await handleResultWithJwt(
     ctx,
-    () =>
-      ensureJwt(ctx.state.jwt)
-        ? getPods(ctx.state.jwt.claims)
-        : Promise.resolve({
-            ok: false,
-            error: "Access Denied.",
-            code: errors.ACCESS_DENIED,
-          }),
+    (ctx) =>
+       getPods(ctx.state.jwt.claims),
     (result) => {
       const body: GetPodsAPIResult = {
         pods: result.value.pods.map((x) => ({

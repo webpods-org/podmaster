@@ -1,4 +1,4 @@
-import handleResult from "../../../handleResult.js";
+import { handleResult } from "../../../handleResult.js";
 import getLogInfo from "../../../../domain/logs/info/getLogInfo.js";
 import { IKoaAppContext } from "../../../../types/koa.js";
 

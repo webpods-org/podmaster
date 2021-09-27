@@ -1,5 +1,5 @@
 import send from "koa-send";
-import handleResult from "../../../handleResult.js";
+import { handleResult } from "../../../handleResult.js";
 import { IKoaAppContext } from "../../../../types/koa.js";
 import getLogFile from "../../../../domain/logs/files/getLogFile.js";
 import * as config from "../../../../config/index.js";

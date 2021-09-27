@@ -1,8 +1,6 @@
 import addLogEntries from "../../../../domain/logs/entries/addLogEntries.js";
-import errors from "../../../../errors/codes.js";
 import { IKoaAppContext } from "../../../../types/koa.js";
-import handleResult from "../../../handleResult.js";
-import { ensureJwt } from "../../../utils/ensureJwt.js";
+import { handleResultWithJwt } from "../../../handleResult.js";
 
 export type AddLogEntriesAPIResult = {
   entries: {
@@ -11,27 +9,18 @@ export type AddLogEntriesAPIResult = {
   }[];
 };
 
-export default async function addAPI(
-  ctx: IKoaAppContext
-): Promise<void> {
+export default async function addAPI(ctx: IKoaAppContext): Promise<void> {
   const hostname = ctx.URL.hostname;
 
-  await handleResult(
+  await handleResultWithJwt(
     ctx,
-    () =>
-      ensureJwt(ctx.state.jwt)
-        ? addLogEntries(
-            hostname,
-            ctx.params.log,
-            ctx.request.body.entries,
-            ctx.request.files,
-            ctx.state.jwt.claims
-          )
-        : Promise.resolve({
-            ok: false,
-            error: "Access Denied.",
-            code: errors.ACCESS_DENIED,
-          }),
+    (ctx) => addLogEntries(
+      hostname,
+      ctx.params.log,
+      ctx.request.body.entries,
+      ctx.request.files,
+      ctx.state.jwt.claims
+    ),
     (result) => {
       const body: AddLogEntriesAPIResult = {
         entries: result.value.entries,

@@ -1,7 +1,5 @@
-import handleResult from "../../handleResult.js";
+import { handleResultWithJwt } from "../../handleResult.js";
 import { IKoaAppContext } from "../../../types/koa.js";
-import errors from "../../../errors/codes.js";
-import { ensureJwt } from "../../utils/ensureJwt.js";
 import getQuery from "../../utils/getParam.js";
 import deletePermissionTokens from "../../../domain/permissionTokens/deletePermissionTokens.js";
 
@@ -13,17 +11,11 @@ export default async function removeAPI(ctx: IKoaAppContext): Promise<void> {
   const iss = getQuery(ctx.query.iss);
   const sub = getQuery(ctx.query.sub);
 
-  await handleResult(
+  await handleResultWithJwt(
     ctx,
-    () =>
-      ensureJwt(ctx.state.jwt)
-        ? deletePermissionTokens(hostname, ctx.params.id, ctx.state.jwt.claims)
-        : Promise.resolve({
-            ok: false,
-            error: "Access Denied.",
-            code: errors.ACCESS_DENIED,
-          }),
-    (result) => {
+    (ctx) =>
+      deletePermissionTokens(hostname, ctx.params.id, ctx.state.jwt.claims),
+    () => {
       const body: DeletePermissionTokenAPIResult = {};
       ctx.body = body;
     }
