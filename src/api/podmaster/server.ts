@@ -6,6 +6,7 @@ import * as podsApi from "./pods/index.js";
 import * as wellKnownEndpoints from "./wellKnown/index.js";
 import * as config from "../../config/index.js";
 import * as authApi from "./oauth/index.js";
+import cors from "@koa/cors";
 
 const MEGABYTE = 1024 * 1024;
 
@@ -33,5 +34,6 @@ export default function setup() {
   );
   koa.use(router.routes());
   koa.use(router.allowedMethods());
+  koa.use(cors());
   return koa.callback();
 }
