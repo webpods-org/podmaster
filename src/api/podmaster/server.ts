@@ -19,7 +19,11 @@ export default function setup() {
   router.get("/pods", podsApi.get);
 
   //.well-known
-  router.get("/.well-known/jwks.json", wellKnownEndpoints.jwks.get);
+  router.get("/.well-known/jwks.json", wellKnownEndpoints.jwks);
+  router.get(
+    "/.well-known/oauth-authorization-server",
+    wellKnownEndpoints.oauthMetadata
+  );
 
   // jwt
   router.post("/oauth/token", authApi.tokens.create);

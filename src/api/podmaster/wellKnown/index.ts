@@ -1,1 +1,2 @@
-export * as jwks from "./jwks/index.js";
+export { default as jwks } from "./jwks.js";
+export { default as oauthMetadata } from "./oauthMetadata.js";

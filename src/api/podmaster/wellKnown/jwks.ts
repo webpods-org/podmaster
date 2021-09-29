@@ -1,6 +1,6 @@
-import * as config from "../../../../config/index.js";
-import { IKoaAppContext } from "../../../../types/koa.js";
-import { JWK } from "../../../../types/index.js";
+import * as config from "../../../config/index.js";
+import { IKoaAppContext } from "../../../types/koa.js";
+import { JWK } from "../../../types/index.js";
 
 export type GetJwksAPIResult = {
   keys: JWK[];

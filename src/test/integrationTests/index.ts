@@ -12,16 +12,16 @@ import { GetPodsAPIResult } from "../../api/podmaster/pods/get.js";
 import { CreatePodAPIResult } from "../../api/podmaster/pods/create.js";
 import { GetLogsAPIResult } from "../../api/pod/logs/get.js";
 import { AddLogEntriesAPIResult } from "../../api/pod/logs/entries/add.js";
-import { AppConfig, Identity, LogEntry } from "../../types/index.js";
+import { AppConfig, LogEntry } from "../../types/index.js";
 import { GetLogInfoAPIResult } from "../../api/pod/logs/info/get.js";
 import promiseSignal from "../../lib/promiseSignal.js";
-import { GetJwksAPIResult } from "../../api/podmaster/wellKnown/jwks/get.js";
+import { GetJwksAPIResult } from "../../api/podmaster/wellKnown/jwks.js";
 import { GetPermissionsAPIResult } from "../../api/pod/permissions/get.js";
 import { GetLogEntriesAPIResult } from "../../api/pod/logs/entries/get.js";
 import { CreatePermissionTokenAPIResult } from "../../api/pod/permissionsTokens/create.js";
 import { RedeemPermissionTokenAPIResult } from "../../api/pod/permissionsTokens/redeem.js";
 import { CreateAuthTokenAPIResult } from "../../api/podmaster/oauth/token/create.js";
-import { InvalidResult } from "../../Result.js";
+import { GetOAuthMetadataAPIResult } from "../../api/podmaster/wellKnown/oauthMetadata.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -444,9 +444,23 @@ export default function run(configDir: string, configFilePath: string) {
       apiResult.permissions[2].identity.sub.should.equal("carol");
     });
 
-    it("gets jwks from well-known endpoint", async () => {
+    let jwksUri: string;
+
+    it("gets oauth metadata from .well-known endpoint", async () => {
       const response = await request(app)
-        .get(`/.well-known/jwks.json`)
+        .get(`/.well-known/oauth-authorization-server`)
+        .set("Host", podmasterHostname);
+
+      response.status.should.equal(200);
+      const apiResult: GetOAuthMetadataAPIResult = JSON.parse(response.text);
+      apiResult.issuer.should.equal(`https://${appConfig.hostname}/`);
+      jwksUri = apiResult.jwks_uri;
+    });
+
+    it("gets jwks config from .well-known endpoint", async () => {
+      const urlObj = new URL(jwksUri);
+      const response = await request(app)
+        .get(urlObj.pathname)
         .set("Host", podmasterHostname);
 
       response.status.should.equal(200);
