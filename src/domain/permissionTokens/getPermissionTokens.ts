@@ -1,12 +1,11 @@
 import * as db from "../../db/index.js";
-import { JwtClaims, PermissionToken } from "../../types/index.js";
+import { HttpError, JwtClaims, PermissionToken } from "../../types/index.js";
 import permissionTokenMapper from "../../mappers/permissionToken.js";
 import ensurePod from "../pods/internal/ensurePod.js";
 import { getPodDataDir } from "../../storage/index.js";
 import getPodPermissionForJwt from "../pods/internal/getPodPermissionForJwt.js";
 import { StatusCodes } from "http-status-codes";
 import { InvalidResult, ValidResult } from "../../Result.js";
-import { HttpError } from "../../utils/http.js";
 
 export type GetPermissionsTokensResult = {
   permissionTokens: PermissionToken[];

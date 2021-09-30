@@ -12,9 +12,8 @@ import getLogPermissionForJwt from "../internal/getLogPermissionForJwt.js";
 import isFilenameValid from "../../../lib/validation/checkFilename.js";
 import { generateInsertStatement } from "../../../lib/sqlite.js";
 import { getPodDataDir } from "../../../storage/index.js";
-import { JwtClaims } from "../../../types/index.js";
+import { HttpError, JwtClaims } from "../../../types/index.js";
 import { InvalidResult, ValidResult } from "../../../Result.js";
-import { HttpError } from "../../../utils/http.js";
 import { StatusCodes } from "http-status-codes";
 
 const moveFile = promisify(mv);

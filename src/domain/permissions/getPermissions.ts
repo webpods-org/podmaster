@@ -1,5 +1,5 @@
 import * as db from "../../db/index.js";
-import { IdentityPermission, JwtClaims } from "../../types/index.js";
+import { HttpError, IdentityPermission, JwtClaims } from "../../types/index.js";
 import podPermissionMapper from "../../mappers/podPermission.js";
 import logPermissionMapper from "../../mappers/logPermission.js";
 import ensurePod from "../pods/internal/ensurePod.js";
@@ -7,7 +7,6 @@ import { getPodDataDir } from "../../storage/index.js";
 import getPodPermissionForJwt from "../pods/internal/getPodPermissionForJwt.js";
 import { StatusCodes } from "http-status-codes";
 import { InvalidResult, ValidResult } from "../../Result.js";
-import { HttpError } from "../../utils/http.js";
 
 export type GetPermissionsResult = {
   permissions: IdentityPermission[];

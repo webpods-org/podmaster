@@ -1,11 +1,10 @@
 import * as db from "../../db/index.js";
-import { JwtClaims } from "../../types/index.js";
+import { HttpError, JwtClaims } from "../../types/index.js";
 import ensurePod from "../pods/internal/ensurePod.js";
 import { getPodDataDir } from "../../storage/index.js";
 import getPodPermissionForJwt from "../pods/internal/getPodPermissionForJwt.js";
 import { StatusCodes } from "http-status-codes";
 import { InvalidResult, ValidResult } from "../../Result.js";
-import { HttpError } from "../../utils/http.js";
 
 export type DeletePermissionTokensResult = {};
 

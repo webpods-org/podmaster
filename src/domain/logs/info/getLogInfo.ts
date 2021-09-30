@@ -3,10 +3,9 @@ import ensurePod from "../../pods/internal/ensurePod.js";
 import { EntriesRow } from "../../../types/db.js";
 import getLogPermissionForJwt from "../internal/getLogPermissionForJwt.js";
 import { getPodDataDir } from "../../../storage/index.js";
-import { JwtClaims } from "../../../types/index.js";
+import { HttpError, JwtClaims } from "../../../types/index.js";
 import { StatusCodes } from "http-status-codes";
 import { InvalidResult, ValidResult } from "../../../Result.js";
-import { HttpError } from "../../../utils/http.js";
 
 export type GetInfoResult = {
   id: number;

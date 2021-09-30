@@ -1,11 +1,10 @@
-import { Authenticator } from "../../types/index.js";
+import { Authenticator, HttpError } from "../../types/index.js";
 import * as config from "../../config/index.js";
 import matchObject from "../../utils/matchObject.js";
 import jsonwebtoken, { SignOptions } from "jsonwebtoken";
 import getJwtValidationParams from "../../lib/jwt/getJwtValidationParams.js";
 import validateJwt from "../../lib/jwt/validateJwt.js";
 import { InvalidResult, ValidResult } from "../../Result.js";
-import { HttpError } from "../../utils/http.js";
 import { StatusCodes } from "http-status-codes";
 
 export type CreateAuthTokenResult = {

@@ -6,13 +6,12 @@ import ensurePod from "../pods/internal/ensurePod.js";
 import { LogsRow } from "../../types/db.js";
 import { generateInsertStatement } from "../../lib/sqlite.js";
 import { getPodDataDir } from "../../storage/index.js";
-import { JwtClaims } from "../../types/index.js";
+import { HttpError, JwtClaims } from "../../types/index.js";
 import getPodPermissionForJwt from "../pods/internal/getPodPermissionForJwt.js";
 import { isAlphanumeric } from "../../api/utils/isAlphanumeric.js";
 import addLogPermission from "../permissions/internal/addLogPermission.js";
 import { StatusCodes } from "http-status-codes";
 import { InvalidResult, ValidResult } from "../../Result.js";
-import { HttpError } from "../../utils/http.js";
 import { default as getLogs } from "./internal/getLogs.js";
 
 export type CreateLogResult = {};

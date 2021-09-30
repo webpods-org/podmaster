@@ -1,9 +1,8 @@
 import { logException } from "../lib/logger/index.js";
 import { IKoaAppContext } from "../types/koa.js";
 import { StatusCodes } from "http-status-codes";
-import { JwtClaims } from "../types/index.js";
+import { HttpError, JwtClaims } from "../types/index.js";
 import { InvalidResult, ValidResult } from "../Result.js";
-import { HttpError } from "../utils/http.js";
 
 export async function handleResult<T>(
   ctx: IKoaAppContext,

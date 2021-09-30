@@ -1,3 +1,4 @@
+import { StatusCodes } from "http-status-codes";
 import { AsymmetricAlgorithm, KeyTypes, SymmetricAlgorithm } from "./crypto";
 
 export type ExternalAuthServers = {
@@ -217,4 +218,9 @@ export type PermissionToken = {
   redemptions: number;
   expiry: number;
   createdAt: number;
+};
+
+export type HttpError = {
+  error: string;
+  status: StatusCodes;
 };

@@ -1,5 +1,5 @@
 import * as db from "../../db/index.js";
-import { JwtClaims, LogAccess } from "../../types/index.js";
+import { HttpError, JwtClaims, LogAccess } from "../../types/index.js";
 import ensurePod from "../pods/internal/ensurePod.js";
 import { PermissionTokensRow } from "../../types/db.js";
 import { generateInsertStatement } from "../../lib/sqlite.js";
@@ -8,7 +8,6 @@ import getPodPermissionForJwt from "../pods/internal/getPodPermissionForJwt.js";
 import random from "../../utils/random.js";
 import { StatusCodes } from "http-status-codes";
 import { InvalidResult, ValidResult } from "../../Result.js";
-import { HttpError } from "../../utils/http.js";
 
 export type CreatePermissionTokenResult = {
   id: string;

@@ -1,5 +1,6 @@
 import * as db from "../../db/index.js";
 import {
+  HttpError,
   Identity,
   JwtClaims,
   LogAccess,
@@ -12,7 +13,6 @@ import addLogPermission from "./internal/addLogPermission.js";
 import addPodPermission from "./internal/addPodPermission.js";
 import { StatusCodes } from "http-status-codes";
 import { InvalidResult, ValidResult } from "../../Result.js";
-import { HttpError } from "../../utils/http.js";
 
 export type AddPermissionsResult = {};
 

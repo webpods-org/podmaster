@@ -4,10 +4,9 @@ import ensurePod from "../../pods/internal/ensurePod.js";
 import getLogPermissionForJwt from "../internal/getLogPermissionForJwt.js";
 import isFilenameValid from "../../../lib/validation/checkFilename.js";
 import { getDirNumber, getPodDataDir } from "../../../storage/index.js";
-import { JwtClaims } from "../../../types/index.js";
+import { HttpError, JwtClaims } from "../../../types/index.js";
 import { StatusCodes } from "http-status-codes";
 import { InvalidResult, ValidResult } from "../../../Result.js";
-import { HttpError } from "../../../utils/http.js";
 
 export type GetFileResult = {
   relativeFilePath: string;

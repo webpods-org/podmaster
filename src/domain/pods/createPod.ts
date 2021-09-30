@@ -1,6 +1,6 @@
 import mkdirp from "mkdirp";
 
-import { JwtClaims } from "../../types/index.js";
+import { HttpError, JwtClaims } from "../../types/index.js";
 import * as config from "../../config/index.js";
 import matchObject from "../../utils/matchObject.js";
 import * as db from "../../db/index.js";
@@ -12,7 +12,6 @@ import { isAlphanumeric } from "../../api/utils/isAlphanumeric.js";
 import getPodByHostnameOrApp from "./internal/getPodByHostnameOrApp.js";
 import { StatusCodes } from "http-status-codes";
 import { InvalidResult, ValidResult } from "../../Result.js";
-import { HttpError } from "../../utils/http.js";
 
 export type CreatePodResult = { hostname: string };
 

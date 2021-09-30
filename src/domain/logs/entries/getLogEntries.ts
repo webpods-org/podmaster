@@ -2,13 +2,12 @@ import * as db from "../../../db/index.js";
 import ensurePod from "../../pods/internal/ensurePod.js";
 import { EntriesRow } from "../../../types/db.js";
 import mapper from "../../../mappers/entry.js";
-import { JwtClaims, LogEntry } from "../../../types/index.js";
+import { HttpError, JwtClaims, LogEntry } from "../../../types/index.js";
 import getLogPermissionForJwt from "../internal/getLogPermissionForJwt.js";
 import { getPodDataDir } from "../../../storage/index.js";
 import * as config from "../../../config/index.js";
 import { StatusCodes } from "http-status-codes";
 import { InvalidResult, ValidResult } from "../../../Result.js";
-import { HttpError } from "../../../utils/http.js";
 
 export type GetEntriesResult = {
   entries: LogEntry[];

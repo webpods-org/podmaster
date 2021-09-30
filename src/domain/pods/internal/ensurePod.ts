@@ -1,8 +1,7 @@
 import getPodByHostname from "./getPodByHostname.js";
-import { PodInfo } from "../../../types/index.js";
+import { PodInfo, HttpError } from "../../../types/index.js";
 import { InvalidResult } from "../../../Result.js";
 import { StatusCodes } from "http-status-codes";
-import { HttpError } from "../../../utils/http.js";
 
 export default async function ensurePod<T>(
   hostname: string,
