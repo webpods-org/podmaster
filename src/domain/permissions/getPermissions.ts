@@ -37,7 +37,7 @@ export default async function getPermissions(
 
     // Get pod permissions
     if (podPermission.write) {
-      const podPermsStmt = podDb.prepare(`SELECT * FROM "pod_permissions"`);
+      const podPermsStmt = podDb.prepare(`SELECT * FROM "pod_permission"`);
       const podPermissionsInDb = podPermsStmt.all().map(podPermissionMapper);
 
       podPermissionsInDb
@@ -50,7 +50,7 @@ export default async function getPermissions(
     }
 
     // Get log permissions.
-    const logPermsStmt = podDb.prepare(`SELECT * FROM "log_permissions"`);
+    const logPermsStmt = podDb.prepare(`SELECT * FROM "log_permission"`);
     const logPermissionsInDb = logPermsStmt.all().map(logPermissionMapper);
 
     for (const logPermission of logPermissionsInDb) {

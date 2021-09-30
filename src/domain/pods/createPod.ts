@@ -110,7 +110,7 @@ export default async function createPod(
   };
 
   const insertPodStmt = systemDb.prepare(
-    generateInsertStatement<PodsRow>("pods", podsRow)
+    generateInsertStatement<PodsRow>("pod", podsRow)
   );
 
   insertPodStmt.run(podsRow);
@@ -131,7 +131,7 @@ export default async function createPod(
   };
   const insertPodPermissionStmt = podDb.prepare(
     generateInsertStatement<PodPermissionsRow>(
-      "pod_permissions",
+      "pod_permission",
       podPermissionsRow
     )
   );

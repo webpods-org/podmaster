@@ -23,7 +23,7 @@ export default async function getLogs(
     return new InvalidResult("NO_PERMISSIONS");
   }
 
-  const getLogsStmt = podDb.prepare(`SELECT * FROM "logs"`);
+  const getLogsStmt = podDb.prepare(`SELECT * FROM "log"`);
 
   const logs = getLogsStmt.all().map((x: LogsRow) => ({
     id: x.id,

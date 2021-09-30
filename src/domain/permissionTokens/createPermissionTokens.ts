@@ -59,7 +59,7 @@ export default async function createPermissionTokens(
 
     const insertStmt = podDb.prepare(
       generateInsertStatement<PermissionTokensRow>(
-        "permission_tokens",
+        "permission_token",
         permissionTokensRow
       )
     );

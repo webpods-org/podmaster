@@ -15,7 +15,7 @@ export default async function addPodPermission(
   podDb: Sqlite3.Database
 ): Promise<void> {
   const existingPermStmt = podDb.prepare(
-    `SELECT * FROM "pod_permissions" WHERE "iss"=@iss AND "sub"=@sub`
+    `SELECT * FROM "pod_permission" WHERE "iss"=@iss AND "sub"=@sub`
   );
 
   const existingRow = existingPermStmt.get({
@@ -34,7 +34,7 @@ export default async function addPodPermission(
 
     const insertPermStmt = podDb.prepare(
       generateInsertStatement<PodPermissionsRow>(
-        "pod_permissions",
+        "pod_permission",
         podPermissionsRow
       )
     );
@@ -62,7 +62,7 @@ export default async function addPodPermission(
 
     const updatePermStatement = podDb.prepare(
       generateUpdateStatement<PodPermissionsRow>(
-        "pod_permissions",
+        "pod_permission",
         podPermissionsRow,
         `WHERE "iss"=@iss AND "sub"=@sub`
       )

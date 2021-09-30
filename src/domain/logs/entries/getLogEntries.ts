@@ -43,8 +43,8 @@ export default async function getEntries(
     function getEntriesFrom(offset: number, ascending: boolean) {
       const getEntriesStmt = podDb.prepare(
         ascending
-          ? `SELECT * FROM "entries" WHERE "log_id" = @log_id LIMIT @limit OFFSET @offset`
-          : `SELECT * FROM "entries" WHERE "log_id" = @log_id ORDER BY ROWID DESC LIMIT @limit OFFSET @offset`
+          ? `SELECT * FROM "log_entry" WHERE "log_id" = @log_id LIMIT @limit OFFSET @offset`
+          : `SELECT * FROM "log_entry" WHERE "log_id" = @log_id ORDER BY ROWID DESC LIMIT @limit OFFSET @offset`
       );
 
       return getEntriesStmt.all({
@@ -56,7 +56,7 @@ export default async function getEntries(
 
     function getEntriesFromId(id: number) {
       const getEntriesStmt = podDb.prepare(
-        `SELECT * FROM "entries" WHERE "log_id" = @log_id AND "id" > @id LIMIT @limit`
+        `SELECT * FROM "log_entry" WHERE "log_id" = @log_id AND "id" > @id LIMIT @limit`
       );
 
       return getEntriesStmt.all({
@@ -68,7 +68,7 @@ export default async function getEntries(
 
     function getEntriesAfterCommit(commit: string) {
       const getCommitStmt = podDb.prepare(
-        `SELECT "id" FROM "entries" WHERE "log_id" = @log_id AND "commit" = @commit`
+        `SELECT "id" FROM "log_entry" WHERE "log_id" = @log_id AND "commit" = @commit`
       );
 
       const commitRow: EntriesRow = getCommitStmt.get({
@@ -90,7 +90,7 @@ export default async function getEntries(
 
       for (const commit of commitList) {
         const getSingleCommitStmt = podDb.prepare(
-          `SELECT * FROM "entries" WHERE "log_id" = @log_id AND "commit" = @commit`
+          `SELECT * FROM "log_entry" WHERE "log_id" = @log_id AND "commit" = @commit`
         );
 
         const commitRow = getSingleCommitStmt.get({

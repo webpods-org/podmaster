@@ -17,7 +17,7 @@ export default async function getPodByHostname(
 
   function getPodFromDb() {
     const podInfoStmt = systemDb.prepare(
-      `SELECT * FROM "pods" WHERE "hostname"=@hostname OR "hostname_alias"=@hostname`
+      `SELECT * FROM "pod" WHERE "hostname"=@hostname OR "hostname_alias"=@hostname`
     );
 
     const dbRow = podInfoStmt.get({ hostname });

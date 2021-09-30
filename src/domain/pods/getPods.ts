@@ -31,7 +31,7 @@ export async function getPods(userClaims: JwtClaims) {
 
   function getPodsFromDb(userClaims: JwtClaims) {
     const podInfoStmt = systemDb.prepare(
-      `SELECT * FROM "pods" WHERE "iss"=@iss AND "sub"=@sub`
+      `SELECT * FROM "pod" WHERE "iss"=@iss AND "sub"=@sub`
     );
 
     return podInfoStmt

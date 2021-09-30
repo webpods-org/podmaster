@@ -18,7 +18,7 @@ export default async function getLogPermissionForJwt(
   podDb: Sqlite3.Database,
   userClaims: JwtClaims | undefined
 ): Promise<LogAccess> {
-  const getLogStmt = podDb.prepare(`SELECT * from "logs" WHERE "id"=@name`);
+  const getLogStmt = podDb.prepare(`SELECT * from "log" WHERE "id"=@name`);
   const logInfoRow = getLogStmt.get({ name });
   const logInfo = logInfoRow ? logMapper(logInfoRow) : undefined;
 
@@ -35,7 +35,7 @@ export default async function getLogPermissionForJwt(
 
   // See if the permission already exists.
   const existingPermStmt = podDb.prepare(
-    `SELECT * FROM "log_permissions" WHERE "log_id"=@log_id AND "iss"=@iss AND ("sub"=@sub OR "sub"='*')`
+    `SELECT * FROM "log_permission" WHERE "log_id"=@log_id AND "iss"=@iss AND ("sub"=@sub OR "sub"='*')`
   );
 
   const logPermissionsInDb = existingPermStmt

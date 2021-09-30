@@ -46,7 +46,7 @@ export default async function deletePermissions(
     }
 
     const deletePodPermsStmt = podDb.prepare(
-      `DELETE FROM "pod_permissions" WHERE "iss"=@iss AND "sub"=@sub`
+      `DELETE FROM "pod_permission" WHERE "iss"=@iss AND "sub"=@sub`
     );
 
     deletePodPermsStmt.run({
@@ -55,7 +55,7 @@ export default async function deletePermissions(
     });
 
     const deleteLogPermsStmt = podDb.prepare(
-      `DELETE FROM "log_permissions" WHERE "iss"=@iss AND "sub"=@sub`
+      `DELETE FROM "log_permission" WHERE "iss"=@iss AND "sub"=@sub`
     );
 
     deleteLogPermsStmt.run({

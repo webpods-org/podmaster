@@ -38,7 +38,7 @@ export default async function getInfo(
     
     // Get the last item
     const lastItemStmt = podDb.prepare(
-      `SELECT "id", "commit" FROM "entries" ORDER BY id DESC LIMIT 1`
+      `SELECT "id", "commit" FROM "log_entry" ORDER BY id DESC LIMIT 1`
     );
 
     const { id, commit } = (lastItemStmt.get() as EntriesRow | undefined) || {

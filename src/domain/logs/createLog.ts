@@ -67,7 +67,7 @@ export default async function createLog(
     };
 
     const insertLogStmt = podDb.prepare(
-      generateInsertStatement<LogsRow>("logs", logsRow)
+      generateInsertStatement<LogsRow>("log", logsRow)
     );
 
     insertLogStmt.run(logsRow);

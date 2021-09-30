@@ -34,7 +34,7 @@ export default async function deletePermissionTokens(
     }
     
     const deleteTokensStmt = podDb.prepare(
-      `DELETE FROM "permission_tokens" WHERE "id"=@id`
+      `DELETE FROM "permission_token" WHERE "id"=@id`
     );
 
     deleteTokensStmt.run({ id });

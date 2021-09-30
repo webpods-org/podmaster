@@ -15,7 +15,7 @@ export default async function getPodPermissionForJwt(
   userClaims: JwtClaims
 ): Promise<PodAccess> {
   // See if the permission already exists.
-  const existingPermStmt = podDb.prepare(`SELECT * FROM "pod_permissions"`);
+  const existingPermStmt = podDb.prepare(`SELECT * FROM "pod_permission"`);
   const permissions = existingPermStmt.all().map(permissionMapper);
 
   const matchingPerm = permissions.find(

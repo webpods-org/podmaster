@@ -34,7 +34,7 @@ export default async function redeemPermissionToken(
     const podDb = db.getPodDb(podDataDir);
 
     const getTokenStmt = podDb.prepare(
-      `SELECT * FROM "permission_tokens" WHERE "id" = @id AND "expiry" > @expiry AND "max_redemptions" > "redemptions"`
+      `SELECT * FROM "permission_token" WHERE "id" = @id AND "expiry" > @expiry AND "max_redemptions" > "redemptions"`
     );
 
     
@@ -70,7 +70,7 @@ export default async function redeemPermissionToken(
     const updateParams = { redemptions: permissionToken.redemptions + 1 };
     const updatePermStmt = podDb.prepare(
       generateUpdateStatement<PermissionTokensRow>(
-        "permission_tokens",
+        "permission_token",
         updateParams,
         `WHERE "id" > @id`
       )

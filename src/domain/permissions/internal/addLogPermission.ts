@@ -16,7 +16,7 @@ export default async function addLogPermission(
   podDb: Sqlite3.Database
 ): Promise<void> {
   const existingPermStmt = podDb.prepare(
-    `SELECT * FROM "log_permissions" WHERE "iss"=@iss AND "sub"=@sub AND "log_id"=@log_id`
+    `SELECT * FROM "log_permission" WHERE "iss"=@iss AND "sub"=@sub AND "log_id"=@log_id`
   );
 
   const existingRow = existingPermStmt.get({
@@ -39,7 +39,7 @@ export default async function addLogPermission(
 
     const insertPermStmt = podDb.prepare(
       generateInsertStatement<LogPermissionsRow>(
-        "log_permissions",
+        "log_permission",
         permissionsRow
       )
     );
@@ -80,7 +80,7 @@ export default async function addLogPermission(
 
     const updatePermStmt = podDb.prepare(
       generateUpdateStatement<LogPermissionsRow>(
-        "log_permissions",
+        "log_permission",
         permissionsRow,
         `WHERE "iss"=@iss AND "sub"=@sub AND "log_id"=@log_id`
       )

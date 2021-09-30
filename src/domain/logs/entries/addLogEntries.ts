@@ -134,7 +134,7 @@ export default async function addEntries(
     ) {
       // Get the last item
       const lastItemStmt = podDb.prepare(
-        `SELECT "id", "commit" FROM "entries" ORDER BY id DESC LIMIT 1`
+        `SELECT "id", "commit" FROM "log_entry" ORDER BY id DESC LIMIT 1`
       );
 
       let { id: lastId, commit: lastCommit } = (lastItemStmt.get() as
@@ -169,7 +169,7 @@ export default async function addEntries(
           };
 
           const insertEntryStmt = podDb.prepare(
-            generateInsertStatement<EntriesRow>("entries", entriesRow)
+            generateInsertStatement<EntriesRow>("log_entry", entriesRow)
           );
 
           insertEntryStmt.run(entriesRow);
@@ -214,7 +214,7 @@ export default async function addEntries(
           };
 
           const insertEntryStmt = podDb.prepare(
-            generateInsertStatement<EntriesRow>("entries", entryRow)
+            generateInsertStatement<EntriesRow>("log_entry", entryRow)
           );
 
           insertEntryStmt.run(entryRow);
