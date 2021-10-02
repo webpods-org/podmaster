@@ -32,8 +32,8 @@ export default async function createPod(
   const appConfig = config.get();
   const systemDb = db.getSystemDb();
 
-  const podHostname = userClaims.webpods?.domain
-    ? `${podId}.${userClaims.webpods.domain}.${appConfig.hostname}`
+  const podHostname = userClaims.webpods?.namespace
+    ? `${podId}.${userClaims.webpods.namespace}.${appConfig.hostname}`
     : `${podId}.${appConfig.hostname}`;
 
   // First check if we have a valid issuer and audience.

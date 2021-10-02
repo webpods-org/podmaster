@@ -20,7 +20,7 @@ export type UncheckedJwtClaims = {
   nbf?: number;
   iat?: number;
   webpods?: {
-    domain: string;
+    namespace: string;
   };
   [key: string]: unknown;
 };
@@ -34,7 +34,7 @@ export type JwtClaims = {
   nbf?: number;
   iat?: number;
   webpods?: {
-    domain: string;
+    namespace: string;
   };
   [key: string]: unknown;
 };
