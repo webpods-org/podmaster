@@ -2,14 +2,14 @@ import { extname, join } from "path";
 import { Files } from "formidable";
 import { createHash } from "crypto";
 import mv from "mv";
-import random from "../../../utils/random.js";
+import random from "../../../utils/getRandomString.js";
 import { promisify } from "util";
 import { existsSync, readFileSync } from "fs";
 import * as db from "../../../db/index.js";
 import { EntriesRow } from "../../../types/db.js";
 import ensurePod from "../../pods/internal/ensurePod.js";
 import getLogPermissionForJwt from "../internal/getLogPermissionForJwt.js";
-import isFilenameValid from "../../../lib/validation/checkFilename.js";
+import isValidFilename from "../../../lib/validation/isValidFilename.js";
 import { generateInsertStatement } from "../../../lib/sqlite.js";
 import { getPodDataDir } from "../../../storage/index.js";
 import { HttpError, PodJwtClaims } from "../../../types/index.js";
@@ -102,7 +102,7 @@ export default async function addEntries(
             */
         const file = Array.isArray(fileOrFiles) ? fileOrFiles[0] : fileOrFiles;
 
-        if (file.name && !isFilenameValid(file.name)) {
+        if (file.name && !isValidFilename(file.name)) {
           return new InvalidResult({
             error: "Invalid filename.",
             status: StatusCodes.BAD_REQUEST,

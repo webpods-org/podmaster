@@ -1,6 +1,6 @@
 import addLog from "../../../domain/logs/createLog.js";
 import { handleResultWithJwt } from "../../handleResult.js";
-import transformQuery from "../../utils/transformQuery.js";
+import transformQuery from "../../../lib/http/transformQueryParam.js";
 import { IKoaPodAppContext } from "../../../types/koa.js";
 
 export type CreateLogAPIResult = {};

@@ -8,7 +8,7 @@ import { PodPermissionsRow, PodsRow } from "../../types/db.js";
 import { generateInsertStatement } from "../../lib/sqlite.js";
 import { getPodDataDir } from "../../storage/index.js";
 import getPodsImpl from "./internal/getPods.js";
-import { isAlphanumeric } from "../../api/utils/isAlphanumeric.js";
+import { isAlphanumeric } from "../../lib/validation/isAlphanumeric.js";
 import { StatusCodes } from "http-status-codes";
 import { InvalidResult, ValidResult } from "../../Result.js";
 import getUserHostFromJwt from "./internal/getUserHostFromJwt.js";

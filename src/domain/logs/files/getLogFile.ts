@@ -2,7 +2,7 @@ import { join } from "path";
 import * as db from "../../../db/index.js";
 import ensurePod from "../../pods/internal/ensurePod.js";
 import getLogPermissionForJwt from "../internal/getLogPermissionForJwt.js";
-import isFilenameValid from "../../../lib/validation/checkFilename.js";
+import isValidFilename from "../../../lib/validation/isValidFilename.js";
 import { getDirNumber, getPodDataDir } from "../../../storage/index.js";
 import { HttpError, PodJwtClaims } from "../../../types/index.js";
 import { StatusCodes } from "http-status-codes";
@@ -44,7 +44,7 @@ export default async function getFile(
       logId !== logId ||
       logsLiteral.toLowerCase() !== "logs" ||
       filesLiteral.toLowerCase() !== "files" ||
-      !isFilenameValid(fileName)
+      !isValidFilename(fileName)
     ) {
       return new InvalidResult({
         error: "The requested url was not found on this server.",

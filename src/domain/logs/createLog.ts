@@ -8,7 +8,7 @@ import { generateInsertStatement } from "../../lib/sqlite.js";
 import { getPodDataDir } from "../../storage/index.js";
 import { HttpError, PodJwtClaims } from "../../types/index.js";
 import getPodPermissionForJwt from "../pods/internal/getPodPermissionForJwt.js";
-import { isAlphanumeric } from "../../api/utils/isAlphanumeric.js";
+import { isAlphanumeric } from "../../lib/validation/isAlphanumeric.js";
 import addLogPermission from "../permissions/internal/addLogPermission.js";
 import { StatusCodes } from "http-status-codes";
 import { InvalidResult, ValidResult } from "../../Result.js";

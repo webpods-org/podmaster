@@ -5,7 +5,7 @@ import { PermissionTokensRow } from "../../types/db.js";
 import { generateInsertStatement } from "../../lib/sqlite.js";
 import { getPodDataDir } from "../../storage/index.js";
 import getPodPermissionForJwt from "../pods/internal/getPodPermissionForJwt.js";
-import random from "../../utils/random.js";
+import random from "../../utils/getRandomString.js";
 import { StatusCodes } from "http-status-codes";
 import { InvalidResult, ValidResult } from "../../Result.js";
 
