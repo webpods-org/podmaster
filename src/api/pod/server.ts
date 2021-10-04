@@ -2,6 +2,7 @@ import Koa from "koa";
 import Router from "koa-router";
 import bodyParser from "koa-body";
 import jwtMiddleware from "../../lib/jwt/middleware.js";
+import getPodInfo from "./index.js";
 import * as logsApi from "./logs/index.js";
 import * as permissionsApi from "./permissions/index.js";
 import * as permissionTokensApi from "./permissionsTokens/index.js";
@@ -16,6 +17,9 @@ export default function setup() {
   const appConfig = config.get();
 
   const router = new Router();
+
+  // pod info
+  router.get("/", getPodInfo);
 
   // permissions
   router.get("/permissions", permissionsApi.get);

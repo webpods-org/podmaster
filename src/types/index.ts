@@ -84,11 +84,11 @@ export type Identity = {
 };
 
 export type LimitedPodInfo = {
-  createdBy: Identity;
   id: string;
   name: string;
   app: string;
   hostname: string;
+  createdBy: Identity;
   createdAt: number;
   tier: string;
   description: string;

@@ -5,8 +5,8 @@ import { HttpError } from "../types/index.js";
 import { InvalidResult, ValidResult } from "../Result.js";
 
 export async function handleResult<
-  TClaims,
   TKoaAppContext extends IKoaAppContext<TClaims>,
+  TClaims,
   TResult
 >(
   ctx: TKoaAppContext,
@@ -48,8 +48,8 @@ function ensureJwt<TClaims, TKoaAppContext extends IKoaAppContext<TClaims>>(
 }
 
 export async function handleResultWithJwt<
-  TClaims,
   TKoaAppContext extends IKoaAppContext<TClaims>,
+  TClaims,
   TResult
 >(
   ctx: TKoaAppContext,

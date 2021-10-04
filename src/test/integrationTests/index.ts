@@ -22,6 +22,7 @@ import { CreatePermissionTokenAPIResult } from "../../api/pod/permissionsTokens/
 import { RedeemPermissionTokenAPIResult } from "../../api/pod/permissionsTokens/redeem.js";
 import { CreateAuthTokenAPIResult } from "../../api/podmaster/oauth/token/create.js";
 import { GetOAuthMetadataAPIResult } from "../../api/podmaster/wellKnown/oauthMetadata.js";
+import { GetPodInfoAPIResult } from "../../api/pod/index.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -30,8 +31,10 @@ export default function run(configDir: string, configFilePath: string) {
   const alicePodmasterJwt = readFileSync(join(configDir, "alice_podmaster_jwt"))
     .toString()
     .replace(/\r?\n|\r/g, "");
-  
-  const alicePodmasterAdminJwt = readFileSync(join(configDir, "alice_podmaster_admin_jwt"))
+
+  const alicePodmasterAdminJwt = readFileSync(
+    join(configDir, "alice_podmaster_admin_jwt")
+  )
     .toString()
     .replace(/\r?\n|\r/g, "");
 
@@ -159,6 +162,18 @@ export default function run(configDir: string, configFilePath: string) {
       apiResult.pods.length.should.be.greaterThan(0);
       apiResult.pods[0].name.should.equal(podName);
       apiResult.pods[0].description.should.equal(podDescription);
+    });
+
+    it("gets info about a pod", async () => {
+      const response = await request(app)
+        .get("/")
+        .set("Host", podHostnameAndPort)
+        .set("Authorization", `Bearer ${alicePodJwt}`);
+
+      response.status.should.equal(200);
+      const apiResult: GetPodInfoAPIResult = JSON.parse(response.text);
+      apiResult.app.should.equal("myweblog.example.com");
+      apiResult.id.should.equal("myweblog");
     });
 
     it("creates a log", async () => {

@@ -5,7 +5,7 @@ export class ValidResult<T> {
   }
 }
 
-export class InvalidResult<T> {
+export class InvalidResult<T, TInternal = {}> {
   error: T;
 
   constructor(error: T) {

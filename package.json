@@ -1,6 +1,6 @@
 {
   "name": "podmaster",
-  "version": "0.0.31",
+  "version": "0.0.32",
   "private": false,
   "type": "module",
   "main": "dist/index.js",
