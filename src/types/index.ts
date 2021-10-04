@@ -87,7 +87,7 @@ export type Identity = {
   sub: string;
 };
 
-export type PodInfo = {
+export type LimitedPodInfo = {
   createdBy: Identity;
   id: string;
   name: string;
@@ -95,8 +95,11 @@ export type PodInfo = {
   hostname: string;
   createdAt: number;
   tier: string;
-  permissions?: PermissionGrant[];
   description: string;
+};
+
+export type PodInfo = LimitedPodInfo & {
+  permissions?: PermissionGrant[];
 };
 
 export type LogInfo = {
@@ -144,6 +147,7 @@ export type AppConfig = {
   useHttps?: HttpsConfig;
   pubsub?: PubSubConfig;
   queries?: QueryConfig;
+  requireNamespace?: boolean;
   auth: {
     defaultExpiry?: number;
     keys: {

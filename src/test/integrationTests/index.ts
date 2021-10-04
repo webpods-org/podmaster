@@ -27,7 +27,11 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 export default function run(configDir: string, configFilePath: string) {
-  const alicePodmasterJwt = readFileSync(join(configDir, "alice_provider_jwt"))
+  const alicePodmasterJwt = readFileSync(join(configDir, "alice_podmaster_jwt"))
+    .toString()
+    .replace(/\r?\n|\r/g, "");
+  
+  const alicePodmasterAdminJwt = readFileSync(join(configDir, "alice_podmaster_admin_jwt"))
     .toString()
     .replace(/\r?\n|\r/g, "");
 
@@ -112,6 +116,24 @@ export default function run(configDir: string, configFilePath: string) {
         .post("/pods")
         .send({
           id: "myweblog",
+          app: "someappid",
+          description: "This is my very own pod.",
+        })
+        .set("Host", podmasterHostname)
+        .set("Authorization", `Bearer ${alicePodmasterJwt}`);
+
+      response.status.should.equal(409);
+      const apiResult: { error: string } = JSON.parse(response.text);
+      apiResult.error.should.equal(
+        "A pod with hostname myweblog.alice.pod1.local.disks.app already exists."
+      );
+    });
+
+    it("cannot create pod with existing app name", async () => {
+      const response = await request(app)
+        .post("/pods")
+        .send({
+          id: "somepodid",
           app: appId,
           description: "This is my very own pod.",
         })
@@ -121,7 +143,7 @@ export default function run(configDir: string, configFilePath: string) {
       response.status.should.equal(409);
       const apiResult: { error: string } = JSON.parse(response.text);
       apiResult.error.should.equal(
-        "A pod named myweblog.pod1.local.disks.app connected to app myweblog.example.com already exists."
+        "A pod connected to app myweblog.example.com already exists."
       );
     });
 
@@ -129,7 +151,7 @@ export default function run(configDir: string, configFilePath: string) {
       const response = await request(app)
         .get("/pods")
         .set("Host", podmasterHostname)
-        .set("Authorization", `Bearer ${alicePodmasterJwt}`);
+        .set("Authorization", `Bearer ${alicePodmasterAdminJwt}`);
 
       response.status.should.equal(200);
       const apiResult: GetPodsAPIResult = JSON.parse(response.text);

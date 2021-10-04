@@ -52,8 +52,8 @@ const config = {
             kty: "RSA",
             alg: "RS256",
             publicKey: `podmaster-publickey`,
-            privateKey: `podmaster-privatekey`
-        }
+            privateKey: `podmaster-privatekey`,
+        },
     },
     /*
       Locally defined JWT keys.
@@ -86,6 +86,10 @@ const config = {
             },
         },
     ],
+    // Validate whether provider jwt mentions webpods.namespace claim.
+    // If missing and requireNamespace=true, then the create-pod request is rejected.
+    // Defauls to true.
+    requireNamespace: true,
     /*
       The first match (based on claims) is selected.
       So if you want multiple tiers, include a claim like 'plan'.

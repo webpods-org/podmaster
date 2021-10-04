@@ -63,10 +63,10 @@ const config: AppConfig = {
       kty: "RSA",
       alg: "RS256",
       publicKey: `podmaster-publickey`,
-      privateKey: `podmaster-privatekey`
-    }
+      privateKey: `podmaster-privatekey`,
+    },
   },
-  
+
   /*
     Locally defined JWT keys.
     These do not require a JWKS lookup.
@@ -99,6 +99,11 @@ const config: AppConfig = {
       },
     },
   ],
+
+  // Validate whether provider jwt mentions webpods.namespace claim.
+  // If missing and requireNamespace=true, then the create-pod request is rejected.
+  // Defauls to true.
+  requireNamespace: true,
 
   /*
     The first match (based on claims) is selected.

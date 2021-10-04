@@ -1,4 +1,4 @@
-import { getPods } from "../../../domain/pods/getPods.js";
+import getPods from "../../../domain/pods/getPods.js";
 import { handleResultWithJwt } from "../../handleResult.js";
 import { IKoaAppContext } from "../../../types/koa.js";
 
@@ -13,8 +13,7 @@ export type GetPodsAPIResult = {
 export default async function getAPI(ctx: IKoaAppContext): Promise<void> {
   await handleResultWithJwt(
     ctx,
-    (ctx) =>
-       getPods(ctx.state.jwt.claims),
+    (ctx) => getPods(ctx.state.jwt.claims),
     (result) => {
       const body: GetPodsAPIResult = {
         pods: result.value.pods.map((x) => ({

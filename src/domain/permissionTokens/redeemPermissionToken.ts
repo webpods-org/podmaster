@@ -37,13 +37,10 @@ export default async function redeemPermissionToken(
       `SELECT * FROM "permission_token" WHERE "id" = @id AND "expiry" > @expiry AND "max_redemptions" > "redemptions"`
     );
 
-    
     const matchingTokens = getTokenStmt.get({
       id: token,
       expiry: Date.now(),
     });
-    
-    
 
     if (!matchingTokens) {
       return new InvalidResult({
@@ -53,7 +50,7 @@ export default async function redeemPermissionToken(
     }
 
     const permissionToken = permissionTokenMapper(matchingTokens);
-    
+
     for (const logPermission of permissionToken.permissions.logs) {
       await addLogPermission(
         logPermission.log,

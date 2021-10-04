@@ -7,11 +7,12 @@ import * as db from "../../db/index.js";
 import { PodPermissionsRow, PodsRow } from "../../types/db.js";
 import { generateInsertStatement } from "../../lib/sqlite.js";
 import { getPodDataDir } from "../../storage/index.js";
-import { getPods } from "./getPods.js";
+import getPodsImpl from "./internal/getPods.js";
 import { isAlphanumeric } from "../../api/utils/isAlphanumeric.js";
-import getPodByHostnameOrApp from "./internal/getPodByHostnameOrApp.js";
 import { StatusCodes } from "http-status-codes";
 import { InvalidResult, ValidResult } from "../../Result.js";
+import getUserHostFromJwt from "./internal/getUserHostFromJwt.js";
+import hasScope from "../../lib/jwt/hasScope.js";
 
 export type CreatePodResult = { hostname: string };
 
@@ -28,13 +29,20 @@ export default async function createPod(
   if (validationErrors) {
     return validationErrors;
   }
-  
+
   const appConfig = config.get();
   const systemDb = db.getSystemDb();
 
-  const podHostname = userClaims.webpods?.namespace
-    ? `${podId}.${userClaims.webpods.namespace}.${appConfig.hostname}`
-    : `${podId}.${appConfig.hostname}`;
+  if (appConfig.requireNamespace !== false && !userClaims.webpods?.namespace) {
+    return new InvalidResult({
+      error: "Invalid JWT. Missing claim 'webpods.namespace'.",
+      status: StatusCodes.UNAUTHORIZED,
+    });
+  }
+
+  // hostname for users can vary based on the JWT
+  // If the JWT defines a namespace (optional), it'll be under "namespace.podmasterhostname".
+  const podHostname = `${podId}.${getUserHostFromJwt(userClaims)}`;
 
   // First check if we have a valid issuer and audience.
   // Audience defaults to hostname of podmaster, but can be overridden.
@@ -54,12 +62,12 @@ export default async function createPod(
   );
 
   /*
-        Verify the claims and create the pod.
-        The rules are:
-          1. If webpods.hostname and webpods.pod exists in the jwt,
-          create ${webpods.pod}.${webpods.hostname}.
-          2. Check maxPodsPerUser
-      */
+    Verify the claims and create the pod.
+    The rules are:
+      1. If webpods.hostname and webpods.pod exists in the jwt,
+      create ${webpods.pod}.${webpods.hostname}.
+      2. Check maxPodsPerUser
+  */
   if (!matchingTier) {
     return new InvalidResult({
       error: "Access denied.",
@@ -67,15 +75,11 @@ export default async function createPod(
     });
   }
 
-  const existingPodsResult = await getPods(userClaims);
-
-  if (existingPodsResult instanceof InvalidResult) {
-    return existingPodsResult;
-  }
+  const existingPods = await getPodsImpl(userClaims.iss, userClaims.sub);
 
   if (
     matchingTier.maxPodsPerUser &&
-    existingPodsResult.value.pods.length >= matchingTier.maxPodsPerUser
+    existingPods.length >= matchingTier.maxPodsPerUser
   ) {
     return new InvalidResult({
       error: "Quota exceeded.",
@@ -83,13 +87,27 @@ export default async function createPod(
     });
   }
 
-  // Check if the pod name is available.
-  const existingPod = await getPodByHostnameOrApp(podHostname, app);
-
-  if (existingPod) {
+  // Check if the pod already exists - (by hostname).
+  if (existingPods.some((x) => x.hostname === podHostname)) {
     return new InvalidResult({
-      error: `A pod named ${podHostname} connected to app ${app} already exists.`,
+      error: `A pod with hostname ${podHostname} already exists.`,
       status: StatusCodes.CONFLICT,
+    });
+  }
+
+  // Check if the pod already exists - (by app).
+  if (existingPods.some((x) => x.app === app)) {
+    return new InvalidResult({
+      error: `A pod connected to app ${app} already exists.`,
+      status: StatusCodes.CONFLICT,
+    });
+  }
+
+  // Let's see if we have permissions.
+  if (!hasScope(userClaims.scope, app, "write")) {
+    return new InvalidResult({
+      error: `Access denied. You don't have permissions to create a pod for the app ${app}.`,
+      status: StatusCodes.UNAUTHORIZED,
     });
   }
 

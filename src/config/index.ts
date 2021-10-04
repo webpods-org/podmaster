@@ -8,6 +8,11 @@ let podmasterJWK: JWK;
 
 export async function init(c: AppConfig): Promise<void> {
   config = c;
+
+  if (config.requireNamespace !== false) {
+    config.requireNamespace = true;
+  }
+
   podmasterSigningKey = await jose.JWK.asKey(c.auth.keys.publicKey, "pem");
   const key = podmasterSigningKey.toJSON();
   podmasterJWK = {
