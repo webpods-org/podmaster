@@ -1,7 +1,7 @@
 import { ParameterizedContext, Next } from "koa";
 import jsonwebtoken, { JwtPayload } from "jsonwebtoken";
 import { log, logException } from "../logger/index.js";
-import { IKoaAppContext, IKoaPodAppContext } from "../../types/koa.js";
+import { IKoaAppContext } from "../../types/koa.js";
 import getJwtValidationParams from "./getJwtValidationParams.js";
 import { checkAud, checkExp, checkNbf } from "./validations.js";
 import { InvalidResult, ValidResult } from "../../Result.js";
