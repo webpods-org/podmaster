@@ -1,5 +1,5 @@
 import * as db from "../../db/index.js";
-import { HttpError, JwtClaims, PermissionToken } from "../../types/index.js";
+import { HttpError, PodJwtClaims, PermissionToken } from "../../types/index.js";
 import permissionTokenMapper from "../../mappers/permissionToken.js";
 import ensurePod from "../pods/internal/ensurePod.js";
 import { getPodDataDir } from "../../storage/index.js";
@@ -13,7 +13,7 @@ export type GetPermissionsTokensResult = {
 
 export default async function getPermissionTokens(
   hostname: string,
-  userClaims: JwtClaims
+  userClaims: PodJwtClaims
 ): Promise<ValidResult<GetPermissionsTokensResult> | InvalidResult<HttpError>> {
   return ensurePod(hostname, async (pod) => {
     const podDataDir = getPodDataDir(pod.id);

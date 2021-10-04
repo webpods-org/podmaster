@@ -1,11 +1,11 @@
 import { handleResultWithJwt } from "../../handleResult.js";
-import { IKoaAppContext } from "../../../types/koa.js";
+import { IKoaPodAppContext } from "../../../types/koa.js";
 import deletePermissions from "../../../domain/permissions/deletePermissions.js";
 import getQuery from "../../utils/getParam.js";
 
 export type RemovePermissionsAPIResult = {};
 
-export default async function removeAPI(ctx: IKoaAppContext): Promise<void> {
+export default async function removeAPI(ctx: IKoaPodAppContext): Promise<void> {
   const hostname = ctx.URL.hostname;
 
   const iss = getQuery(ctx.query.iss);

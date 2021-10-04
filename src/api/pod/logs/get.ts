@@ -1,6 +1,6 @@
 import getLogs from "../../../domain/logs/getLogs.js";
 import { handleResultWithJwt } from "../../handleResult.js";
-import { IKoaAppContext } from "../../../types/koa.js";
+import { IKoaPodAppContext } from "../../../types/koa.js";
 
 export type GetLogsAPIResult = {
   logs: {
@@ -10,7 +10,7 @@ export type GetLogsAPIResult = {
   }[];
 };
 
-export default async function getAPI(ctx: IKoaAppContext): Promise<void> {
+export default async function getAPI(ctx: IKoaPodAppContext): Promise<void> {
   const hostname = ctx.URL.hostname;
 
   await handleResultWithJwt(

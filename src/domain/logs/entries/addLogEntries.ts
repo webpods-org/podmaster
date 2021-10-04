@@ -12,7 +12,7 @@ import getLogPermissionForJwt from "../internal/getLogPermissionForJwt.js";
 import isFilenameValid from "../../../lib/validation/checkFilename.js";
 import { generateInsertStatement } from "../../../lib/sqlite.js";
 import { getPodDataDir } from "../../../storage/index.js";
-import { HttpError, JwtClaims } from "../../../types/index.js";
+import { HttpError, PodJwtClaims } from "../../../types/index.js";
 import { InvalidResult, ValidResult } from "../../../Result.js";
 import { StatusCodes } from "http-status-codes";
 
@@ -36,7 +36,7 @@ export default async function addEntries(
   log: string,
   entries: LogEntry[] | undefined,
   files: Files | undefined,
-  userClaims: JwtClaims
+  userClaims: PodJwtClaims
 ): Promise<ValidResult<AddLogEntriesResult> | InvalidResult<HttpError>> {
   return ensurePod(hostname, async (pod) => {
     function getFilePathBasedOnOriginalName(filename: string) {

@@ -1,11 +1,11 @@
 import WebSocket from "ws";
-import { JwtClaims } from "./index.js";
+import { PodJwtClaims } from "./index.js";
 
 export type TrackedWebSocket = WebSocket & {
   isAlive?: boolean;
   webpodsTracking?: {
     status: "VALIDATED_JWT" | "WAITING_TO_CONNECT" | "CONNECTED";
-    jwtClaims: JwtClaims;
+    jwtClaims: PodJwtClaims;
     channels: string[];
   };
 };

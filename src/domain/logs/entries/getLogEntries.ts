@@ -2,7 +2,7 @@ import * as db from "../../../db/index.js";
 import ensurePod from "../../pods/internal/ensurePod.js";
 import { EntriesRow } from "../../../types/db.js";
 import mapper from "../../../mappers/entry.js";
-import { HttpError, JwtClaims, LogEntry } from "../../../types/index.js";
+import { HttpError, PodJwtClaims, LogEntry } from "../../../types/index.js";
 import getLogPermissionForJwt from "../internal/getLogPermissionForJwt.js";
 import { getPodDataDir } from "../../../storage/index.js";
 import * as config from "../../../config/index.js";
@@ -33,7 +33,7 @@ export default async function getEntries(
     commits: commitIds,
     limit: maxResults,
   }: GetEntriesOptions,
-  userClaims: JwtClaims | undefined
+  userClaims: PodJwtClaims | undefined
 ): Promise<ValidResult<GetEntriesResult> | InvalidResult<HttpError>> {
   const appConfig = config.get();
 

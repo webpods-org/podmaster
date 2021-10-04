@@ -1,6 +1,6 @@
 import Sqlite3 from "better-sqlite3";
 
-import { JwtClaims, PodAccess, PodPermission } from "../../../types/index.js";
+import { PodJwtClaims, PodAccess, PodPermission } from "../../../types/index.js";
 import permissionMapper from "../../../mappers/podPermission.js";
 import hasScope from "../../../lib/jwt/hasScope.js";
 
@@ -12,7 +12,7 @@ const noAccess: PodAccess = {
 export default async function getPodPermissionForJwt(
   app: string,
   podDb: Sqlite3.Database,
-  userClaims: JwtClaims
+  userClaims: PodJwtClaims
 ): Promise<PodAccess> {
   // See if the permission already exists.
   const existingPermStmt = podDb.prepare(`SELECT * FROM "pod_permission"`);

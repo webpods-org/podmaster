@@ -1,11 +1,13 @@
-import { Authenticator, HttpError } from "../../types/index.js";
+import { Authenticator, HttpError, PodJwtClaims } from "../../types/index.js";
 import * as config from "../../config/index.js";
 import matchObject from "../../utils/matchObject.js";
-import jsonwebtoken, { SignOptions } from "jsonwebtoken";
+import jsonwebtoken, { JwtPayload, SignOptions } from "jsonwebtoken";
 import getJwtValidationParams from "../../lib/jwt/getJwtValidationParams.js";
-import validateJwt from "../../lib/jwt/validateJwt.js";
 import { InvalidResult, ValidResult } from "../../Result.js";
 import { StatusCodes } from "http-status-codes";
+import { AsymmetricAlgorithm } from "../../types/crypto.js";
+import { checkAud, checkExp, checkNbf } from "../../lib/jwt/validations.js";
+import { claimsFieldIsObject } from "../../lib/jwt/claimsFieldIsObject.js";
 
 export type CreateAuthTokenResult = {
   access_token: string;
@@ -154,4 +156,28 @@ function getAuthenticator(
   }
 
   return new ValidResult(authenticator);
+}
+
+async function validateJwt(
+  hostname: string,
+  token: string,
+  publicKey: string,
+  alg: AsymmetricAlgorithm
+): Promise<ValidResult<JwtPayload> | InvalidResult<"INVALID_CLAIMS">> {
+  const claims = jsonwebtoken.verify(token, publicKey, {
+    algorithms: [alg],
+  });
+
+  // We only support claims which are JSON objects.
+  if (
+    claimsFieldIsObject(claims) &&
+    checkExp(claims) &&
+    checkNbf(claims) &&
+    checkAud(claims, [hostname])
+  ) {
+    // Additional checks for exp, nbf and aud
+    return new ValidResult(claims);
+  } else {
+    return new InvalidResult("INVALID_CLAIMS");
+  }
 }

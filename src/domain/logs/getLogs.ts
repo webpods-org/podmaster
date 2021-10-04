@@ -1,7 +1,7 @@
 import * as db from "../../db/index.js";
 import ensurePod from "../pods/internal/ensurePod.js";
 import { getPodDataDir } from "../../storage/index.js";
-import { HttpError, JwtClaims } from "../../types/index.js";
+import { HttpError, PodJwtClaims } from "../../types/index.js";
 import getPodPermissionForJwt from "../pods/internal/getPodPermissionForJwt.js";
 import { StatusCodes } from "http-status-codes";
 import { InvalidResult, ValidResult } from "../../Result.js";
@@ -17,7 +17,7 @@ export type GetLogsResult = {
 
 export default async function getLogs(
   hostname: string,
-  userClaims: JwtClaims
+  userClaims: PodJwtClaims
 ): Promise<ValidResult<GetLogsResult> | InvalidResult<HttpError>> {
   return ensurePod(hostname, async (pod) => {
     const podDataDir = getPodDataDir(pod.id);

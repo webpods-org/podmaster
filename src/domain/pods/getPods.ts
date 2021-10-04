@@ -1,5 +1,5 @@
 import * as config from "../../config/index.js";
-import { HttpError, JwtClaims, LimitedPodInfo } from "../../types/index.js";
+import { HttpError, PodJwtClaims, LimitedPodInfo, PodmasterJwtClaims } from "../../types/index.js";
 import { StatusCodes } from "http-status-codes";
 import { InvalidResult, ValidResult } from "../../Result.js";
 import { default as getPodsImpl } from "./internal/getPods.js";
@@ -9,7 +9,7 @@ export type GetPodsResult = {
 };
 
 export default async function getPods(
-  userClaims: JwtClaims
+  userClaims: PodmasterJwtClaims
 ): Promise<ValidResult<{ pods: LimitedPodInfo[] }> | InvalidResult<HttpError>> {
   const appConfig = config.get();
 

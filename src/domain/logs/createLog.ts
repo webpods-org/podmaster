@@ -6,7 +6,7 @@ import ensurePod from "../pods/internal/ensurePod.js";
 import { LogsRow } from "../../types/db.js";
 import { generateInsertStatement } from "../../lib/sqlite.js";
 import { getPodDataDir } from "../../storage/index.js";
-import { HttpError, JwtClaims } from "../../types/index.js";
+import { HttpError, PodJwtClaims } from "../../types/index.js";
 import getPodPermissionForJwt from "../pods/internal/getPodPermissionForJwt.js";
 import { isAlphanumeric } from "../../api/utils/isAlphanumeric.js";
 import addLogPermission from "../permissions/internal/addLogPermission.js";
@@ -22,7 +22,7 @@ export default async function createLog(
   logName: string,
   logDescription: string,
   publik: boolean | undefined,
-  userClaims: JwtClaims
+  userClaims: PodJwtClaims
 ): Promise<ValidResult<CreateLogResult> | InvalidResult<HttpError>> {
   return ensurePod(hostname, async (pod) => {
     // Check fields

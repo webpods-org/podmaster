@@ -4,7 +4,7 @@ import ensurePod from "../../pods/internal/ensurePod.js";
 import getLogPermissionForJwt from "../internal/getLogPermissionForJwt.js";
 import isFilenameValid from "../../../lib/validation/checkFilename.js";
 import { getDirNumber, getPodDataDir } from "../../../storage/index.js";
-import { HttpError, JwtClaims } from "../../../types/index.js";
+import { HttpError, PodJwtClaims } from "../../../types/index.js";
 import { StatusCodes } from "http-status-codes";
 import { InvalidResult, ValidResult } from "../../../Result.js";
 
@@ -16,7 +16,7 @@ export default async function getFile(
   hostname: string,
   logId: string,
   urlPath: string,
-  userClaims: JwtClaims | undefined
+  userClaims: PodJwtClaims | undefined
 ): Promise<ValidResult<GetFileResult> | InvalidResult<HttpError>> {
   return ensurePod(hostname, async (pod) => {
     // Let's see if the log already exists.

@@ -1,5 +1,5 @@
 import addLogEntries from "../../../../domain/logs/entries/addLogEntries.js";
-import { IKoaAppContext } from "../../../../types/koa.js";
+import { IKoaPodAppContext } from "../../../../types/koa.js";
 import { handleResultWithJwt } from "../../../handleResult.js";
 
 export type AddLogEntriesAPIResult = {
@@ -9,7 +9,7 @@ export type AddLogEntriesAPIResult = {
   }[];
 };
 
-export default async function addAPI(ctx: IKoaAppContext): Promise<void> {
+export default async function addAPI(ctx: IKoaPodAppContext): Promise<void> {
   const hostname = ctx.URL.hostname;
 
   await handleResultWithJwt(

@@ -7,6 +7,8 @@ import * as permissionsApi from "./permissions/index.js";
 import * as permissionTokensApi from "./permissionsTokens/index.js";
 import * as config from "../../config/index.js";
 import cors from "@koa/cors";
+import { JwtPayload } from "jsonwebtoken";
+import { PodJwtClaims } from "../../types/index.js";
 
 const MEGABYTE = 1024 * 1024;
 
@@ -35,7 +37,7 @@ export default function setup() {
   router.get("/logs/:log/files/(.*)", logsApi.files.item);
 
   const koa = new Koa();
-  koa.use(jwtMiddleware({ exclude: [/^\/channels$/] }));
+  koa.use(jwtMiddleware({ exclude: [/^\/channels$/] }, validateClaims));
   koa.use(
     bodyParser({
       multipart: true,
@@ -46,4 +48,14 @@ export default function setup() {
   koa.use(router.allowedMethods());
   koa.use(cors());
   return koa.callback();
+}
+
+function validateClaims(claims: string | JwtPayload): claims is PodJwtClaims {
+  return typeof claims === "object" &&
+    (claims as any).iss &&
+    (claims as any).sub &&
+    (claims as any).aud &&
+    claims.sub !== "*"
+    ? true
+    : false;
 }

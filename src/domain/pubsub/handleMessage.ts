@@ -1,4 +1,4 @@
-import jsonwebtoken from "jsonwebtoken";
+import jsonwebtoken, { JwtPayload } from "jsonwebtoken";
 import { IncomingMessage } from "http";
 
 import getJwtValidationParams from "../../lib/jwt/getJwtValidationParams.js";
@@ -14,12 +14,13 @@ import {
   publish,
   removeSubscription,
 } from "./subscriptions.js";
-import validateClaims from "../../lib/jwt/validateClaims.js";
 import getPodByHostname from "../pods/internal/getPodByHostname.js";
 import * as db from "../../db/index.js";
 import getLogPermissionForJwt from "../logs/internal/getLogPermissionForJwt.js";
 import { getPodDataDir } from "../../storage/index.js";
 import { ValidResult } from "../../Result.js";
+import { claimsFieldIsObject } from "../../lib/jwt/claimsFieldIsObject.js";
+import { PodJwtClaims } from "../../types/index.js";
 
 export function handleMessage(
   hostname: string,
@@ -41,7 +42,7 @@ export function handleMessage(
             }
           );
 
-          if (validateClaims(jwtClaims)) {
+          if (claimsAreValid(jwtClaims)) {
             ws.send(
               JSON.stringify({
                 event: "connect",
@@ -177,4 +178,10 @@ export function handleMessage(
       }
     }
   };
+}
+
+function claimsAreValid(claims: string | JwtPayload): claims is PodJwtClaims {
+  return claimsFieldIsObject(claims) && claims.iss && claims.sub && claims.aud
+    ? true
+    : false;
 }

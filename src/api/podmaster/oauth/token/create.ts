@@ -1,5 +1,5 @@
 import { handleResult } from "../../../handleResult.js";
-import { IKoaAppContext } from "../../../../types/koa.js";
+import { IKoaPodmasterAppContext } from "../../../../types/koa.js";
 import createAuthToken from "../../../../domain/oauth/createToken.js";
 
 export type CreateAuthTokenAPIResult = {
@@ -8,7 +8,9 @@ export type CreateAuthTokenAPIResult = {
   expires_in: number;
 };
 
-export default async function createAPI(ctx: IKoaAppContext): Promise<void> {
+export default async function createAPI(
+  ctx: IKoaPodmasterAppContext
+): Promise<void> {
   await handleResult(
     ctx,
     () =>

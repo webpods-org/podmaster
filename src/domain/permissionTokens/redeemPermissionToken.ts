@@ -1,5 +1,5 @@
 import * as db from "../../db/index.js";
-import { HttpError, JwtClaims } from "../../types/index.js";
+import { HttpError, PodJwtClaims } from "../../types/index.js";
 import ensurePod from "../pods/internal/ensurePod.js";
 import { PermissionTokensRow } from "../../types/db.js";
 import { generateUpdateStatement } from "../../lib/sqlite.js";
@@ -14,7 +14,7 @@ export type RedeemPermissionTokenResult = {};
 export default async function redeemPermissionToken(
   hostname: string,
   token: string,
-  userClaims: JwtClaims
+  userClaims: PodJwtClaims
 ): Promise<
   ValidResult<RedeemPermissionTokenResult> | InvalidResult<HttpError>
 > {

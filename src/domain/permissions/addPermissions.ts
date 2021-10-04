@@ -2,7 +2,7 @@ import * as db from "../../db/index.js";
 import {
   HttpError,
   Identity,
-  JwtClaims,
+  PodJwtClaims,
   LogAccess,
   PodAccess,
 } from "../../types/index.js";
@@ -28,7 +28,7 @@ export default async function addPermissions(
       access: LogAccess;
     }[];
   },
-  userClaims: JwtClaims
+  userClaims: PodJwtClaims
 ): Promise<ValidResult<AddPermissionsResult> | InvalidResult<HttpError>> {
   return ensurePod(hostname, async (pod) => {
     // Let's see if the log already exists.

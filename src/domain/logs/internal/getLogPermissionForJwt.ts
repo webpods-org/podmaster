@@ -2,7 +2,7 @@ import Sqlite3 from "better-sqlite3";
 
 import permissionMapper from "../../../mappers/logPermission.js";
 import logMapper from "../../../mappers/log.js";
-import { JwtClaims, LogAccess } from "../../../types/index.js";
+import { PodJwtClaims, LogAccess } from "../../../types/index.js";
 import hasScope from "../../../lib/jwt/hasScope.js";
 
 const noAccess: LogAccess = {
@@ -16,7 +16,7 @@ export default async function getLogPermissionForJwt(
   app: string,
   name: string,
   podDb: Sqlite3.Database,
-  userClaims: JwtClaims | undefined
+  userClaims: PodJwtClaims | undefined
 ): Promise<LogAccess> {
   const getLogStmt = podDb.prepare(`SELECT * from "log" WHERE "id"=@name`);
   const logInfoRow = getLogStmt.get({ name });

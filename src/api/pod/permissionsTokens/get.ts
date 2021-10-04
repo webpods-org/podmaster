@@ -1,13 +1,13 @@
 import { handleResultWithJwt } from "../../handleResult.js";
 import { PermissionToken } from "../../../types/index.js";
-import { IKoaAppContext } from "../../../types/koa.js";
+import { IKoaPodAppContext } from "../../../types/koa.js";
 import getPermissionTokens from "../../../domain/permissionTokens/getPermissionTokens.js";
 
 export type GetPermissionTokensAPIResult = {
   permissionTokens: PermissionToken[];
 };
 
-export default async function getAPI(ctx: IKoaAppContext): Promise<void> {
+export default async function getAPI(ctx: IKoaPodAppContext): Promise<void> {
   const hostname = ctx.URL.hostname;
 
   await handleResultWithJwt(

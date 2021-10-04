@@ -1,6 +1,6 @@
 import mkdirp from "mkdirp";
 
-import { HttpError, JwtClaims } from "../../types/index.js";
+import { HttpError, PodJwtClaims, PodmasterJwtClaims } from "../../types/index.js";
 import * as config from "../../config/index.js";
 import matchObject from "../../utils/matchObject.js";
 import * as db from "../../db/index.js";
@@ -21,7 +21,7 @@ export default async function createPod(
   podTitle: string,
   app: string,
   description: string,
-  userClaims: JwtClaims
+  userClaims: PodmasterJwtClaims
 ): Promise<ValidResult<CreatePodResult> | InvalidResult<HttpError>> {
   // Check fields
   const validationErrors = validateInput({ podId, app });

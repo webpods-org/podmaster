@@ -1,12 +1,16 @@
 import { IRouterContext } from "koa-router";
-import { JwtClaims } from "./index.js";
+import { PodJwtClaims, PodmasterJwtClaims } from "./index.js";
 
-export interface IKoaAppContext extends IRouterContext {
+export interface IKoaAppContext<TClaims> extends IRouterContext {
   state: {
     jwt:
       | {
-          claims: JwtClaims;
+          claims: TClaims;
         }
       | undefined;
   };
 }
+
+export interface IKoaPodAppContext extends IKoaAppContext<PodJwtClaims> {}
+export interface IKoaPodmasterAppContext
+  extends IKoaAppContext<PodmasterJwtClaims> {}

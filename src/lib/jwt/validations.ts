@@ -1,10 +1,10 @@
-import { UncheckedJwtClaims } from "../../types/index.js";
+import { JwtPayload } from "jsonwebtoken";
 
 /*
   If exp is missing, assume it's valid for iat + 300 seconds.
   300s is totally arbitrary, but seems like a good compromise.
 */
-export function checkExp(claims: UncheckedJwtClaims) {
+export function checkExp(claims: JwtPayload) {
   const now = Date.now();
   return (
     (!claims.exp && claims.iat && (claims.iat + 300) * 1000 > now) ||
@@ -12,12 +12,12 @@ export function checkExp(claims: UncheckedJwtClaims) {
   );
 }
 
-export function checkNbf(claims: UncheckedJwtClaims) {
+export function checkNbf(claims: JwtPayload) {
   const now = Date.now();
   return !claims.nbf || now > claims.nbf * 1000;
 }
 
-export function checkAud(claims: UncheckedJwtClaims, hostnames: string[]) {
+export function checkAud(claims: JwtPayload, hostnames: string[]) {
   const aud: string | string[] | undefined = claims.aud;
 
   return (

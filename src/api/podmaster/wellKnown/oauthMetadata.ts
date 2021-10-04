@@ -1,5 +1,5 @@
 import * as config from "../../../config/index.js";
-import { IKoaAppContext } from "../../../types/koa.js";
+import { IKoaPodAppContext } from "../../../types/koa.js";
 
 export type GetOAuthMetadataAPIResult = {
   issuer: string;
@@ -8,7 +8,7 @@ export type GetOAuthMetadataAPIResult = {
   grant_types_supported: string[];
 };
 
-export default async function getJwks(ctx: IKoaAppContext): Promise<void> {
+export default async function getJwks(ctx: IKoaPodAppContext): Promise<void> {
   const appConfig = config.get();
 
   ctx.body = {

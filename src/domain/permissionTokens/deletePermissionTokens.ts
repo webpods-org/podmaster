@@ -1,5 +1,5 @@
 import * as db from "../../db/index.js";
-import { HttpError, JwtClaims } from "../../types/index.js";
+import { HttpError, PodJwtClaims } from "../../types/index.js";
 import ensurePod from "../pods/internal/ensurePod.js";
 import { getPodDataDir } from "../../storage/index.js";
 import getPodPermissionForJwt from "../pods/internal/getPodPermissionForJwt.js";
@@ -11,7 +11,7 @@ export type DeletePermissionTokensResult = {};
 export default async function deletePermissionTokens(
   hostname: string,
   id: string,
-  userClaims: JwtClaims
+  userClaims: PodJwtClaims
 ): Promise<
   ValidResult<DeletePermissionTokensResult> | InvalidResult<HttpError>
 > {

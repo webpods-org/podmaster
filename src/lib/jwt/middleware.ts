@@ -1,11 +1,9 @@
 import { ParameterizedContext, Next } from "koa";
-import jsonwebtoken from "jsonwebtoken";
+import jsonwebtoken, { JwtPayload } from "jsonwebtoken";
 import { log, logException } from "../logger/index.js";
-import { IKoaAppContext } from "../../types/koa.js";
-import getJwtValidationParams, { JWKInfo } from "./getJwtValidationParams.js";
-import validateClaims from "./validateClaims.js";
+import { IKoaAppContext, IKoaPodAppContext } from "../../types/koa.js";
+import getJwtValidationParams from "./getJwtValidationParams.js";
 import { checkAud, checkExp, checkNbf } from "./validations.js";
-import * as config from "../../config/index.js";
 import { InvalidResult, ValidResult } from "../../Result.js";
 import { StatusCodes } from "http-status-codes";
 
@@ -19,9 +17,14 @@ export class AuthenticationError extends Error {
   }
 }
 
-export default function jwtMiddleware(options: { exclude: RegExp[] }) {
-  const appConfig = config.get();
-  return async (ctx: IKoaAppContext, next: Next): Promise<void> => {
+export default function jwtMiddleware<
+  TClaims,
+  TKoaAppContext extends IKoaAppContext<TClaims>
+>(
+  options: { exclude: RegExp[] },
+  validator: (claims: string | JwtPayload) => claims is TClaims
+) {
+  return async (ctx: TKoaAppContext, next: Next): Promise<void> => {
     if (options.exclude.some((regex) => regex.test(ctx.path))) {
       await next();
     } else {
@@ -42,7 +45,7 @@ export default function jwtMiddleware(options: { exclude: RegExp[] }) {
           );
 
           // We only support claims which are JSON objects.
-          if (validateClaims(claims)) {
+          if (validator(claims)) {
             const hostname = ctx.URL.hostname;
             // Additional checks for exp, nbf and aud
             if (

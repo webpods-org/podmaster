@@ -12,20 +12,20 @@ export type JwksEndpoint = {
   url: string;
 };
 
-export type UncheckedJwtClaims = {
-  iss?: string;
-  sub?: string;
-  aud?: string | string[];
+export type PodmasterJwtClaims = {
+  iss: string;
+  sub: string;
+  aud: string | string[];
   exp?: number;
   nbf?: number;
   iat?: number;
   webpods?: {
     namespace: string;
   };
-  [key: string]: unknown;
+  scope: string;
 };
 
-export type JwtClaims = {
+export type PodJwtClaims = {
   iss: string;
   sub: string;
   aud: string | string[];
@@ -33,14 +33,10 @@ export type JwtClaims = {
   exp?: number;
   nbf?: number;
   iat?: number;
-  webpods?: {
-    namespace: string;
-  };
-  [key: string]: unknown;
 };
 
 export type PermissionGrant = {
-  claims: JwtClaims;
+  claims: PodJwtClaims;
   read?: boolean;
   write?: boolean;
   metadata?: boolean;
