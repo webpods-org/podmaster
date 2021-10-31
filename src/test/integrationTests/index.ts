@@ -526,7 +526,7 @@ export default function run(configDir: string, configFilePath: string) {
 
         wsSender.addEventListener("message", async (message) => {
           if (message.data) {
-            const data = JSON.parse(message.data);
+            const data = JSON.parse(message.data.toString());
             if (data.event === "connect") {
               // Wait for receiver to be subscribed.
               await receiverSubscribe;
@@ -544,7 +544,7 @@ export default function run(configDir: string, configFilePath: string) {
 
         wsReceiver.addEventListener("message", async (message) => {
           if (message.data) {
-            const data = JSON.parse(message.data);
+            const data = JSON.parse(message.data.toString());
             if (data.event === "connect") {
               wsReceiver.send(
                 JSON.stringify({
