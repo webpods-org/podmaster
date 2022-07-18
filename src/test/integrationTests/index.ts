@@ -128,7 +128,7 @@ export default function run(configDir: string, configFilePath: string) {
       response.status.should.equal(409);
       const apiResult: { error: string } = JSON.parse(response.text);
       apiResult.error.should.equal(
-        "A pod with hostname myweblog.alice.pod1.local.disks.app already exists."
+        "A pod with hostname myweblog.alice.pod1.local.webpods.org already exists."
       );
     });
 

@@ -66,6 +66,6 @@ create_jwt \
   'myweblog.example.com:read myweblog.example.com:write' \
   carol_pod_jwt
 
-ssh-to-jwk ~/temp/webpods/podmaster.RS256.key.pub |
+ssh-to-jwk "$CONFIG_DIR"/podmaster.RS256.key.pub |
   basho --json '{ ...x, "alg": "RS256", kid: "k1_" + Date.now() }' \
     >"$CONFIG_DIR/podmaster.jwk.json"
