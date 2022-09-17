@@ -7,7 +7,7 @@ SCRIPT_PATH=$(dirname "$0")
 cp "$SCRIPT_PATH/env.sh" "$CONFIG_DIR/env-source.sh"
 
 # write out the new confile file.
-basho \
+npx basho \
 -i fs fs \
 -j "fs.readFileSync(\"$CONFIG_DIR/env-source.sh\").toString()" \
 -j "x.replace(/\/path\/to\/data\/dir/g, \"$CONFIG_DIR\")" \

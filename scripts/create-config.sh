@@ -9,14 +9,14 @@ SCRIPT_PATH=$(dirname "$0")
 cp "$SCRIPT_PATH/config.mjs" "$CONFIG_DIR/config-source.js"
 
 # Replace all the newlines with \r\n
-PROVIDER_PUBLIC_KEY=$(basho -i fs fs 'fs.readFileSync("'"$CONFIG_DIR"'/provider.RS256.key.pub.pem").toString().replace(/\r?\n|\r/g, "\\r\\n")')
-PODMASTER_PRIVATE_KEY=$(basho -i fs fs 'fs.readFileSync("'"$CONFIG_DIR"'/podmaster.RS256.key").toString().replace(/\r?\n|\r/g, "\\r\\n")')
-PODMASTER_PUBLIC_KEY=$(basho -i fs fs 'fs.readFileSync("'"$CONFIG_DIR"'/podmaster.RS256.key.pub.pem").toString().replace(/\r?\n|\r/g, "\\r\\n")')
-SOME_OTHER_PODMASTER_PUBLIC_KEY=$(basho -i fs fs 'fs.readFileSync("'"$CONFIG_DIR"'/podzilla.RS256.key.pub.pem").toString().replace(/\r?\n|\r/g, "\\r\\n")')
+PROVIDER_PUBLIC_KEY=$(npx basho -i fs fs 'fs.readFileSync("'"$CONFIG_DIR"'/provider.RS256.key.pub.pem").toString().replace(/\r?\n|\r/g, "\\r\\n")')
+PODMASTER_PRIVATE_KEY=$(npx basho -i fs fs 'fs.readFileSync("'"$CONFIG_DIR"'/podmaster.RS256.key").toString().replace(/\r?\n|\r/g, "\\r\\n")')
+PODMASTER_PUBLIC_KEY=$(npx basho -i fs fs 'fs.readFileSync("'"$CONFIG_DIR"'/podmaster.RS256.key.pub.pem").toString().replace(/\r?\n|\r/g, "\\r\\n")')
+SOME_OTHER_PODMASTER_PUBLIC_KEY=$(npx basho -i fs fs 'fs.readFileSync("'"$CONFIG_DIR"'/podzilla.RS256.key.pub.pem").toString().replace(/\r?\n|\r/g, "\\r\\n")')
 
 
 # write out the new confile file.
-basho \
+npx basho \
 --import fs fs \
 --import path path \
 -d filename "\"$CONFIG_DIR/config-source.js\"" \

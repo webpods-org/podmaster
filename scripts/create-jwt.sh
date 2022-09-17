@@ -21,7 +21,7 @@ function create_jwt() {
   local P_SCOPE=$6
   local P_FILENAME=$7
 
-  basho \
+  npx basho \
     --import fs fs \
     --import crypto crypto \
     -d header '{ "alg": "RS256", "type": "JWT", kid: "'$P_KID'" }' \
@@ -66,6 +66,6 @@ create_jwt \
   'myweblog.example.com:read myweblog.example.com:write' \
   carol_pod_jwt
 
-ssh-to-jwk "$CONFIG_DIR"/podmaster.RS256.key.pub |
-  basho --json '{ ...x, "alg": "RS256", kid: "k1_" + Date.now() }' \
+npx ssh-to-jwk "$CONFIG_DIR"/podmaster.RS256.key.pub |
+  npx basho --json '{ ...x, "alg": "RS256", kid: "k1_" + Date.now() }' \
     >"$CONFIG_DIR/podmaster.jwk.json"
