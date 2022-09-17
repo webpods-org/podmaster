@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/usr/bin/env bash
 cd "$(dirname "$0")"
 TEMP_DIR=$(mktemp -d 2>/dev/null || mktemp -d -t 'mytmpdir')
 echo Using $TEMP_DIR to store data for the test. Will be deleted.
