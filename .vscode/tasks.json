@@ -18,7 +18,7 @@
       "options": {
         "env": {
           // replace the following with wherever you're setting up test data.
-          "PODMASTER_TEST_DATA_DIR": "/home/jeswin/temp/webpods"
+          "PODMASTER_TEST_DATA_DIR": "/home/jeswin/temp/podster"
         }
       },
       "command": "${workspaceFolder}/scripts/delete-data.sh",

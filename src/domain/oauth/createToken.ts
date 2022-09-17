@@ -125,6 +125,7 @@ function getClaimsFromAssertion(
   const { payload } = decodeResult;
 
   if (
+    typeof payload === "string" ||
     !payload.iss ||
     !payload.sub ||
     typeof payload.iss !== "string" ||

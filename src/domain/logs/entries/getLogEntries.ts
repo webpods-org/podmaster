@@ -127,7 +127,7 @@ export default async function getEntries(
         status: StatusCodes.UNAUTHORIZED,
       });
     }
-    
+
     const dbEntries = sinceId
       ? getEntriesFromId(sinceId)
       : sinceCommit

@@ -18,7 +18,7 @@ export class AuthenticationError extends Error {
 }
 
 export default function jwtMiddleware<
-  TClaims,
+  TClaims extends JwtPayload,
   TKoaAppContext extends IKoaAppContext<TClaims>
 >(
   options: { exclude: RegExp[] },

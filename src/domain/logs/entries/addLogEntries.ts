@@ -1,10 +1,10 @@
-import { extname, join } from "path";
+import { extname,  join } from "path";
 import { Files } from "formidable";
 import { createHash } from "crypto";
 import mv from "mv";
 import random from "../../../utils/getRandomString.js";
 import { promisify } from "util";
-import { existsSync, readFileSync } from "fs";
+import { existsSync,  readFileSync } from "fs";
 import * as db from "../../../db/index.js";
 import { EntriesRow } from "../../../types/db.js";
 import ensurePod from "../../pods/internal/ensurePod.js";
@@ -12,7 +12,7 @@ import getLogPermissionForJwt from "../internal/getLogPermissionForJwt.js";
 import isValidFilename from "../../../lib/validation/isValidFilename.js";
 import { generateInsertStatement } from "../../../lib/sqlite.js";
 import { getPodDataDir } from "../../../storage/index.js";
-import { HttpError, PodJwtClaims } from "../../../types/index.js";
+import { HttpError,  PodJwtClaims } from "../../../types/index.js";
 import { InvalidResult, ValidResult } from "../../../Result.js";
 import { StatusCodes } from "http-status-codes";
 
@@ -81,7 +81,7 @@ export default async function addEntries(
         status: StatusCodes.UNAUTHORIZED,
       });
     }
-    
+
     // First move the files into the the log directory.
     const movedFiles: {
       [key: string]: {
@@ -92,8 +92,9 @@ export default async function addEntries(
     } = {};
 
     if (files) {
-      for (const field in files) {
-        const fileOrFiles = files[field];
+      const fileNames = Object.keys(files);
+      for (const fileName of fileNames) {
+        const fileOrFiles = files[fileName];
 
         /*
               Move the file...
@@ -102,26 +103,26 @@ export default async function addEntries(
             */
         const file = Array.isArray(fileOrFiles) ? fileOrFiles[0] : fileOrFiles;
 
-        if (file.name && !isValidFilename(file.name)) {
+        if (fileName && !isValidFilename(fileName)) {
           return new InvalidResult({
             error: "Invalid filename.",
             status: StatusCodes.BAD_REQUEST,
           });
         }
 
-        const newPath = file.name
-          ? getFilePathBasedOnOriginalName(file.name)
-          : getRandomFilePath(file.name);
+        const newPath = fileName
+          ? getFilePathBasedOnOriginalName(fileName)
+          : getRandomFilePath(fileName);
 
-        await moveFile(file.path, newPath);
+        await moveFile(file.filepath, newPath);
 
         const fileBuffer = readFileSync(newPath);
         const hashSum = createHash("sha256");
         hashSum.update(fileBuffer);
         const hash = hashSum.digest("hex");
 
-        movedFiles[file.path] = {
-          filename: file.name || random(12),
+        movedFiles[file.filepath] = {
+          filename: fileName || random(12),
           newPath,
           hash,
         };
@@ -193,7 +194,7 @@ export default async function addEntries(
             ? fileOrFiles[0]
             : fileOrFiles;
 
-          const movedFile = movedFiles[file.path];
+          const movedFile = movedFiles[file.filepath];
 
           const lastCommitAndContentHash = `${lastCommit};${movedFile.hash}`;
 
